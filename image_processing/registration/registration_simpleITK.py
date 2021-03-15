@@ -3,7 +3,7 @@ import sys
 import os
 
 
-def rigid_registration(ref: str, target: str, round: int, channel: int, output_dir: str = ""):
+def calculateRigidTransform(ref: str, target: str, round: int, channel: int, output_dir: str = ""):
     """Calculates and writes the rigid transformation necessary to register the target onto the reference. 
 
     Parameters
@@ -37,9 +37,16 @@ def rigid_registration(ref: str, target: str, round: int, channel: int, output_d
 
     sitk.WriteTransform(outTx, f"{output_dir}transform_r{round}_c{channel}.txt")
 
-    print(f"Transform written to {output_dir}transform_r{round}_c{channel}.txt")
+    print(f"Transform written to {output_dir}transform_r{round}_c{channel}.txt \n")
 
     ## important commands for future transform use:
-    #sitk.WriteImage(moving_resampled, outputFileName)
     #read_result = sitk.ReadTransform('euler2D.tfm')
     #moving_resampled = sitk.Resample(moving, fixed, result, sitk.sitkLinear, 0.0, moving.GetPixelID())
+    #sitk.WriteImage(moving_resampled, outputFileName)
+
+
+def writeRigidTransformed(target_img_path, transform_file, output_file):
+    target = sitk.ReadImage(target_img_path, sitk.sitkFloat32)
+    read_result = sitk.ReadTransform(transform_file)
+    resampled = sitk.Resample(target, read_result, sitk.sitkLinear, 0.0, target.GetPixelID())
+    sitk.WriteImage(resampled, output_file)

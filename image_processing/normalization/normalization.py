@@ -1,8 +1,8 @@
 import numpy as np
 from PIL import Image
 
-def numpyNormalization(img):
-    image = Image.open(img)
+def numpyNormalization(image_path):
+    image = Image.open(image_path)
     ar = np.asarray(image)
     mn = np.min(ar)
     mx = np.max(ar)

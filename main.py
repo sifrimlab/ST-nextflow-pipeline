@@ -58,7 +58,7 @@ from icecream import ic
 
 # communISS
 from image_processing.normalization.normalization import numpyNormalization
-from image_processing.registration.registration_simpleITK import rigid_registration
+from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
 
 # variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
@@ -227,9 +227,13 @@ if __name__ == '__main__':
     if not os.path.isfile(codebook_path):
         raise ValueError("Inputted codebook file does not exist")
     
-    
+    # creating output dir
+    output_dir = f"{input_dir}communISS_output/"
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
     # parse input images into pandas
-    image_df = formatISSImages(input_dir, silent=True)
+    image_df = formatISSImages(input_dir=input_dir, silent=True)
     image_df.to_csv("images.csv")
 
     # parse codebook
@@ -239,14 +243,24 @@ if __name__ == '__main__':
 
     # calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
-    if not os.path.isdir(f"{input_dir}transforms/"):
-        os.mkdir(f"{input_dir}transforms/")
-    transform_dir = f"{input_dir}transforms/"
+    if not os.path.isdir(f"{output_dir}transforms/"):
+        os.mkdir(f"{output_dir}transforms/")
+    transform_dir = f"{output_dir}transforms/"
 
-    # actually perform registration per row
+    # calculate registration per row
     for index, row in image_df.iterrows():
-        rigid_registration(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
+        calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
         
+    # create registration dir if it doesn't exist already
+    if not os.path.isdir(f"{output_dir}registered/"):
+        os.mkdir(f"{output_dir}registered/")
+    registered_dir = f"{output_dir}registered/"
+
+    #actually warp the images using the transforms
+    for index, row in image_df.iterrows():
+        transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
+        writeRigidTransformed(row['Image_path'], transform_file, f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff")
+    
 
     # tiling/paralelizing
     # registrataion step 2
