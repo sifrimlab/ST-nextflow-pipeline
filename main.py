@@ -57,22 +57,58 @@ from icecream import ic
 
 # variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
+
 ## helper functions:
-def parseCodebook():
-    pass
 
-def formatImages(input_dir):
-    '''
-        This function takes the input_dir that contains the ISS data.
-        It first prints out a layout of the detected tif files for debugging purposes/self control.
-        Then it converts the detected hierarchy into a pandas dataframe that stores the absolute path to images from each round/channel combination. 
-        The function thus returns this dataframe
-    '''
-    # first print the file hierarchy
-    # print('''Detected tif images are: {}
-    # If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory'''.format(listFileHierarchy(input_dir)))
+# parseCodebook takes in the filepath and returns a dict that represents the barcodes. 
+# (might change this into a pandas later, but for now I'm going to go with )
+def parseCodebook(pathToCSV: str):
+    """Parses the input codebook csv file into a dict representation of it 
 
-    
+    Parameters
+    ----------
+    pathToCSV : str
+        Path to the input CSV
+
+    Returns
+    -------
+    Dict
+        Dict representation of the given csv file
+
+    Raises
+    ------
+    Exception
+        Raises exception if the columns are not as expected or the input file is not comma delimited.
+    """
+    codebook_dict = {}
+    try:
+        with open(pathToCSV, 'r') as file:
+            for line in file:
+                line_split = line.strip().split(',')
+                codebook_dict[line_split[0]] = line_split[1]
+    except:
+        print("Something went wrong with parsing your codebook. It might not comma delimited?")
+    #casual check that the keys don't follow an integer pattern, cause that might mean the user switched the two columns.
+    if any(key.isdecimal() for key in codebook_dict.keys()):
+        raise Exception("Your genes are only combinations of numbers. You might have changed the order of the columns around.")
+    return codebook_dict
+
+def formatISSImages(input_dir, silent = False):
+    '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
+        
+        Parameters
+        ----------
+        input_dir : str
+            File path to the images of your ISS project
+        silent : boolean
+            Boolean to determine if at the end of the function use, it should print out a textual representation of the file hierarchy it found and used in the input_dir.
+            False by default, meaning that it will print the hierarchy.
+        
+        Returns
+        -------
+        Pandas.DataFrame
+            This dataframe represents Tiff images contained in the input dir.
+    '''    
     # initialize dataframe
     df = pd.DataFrame(columns=['Round', 'Channel', 'Image_path', 'Reference','DAPI' ])
 
@@ -105,7 +141,7 @@ def formatImages(input_dir):
         
         # If it reaches here, it needs to search for round dirs instead
         if (any(i in root_base.upper() for i in round_suffixes)):
-            # extract round number of this directory
+            # extract round number of this directory, this is done by finding digits in the dir names
             round_number = re.findall(r'\d+', root_base)[0]
             
             # extract all .tif files
@@ -115,6 +151,13 @@ def formatImages(input_dir):
                 channel_number = re.findall(r'\d+', file)[0]
                 image_path = f"{root}/{file}"
                 df = df.append({'Round': round_number, 'Channel': channel_number, 'Image_path': image_path,'Reference': reference_full, 'DAPI' : dapi_full} ,ignore_index=True)
+    if (silent == False):
+        print('''Detected tif images are: {}
+        If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory
+        '''.format(listFileHierarchy(input_dir)))
+    df = pd.DataFrame(columns=['Round', 'Channel', 'Image_path', 'Reference','DAPI' ])
+    if df.empty:
+        print("No round image were found, so the naming convention of your round directories is probably not as expected. \n")           
     return df
         
 
@@ -140,10 +183,12 @@ def addBackslash(path):
         if not path.endswith("/"):
             path += "/"
     return path
+
 #############################
 ## Test parameters:
 ## input_dir = /media/tool/starfish_test_data/ExampleInSituSequencing
 ## Codebook = /media/tool/starfish_test_data/ExampleInSituSequencing/output/codebook.json
+## Codebook = /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook.csv
 ## command to run: python main.py /media/tool/starfish_test_data/ExampleInSituSequencing /media/tool/starfish_test_data/ExampleInSituSequencing/output/codebook.json
 ##############################
 
@@ -169,11 +214,14 @@ if __name__ == '__main__':
     
     
     # parse input images into pandas
-    image_df = formatImages(input_dir)
-    image_df.to_csv("test.csv")
+    # image_df = formatISSImages(input_dir)
+    # image_df.to_csv("images.csv")
 
-    # Normalize images
+    # parse codebook
+    codebook_dict = parseCodebook(codebook_path)
+    print(codebook_dict)
     # registration step 1
+    # Normalize images
     # tiling/paralelizing
     # registrataion step 2
     # spot detection/decoding
