@@ -47,6 +47,7 @@ __status__ = "Production"
 
 '''
 # Imports
+# pypi
 import argparse
 import os
 import glob
@@ -54,6 +55,9 @@ import pandas as pd
 import warnings
 import re
 from icecream import ic
+
+# communISS
+from image_processing.normalization.normalization import numpyNormalization
 
 # variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
@@ -88,7 +92,7 @@ def parseCodebook(pathToCSV: str):
                 codebook_dict[line_split[0]] = line_split[1]
     except:
         print("Something went wrong with parsing your codebook. It might not comma delimited?")
-    #casual check that the keys don't follow an integer pattern, cause that might mean the user switched the two columns.
+    # casual check that the keys don't follow an integer pattern (eg.: 4512), cause that might mean the user switched the two columns.
     if any(key.isdecimal() for key in codebook_dict.keys()):
         raise Exception("Your genes are only combinations of numbers. You might have changed the order of the columns around.")
     return codebook_dict
@@ -165,7 +169,7 @@ def formatISSImages(input_dir, silent = False):
         
     
 ## Helper function for the entire workflow
-def listFileHierarchy(directory):
+def listFileHierarchy(directory: str):
     hierarchyString = ""
     for root, dirs, files in os.walk(directory):
         level = root.replace(directory, '').count(os.sep)
@@ -178,7 +182,19 @@ def listFileHierarchy(directory):
     return hierarchyString
 
 # helper function that adds a backslash to a directory path for consistency
-def addBackslash(path):
+def addBackslash(path: str):
+    """Adds a backslash to end the given path if not done so already.
+
+    Parameters
+    ----------
+    path : str
+        Given path that needs the backslash added.
+
+    Returns
+    -------
+    str
+        The input path with exactly one backslash in the end.
+    """
     if os.path.isdir(path):
         if not path.endswith("/"):
             path += "/"
