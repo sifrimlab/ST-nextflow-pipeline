@@ -2,10 +2,7 @@ import SimpleITK as sitk
 import sys
 import os
 
-ref = "/home/nacho/Documents/Code/starfish/image_similarity/imgs/ref_tile48.tif"
-target = "/home/nacho/Documents/Code/starfish/image_similarity/imgs/r1_c2_tile48.tif"
-
-def register_simpleITK(ref, target):
+def register_simpleITK(ref: str, target: str, round: int, channel: int):
     def command_iteration(method):
         print(f"{method.GetOptimizerIteration():3} = {method.GetMetricValue():10.5f} : {method.GetOptimizerPosition()}")
 
@@ -35,13 +32,12 @@ def register_simpleITK(ref, target):
     print(f" Iteration: {R.GetOptimizerIteration()}")
     print(f" Metric value: {R.GetMetricValue()}")
 
-    # sitk.WriteTransform(outTx, "transform.txt")
-
-
-    moving_resampled = sitk.Resample(moving, fixed, outTx, sitk.sitkLinear, 0.0, moving.GetPixelID())
+    sitk.WriteTransform(outTx, "transform.txt")
+    # for future use: reading is with read_result = sitk.ReadTransform('euler2D.tfm')
+    moving_resampled = sitk.Resample(moving, fixed, result, sitk.sitkLinear, 0.0, moving.GetPixelID())
     return moving_resampled
     #sitk.WriteImage(moving_resampled, outputFileName)
 
-
+test = register_simpleITK(ref, target)
 
 
