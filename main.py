@@ -58,6 +58,7 @@ from icecream import ic
 
 # communISS
 from image_processing.normalization.normalization import numpyNormalization
+from image_processing.registration.registration_simpleITK import rigid_registration
 
 # variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
@@ -118,7 +119,6 @@ def formatISSImages(input_dir, silent = False):
 
     # suffix definitions so that recognizing the correct directories is more error robust
     aux_dir_names = ("DO", "AUX_IMAGES", "AUXILLARY_IMAGES")
-    round_suffixes = ("ROUND", "R")
     channel_suffixes = ("CHANNEL", "C")
     # loop over directory
     for root, dirs, files in os.walk(input_dir):
@@ -144,7 +144,7 @@ def formatISSImages(input_dir, silent = False):
                 continue
         
         # If it reaches here, it needs to search for round dirs instead
-        if (any(i in root_base.upper() for i in round_suffixes)):
+        if "ROUND" in root_base.upper():
             # extract round number of this directory, this is done by finding digits in the dir names
             round_number = re.findall(r'\d+', root_base)[0]
             
@@ -159,7 +159,6 @@ def formatISSImages(input_dir, silent = False):
         print('''Detected tif images are: {}
         If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory
         '''.format(listFileHierarchy(input_dir)))
-    df = pd.DataFrame(columns=['Round', 'Channel', 'Image_path', 'Reference','DAPI' ])
     if df.empty:
         print("No round image were found, so the naming convention of your round directories is probably not as expected. \n")           
     return df
@@ -219,8 +218,8 @@ if __name__ == '__main__':
     parser.add_argument('--default',action='store_true', help='Flag to indicate whether to run the default pipeline')
     args = parser.parse_args()
 
-    # parsing the actual arguments
-    # rest of the pipeline works with absolute paths behind the scenes for the images to avoid any mistakes.
+    # Parsing the actual arguments.
+    # Rest of the pipeline works with absolute paths behind the scenes for the images to avoid any mistakes.
     input_dir = addBackslash(os.path.abspath(args.input_dir))
     codebook_path = os.path.abspath(args.codebook)
     if not os.path.isdir(input_dir):
@@ -230,14 +229,25 @@ if __name__ == '__main__':
     
     
     # parse input images into pandas
-    # image_df = formatISSImages(input_dir)
-    # image_df.to_csv("images.csv")
+    image_df = formatISSImages(input_dir, silent=True)
+    image_df.to_csv("images.csv")
 
     # parse codebook
     codebook_dict = parseCodebook(codebook_path)
-    print(codebook_dict)
-    # registration step 1
+    
     # Normalize images
+
+    # calculate registration transformation step 1
+    # First create transform dir if it doesn't exist yet
+    if not os.path.isdir(f"{input_dir}transforms/"):
+        os.mkdir(f"{input_dir}transforms/")
+    transform_dir = f"{input_dir}transforms/"
+
+    # actually perform registration per row
+    for index, row in image_df.iterrows():
+        rigid_registration(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
+        
+
     # tiling/paralelizing
     # registrataion step 2
     # spot detection/decoding
