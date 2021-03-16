@@ -39,7 +39,6 @@ def parseCodebook(pathToCSV: str):
         raise Exception("Your genes are only combinations of numbers. You might have changed the order of the columns around.")
     return codebook_dict
 
-
 def formatISSImages(input_dir, silent = False):
     '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
         
@@ -105,7 +104,6 @@ def formatISSImages(input_dir, silent = False):
     if df.empty:
         print("No round image were found. The naming convention of your round directories is probably not as expected. \n")           
     return df
-    
     
 def listUsedFiles(directory: str, dataframe):
     hierarchyString = ""

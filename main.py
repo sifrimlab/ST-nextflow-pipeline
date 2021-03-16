@@ -63,6 +63,7 @@ from decorators import measureTime
 
 # Variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
+seperate_aux_images = False
 #############################
 ## Test parameters:
 ## input_dir = /media/tool/starfish_test_data/ExampleInSituSequencing
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     codebook_dict = parseCodebook(codebook_path)
     
     # Normalize images
-    
+
     # Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
     if not os.path.isdir(f"{output_dir}transforms/"):
@@ -126,18 +127,36 @@ if __name__ == '__main__':
         registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
         writeRigidTransformed(row['Image_path'], transform_file, registered_file)
     
-    # Create tile directory
+    # Create tile directories
     if not os.path.isdir(f"{output_dir}tiled/"):
         os.mkdir(f"{output_dir}tiled/")
     tiled_dir = f"{output_dir}tiled/"
 
-    #Tile the images
-    for index, row in image_df.iterrows(): 
-        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
-        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{tiled_dir}r{row['Round']}_c{row['Channel']}")
-    
+    # if not os.path.isdir(f"{tiled_dir}aux_images/"):
+    #     os.mkdir(f"{tiled_dir}aux_images/")
+    # aux_dir = f"{tiled_dir}aux_images/"
 
-    # tiling/paralelizing
+    # Tile the images and create a new dataframe to represent them
+    for index, row in image_df.iterrows(): 
+        round_number= row['Round']
+        if not os.path.isdir(f"{tiled_dir}Round{round_number}/"):
+            os.mkdir(f"{tiled_dir}Round{round_number}/")
+        round_dir = f"{tiled_dir}Round{round_number}/"
+
+        channel_number=row['Channel']
+
+        # Don't forget to fill in the wanted tile resolution here
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
+
+        # Tile round images
+        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{round_dir}c{channel_number}")
+        # Write aux images in the same dir
+        writeTiles(row['Reference'], tile_x_size, tile_y_size, f"{round_dir}REF_Round{round_number}")
+        writeTiles(row['DAPI'], tile_x_size, tile_y_size, f"{round_dir}DAPI_Round{round_number}")
+    
+    
+    # Tile the aux images
+    
     # registrataion step 2
     # spot detection/decoding
     # Visualization
