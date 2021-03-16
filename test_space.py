@@ -79,11 +79,12 @@ from decorators import measureTime
 
 ## testing for optimal divison
 
-@measureTime
-def findOptimalDivisor(number, target_quotient):
-    divisors = [i for i in range(1,number) if number % i==0]
-    quotients = [number/divisor for divisor in divisors]
-    min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
-    best_divisor = number/min_loss
-    return best_divisor
-findOptimalDivisor(3066, 1000)
+# @measureTime
+# def findOptimalDivisor(number, target_quotient):
+#     divisors = [i for i in range(1,number) if number % i==0]
+#     quotients = [number/divisor for divisor in divisors]
+#     min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
+#     best_divisor = number/min_loss
+#     return best_divisor
+# findOptimalDivisor(3066, 1000)
+

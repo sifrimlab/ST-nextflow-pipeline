@@ -54,7 +54,7 @@ import pandas as pd
 from icecream import ic
 
 # communISS
-from inputParsing import addBackslash, formatISSImages, parseCodebook
+from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages
 
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
@@ -96,7 +96,6 @@ if __name__ == '__main__':
         raise ValueError("Inputted codebook file does not exist")
     
     # creating output dir
-    print(output_dir)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
     # parse input images into pandas
@@ -132,31 +131,38 @@ if __name__ == '__main__':
     if not os.path.isdir(f"{output_dir}tiled/"):
         os.mkdir(f"{output_dir}tiled/")
     tiled_dir = f"{output_dir}tiled/"
-    # if not os.path.isdir(f"{tiled_dir}aux_images/"):
-    #     os.mkdir(f"{tiled_dir}aux_images/")
-    # aux_dir = f"{tiled_dir}aux_images/"
 
-    # Tile the images and create a new dataframe to represent them
+    # Iterate over every row, meaning go over every tif image
     for index, row in image_df.iterrows(): 
+        # Get round number of the current iteration
         round_number= row['Round']
+        # Create a dir for it if it doesn't exist already
         if not os.path.isdir(f"{tiled_dir}Round{round_number}/"):
             os.mkdir(f"{tiled_dir}Round{round_number}/")
+        # Define the dir path
         round_dir = f"{tiled_dir}Round{round_number}/"
-
+        # Define channel number of current iteration
         channel_number=row['Channel']
 
-        # Don't forget to fill in the wanted tile resolution here
-        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 200,200)
+        # Calculate the optimal size to get the image to a certain resolution (to be filled in)
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
 
-        # Tile round images
-        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{round_dir}c{channel_number}")
-        # Write aux images in the same dir
-        writeTiles(row['Reference'], tile_x_size, tile_y_size, f"{round_dir}REF_Round{round_number}")
-        writeTiles(row['DAPI'], tile_x_size, tile_y_size, f"{round_dir}DAPI_Round{round_number}")
-    
-    # Tile the aux images
-    
+        # Tile the current image
+        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
+        # Then also tile its aux images if not done so already for this round
+        if not os.path.isfile(f"{round_dir}Round{round_number}_REF_tile1.tif"):
+            writeTiles(row['Reference'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
+        if not os.path.isfile(f"{round_dir}Round{round_number}_DAPI_tile1.tif"):
+            writeTiles(row['DAPI'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_DAPI")
+
+    # Create a new dataframe to represent them.
+    tiled_df = formatTiledISSImages(tiled_dir)
+    tiled_df.to_csv("tiled_images.csv")
+
+
     # registrataion step 2
+
+
     # spot detection/decoding
     # Visualization
 

@@ -39,6 +39,29 @@ def parseCodebook(pathToCSV: str):
         raise Exception("Your genes are only combinations of numbers. You might have changed the order of the columns around.")
     return codebook_dict
 
+
+def formatTiledISSImages(input_dir):
+    # Create dataframe to be filled in while looping over all files
+    df = pd.DataFrame(columns=['Tile', 'Round', 'Channel', 'Image_path', 'Reference','DAPI' ])
+    #loop over the entire Tiled dir
+    for root, dirs, files in os.walk(input_dir):
+        # If the current root is a Round dir, we want to extract the files
+        root_base = (root.split("/"))[-1]
+        if root_base.startswith("Round"):
+            for file in files:
+                # Extract relevent information for the filenames by first splitting off the .tif extension, then splitting into "_", then taking the last character of each element
+                numbers_extracted_from_file_name = [int(element[-1]) if element[-1].isdigit() else element[-1] for element in file.split(".")[0].split("_")]
+                round_n, channel_n, tile_n = numbers_extracted_from_file_name
+                # The reference and dapi filenames are hardcoded. This shouldn't be a problem because the tiled images are created by the code.
+                reference_file = f"Round{round_n}_REF_tile{tile_n}.tif"
+                dapi_file = f"Round{round_n}_DAPI_tile{tile_n}.tif"
+                 # beware that if it's an aux image, channel_n will be a letter, not a digit
+                if isinstance(channel_n, int):
+                    df = df.append({'Tile': tile_n, 'Round': round_n, 'Channel': channel_n, 'Image_path': f"{root}/{file}", 'Reference': f"{root}/{reference_file}",'DAPI' : f"{root}/{dapi_file}"}, ignore_index=True)
+    return df
+                
+formatTiledISSImages("/media/tool/starfish_test_data/communISS_output/tiled/")
+
 def formatISSImages(input_dir, silent = False):
     '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
         

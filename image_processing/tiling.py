@@ -28,10 +28,9 @@ def writeTiles(img_path, tile_size_x, tile_size_y, output_file_prefix, offset_x=
             # Multiplier is used for calculating the tile number, it represents how many tiles will be created on the x-axis
             multiplier = (int(math.ceil(img_shape[1]/(offset[0] * 1.0)))) 
             cropped_img = img[offset[1]*i:min(offset[1]*i+tile_size[1], img_shape[0]), offset[0]*j:min(offset[0]*j+tile_size[0], img_shape[1])]
-            print(f"i {i}, j {j}, multiplier {multiplier}")
             tile_number = multiplier*int(i) + int(j) +1
-            cv2.imwrite(f"{output_file_prefix}_tile_{tile_number}.tif", cropped_img)
-    print(f"Tiles written to {output_file_prefix}_tile_x.tif")
+            cv2.imwrite(f"{output_file_prefix}_Tile{tile_number}.tif", cropped_img)
+    print(f"Tiles written to {output_file_prefix}_TileX.tif")
 
 
 def findOptimalDivisor(number, target_quotient):
