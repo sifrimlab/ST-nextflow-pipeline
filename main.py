@@ -159,28 +159,27 @@ def formatISSImages(input_dir, silent = False):
                 image_path = f"{root}/{file}"
                 df = df.append({'Round': round_number, 'Channel': channel_number, 'Image_path': image_path,'Reference': reference_full, 'DAPI' : dapi_full} ,ignore_index=True)
     if (silent == False):
-        print('''Detected tif images are: {}
-        If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory
-        '''.format(listFileHierarchy(input_dir)))
+        print("Detected tif images are:\n{}\n If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory. \n"
+        .format(listUsedFiles(input_dir, df)))
     if df.empty:
-        print("No round image were found, so the naming convention of your round directories is probably not as expected. \n")           
+        print("No round image were found. The naming convention of your round directories is probably not as expected. \n")           
     return df
         
-
-
-        
-    
-## Helper function for the entire workflow
-def listFileHierarchy(directory: str):
+def listUsedFiles(directory: str, dataframe):
     hierarchyString = ""
     for root, dirs, files in os.walk(directory):
+        # calculate level by getting rid of the prefix that every file will have (directory)
         level = root.replace(directory, '').count(os.sep)
         indent = ' ' * 4 * (level)
-        hierarchyString += '{}{}/\n'.format(indent, os.path.basename(root))
+        base = '{}{}/\n'.format(indent, os.path.basename(root))
         subindent = ' ' * 4 * (level + 1)
+        base_added = False
         for f in files:
-            if f.upper().endswith(tif_suffixes):
-                hierarchyString+='{}{}\n'.format(subindent, f)
+            if f"{root}/{f}" in dataframe.values:
+                if not base_added:
+                    hierarchyString+=base
+                    base_added = True
+                hierarchyString += '{}{}\n'.format(subindent, f)
     return hierarchyString
 
 # helper function that adds a backslash to a directory path for consistency
@@ -236,7 +235,7 @@ if __name__ == '__main__':
         os.mkdir(output_dir)
 
     # parse input images into pandas
-    image_df = formatISSImages(input_dir=input_dir, silent=True)
+    image_df = formatISSImages(input_dir=input_dir, silent=False)
     image_df.to_csv("images.csv")
 
     # parse codebook
@@ -246,24 +245,24 @@ if __name__ == '__main__':
 
     # Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
-    if not os.path.isdir(f"{output_dir}transforms/"):
-        os.mkdir(f"{output_dir}transforms/")
-    transform_dir = f"{output_dir}transforms/"
+    # if not os.path.isdir(f"{output_dir}transforms/"):
+    #     os.mkdir(f"{output_dir}transforms/")
+    # transform_dir = f"{output_dir}transforms/"
 
     # calculate registration per row
-    for index, row in image_df.iterrows():
-        calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
+    # for index, row in image_df.iterrows():
+    #     calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
         
-    # create registration dir if it doesn't exist already
-    if not os.path.isdir(f"{output_dir}registered/"):
-        os.mkdir(f"{output_dir}registered/")
-    registered_dir = f"{output_dir}registered/"
+    # # create registration dir if it doesn't exist already
+    # if not os.path.isdir(f"{output_dir}registered/"):
+    #     os.mkdir(f"{output_dir}registered/")
+    # registered_dir = f"{output_dir}registered/"
 
-    #actually warp the images using the transforms
-    for index, row in image_df.iterrows():
-        transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
-        registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
-        writeRigidTransformed(row['Image_path'], transform_file, registered_file)
+    # #actually warp the images using the transforms
+    # for index, row in image_df.iterrows():
+    #     transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
+    #     registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
+    #     writeRigidTransformed(row['Image_path'], transform_file, registered_file)
     
 
     # tiling/paralelizing
