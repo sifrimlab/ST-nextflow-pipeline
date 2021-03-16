@@ -76,7 +76,9 @@ if __name__ == '__main__':
     # code the argparser for commandline utility
     parser = argparse.ArgumentParser(prog='communISH', description='Run a rudimentary ISS pipeline')
     # input dir for images
-    parser.add_argument('input_dir',help='Path to your input directory')
+    parser.add_argument('input_dir_arg',help='Path to your input directory')
+    #output dir for images
+    parser.add_argument('output_dir_arg',help='Path to your output directory')
     # input path for codebook
     parser.add_argument('codebook', help='Path to your codebook')
     # flag to see if the user wants to customize or not
@@ -85,7 +87,8 @@ if __name__ == '__main__':
 
     # Parsing the actual arguments.
     # Rest of the pipeline works with absolute paths behind the scenes for the images to avoid any mistakes.
-    input_dir = addBackslash(os.path.abspath(args.input_dir))
+    input_dir = os.path.abspath(args.input_dir_arg) + "/"
+    output_dir = os.path.abspath(args.output_dir_arg) + "/"
     codebook_path = os.path.abspath(args.codebook)
     if not os.path.isdir(input_dir):
         raise ValueError("Inputted directory is not a directory or does not exists")
@@ -93,10 +96,9 @@ if __name__ == '__main__':
         raise ValueError("Inputted codebook file does not exist")
     
     # creating output dir
-    output_dir = f"{input_dir}communISS_output/"
+    print(output_dir)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-
     # parse input images into pandas
     image_df = formatISSImages(input_dir=input_dir, silent=False)
     image_df.to_csv("images.csv")
@@ -120,7 +122,6 @@ if __name__ == '__main__':
     if not os.path.isdir(f"{output_dir}registered/"):
         os.mkdir(f"{output_dir}registered/")
     registered_dir = f"{output_dir}registered/"
-
     # #actually warp the images using the transforms
     for index, row in image_df.iterrows():
         transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
@@ -131,7 +132,6 @@ if __name__ == '__main__':
     if not os.path.isdir(f"{output_dir}tiled/"):
         os.mkdir(f"{output_dir}tiled/")
     tiled_dir = f"{output_dir}tiled/"
-
     # if not os.path.isdir(f"{tiled_dir}aux_images/"):
     #     os.mkdir(f"{tiled_dir}aux_images/")
     # aux_dir = f"{tiled_dir}aux_images/"
@@ -146,14 +146,13 @@ if __name__ == '__main__':
         channel_number=row['Channel']
 
         # Don't forget to fill in the wanted tile resolution here
-        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 200,200)
 
         # Tile round images
         writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{round_dir}c{channel_number}")
         # Write aux images in the same dir
         writeTiles(row['Reference'], tile_x_size, tile_y_size, f"{round_dir}REF_Round{round_number}")
         writeTiles(row['DAPI'], tile_x_size, tile_y_size, f"{round_dir}DAPI_Round{round_number}")
-    
     
     # Tile the aux images
     
