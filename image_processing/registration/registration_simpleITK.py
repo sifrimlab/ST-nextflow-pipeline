@@ -3,7 +3,7 @@ import sys
 import os
 
 
-def calculateRigidTransform(ref: str, target: str, round: int, channel: int, output_dir: str = ""):
+def calculateRigidTransform(ref: str, target: str, round: int, channel: int, output_dir: str = "", silent=False):
     """Calculates and writes the rigid transformation necessary to register the target onto the reference. 
 
     Parameters
@@ -31,9 +31,10 @@ def calculateRigidTransform(ref: str, target: str, round: int, channel: int, out
 
     outTx = R.Execute(fixed, moving)
 
-    # print(f"Optimizer stop condition: {R.GetOptimizerStopConditionDescription()}")
-    print(f"Calculating transform of round {round}, channel {channel}...")
-    print(f"Finished at iteration {R.GetOptimizerIteration()} with a metric value of {R.GetMetricValue()}")
+    if not silent:
+        # print(f"Optimizer stop condition: {R.GetOptimizerStopConditionDescription()}")
+        print(f"Calculating transform of round {round}, channel {channel}...")
+        print(f"Finished at iteration {R.GetOptimizerIteration()} with a metric value of {R.GetMetricValue()}")
 
     sitk.WriteTransform(outTx, f"{output_dir}transform_r{round}_c{channel}.txt")
 
