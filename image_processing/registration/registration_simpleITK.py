@@ -45,6 +45,9 @@ def calculateRigidTransform(ref: str, target: str, round: int, channel: int, out
     #moving_resampled = sitk.Resample(moving, fixed, result, sitk.sitkLinear, 0.0, moving.GetPixelID())
     #sitk.WriteImage(moving_resampled, outputFileName)
 
+    #nda = sitk.GetArrayFromImage(image_RGB)
+
+
 
 def writeRigidTransformed(target_img_path: str, transform_file: str, output_file: str):
     """Warps the given image with the given transformation and writes the warped image to the destination file.

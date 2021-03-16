@@ -58,11 +58,12 @@ def formatTiledISSImages(input_dir):
                  # beware that if it's an aux image, channel_n will be a letter, not a digit
                 if isinstance(channel_n, int):
                     df = df.append({'Tile': tile_n, 'Round': round_n, 'Channel': channel_n, 'Image_path': f"{root}/{file}", 'Reference': f"{root}/{reference_file}",'DAPI' : f"{root}/{dapi_file}"}, ignore_index=True)
-    return df
+    # Return a sorted df
+    return df.sort_values(['Tile', 'Round', 'Channel'])
                 
 formatTiledISSImages("/media/tool/starfish_test_data/communISS_output/tiled/")
 
-def formatISSImages(input_dir, silent = False):
+def formatISSImages(input_dir, silent = False, seperate_aux_files_per_round=False):
     '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
         
         Parameters

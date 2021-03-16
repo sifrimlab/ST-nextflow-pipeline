@@ -88,3 +88,26 @@ from decorators import measureTime
 #     return best_divisor
 # findOptimalDivisor(3066, 1000)
 
+##Testing for white tophat
+# from skimage import io
+# from skimage.morphology import white_tophat
+
+
+# img = io.imread("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/c4.TIF")
+# filtered = white_tophat(img)
+
+# fig = plt.figure()
+# plt.gray()
+# ax = fig.add_subplot(1, 2, 1)
+# imgplot = plt.imshow(img)
+# ax.set_title('Original')
+# ax = fig.add_subplot(1, 2, 2)
+# imgplot = plt.imshow(filtered)
+# ax.set_title('filtered')
+# plt.show()
+
+## playing with os.path.join
+import os
+base_dir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
+new_dir = "formatted"
+print(os.path.join(base_dir, new_dir)+"/")
