@@ -66,3 +66,4 @@ def writeRigidTransformed(target_img_path: str, transform_file: str, output_file
     resampled = sitk.Resample(target, read_result, sitk.sitkLinear, 0.0, target.GetPixelID())
     # Write image to the given destination
     sitk.WriteImage(resampled, output_file)
+    print(f"Warped image written to {output_file}.")
