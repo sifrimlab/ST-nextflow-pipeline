@@ -36,9 +36,54 @@ img_list = ["/media/tool/starfish_test_data/MERFISH/seperate_stacks/16-bit/MERFI
 
 
 
+## Tiling testing:
+from skimage import io
+import cv2
+import math
+from decorators import measureTime
 
-## Testing with elements in dataframe
-import pandas as pd
-df = pd.read_csv("images.csv")
-if "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF" in df.values:
-    print("yup")
+# @measureTime
+# def skimageTest():
+#     img = io.imread("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/c4.TIF", 1) # 512x512
+
+#     # Don't forget, cv2 works with shape = (y, x)
+#     img_shape = img.shape
+
+#     tile_size = (665, 490)
+#     offset = (665, 490)
+
+#     for i in range(int(math.ceil(img_shape[0]/(offset[1] * 1.0)))):
+#         for j in range(int(math.ceil(img_shape[1]/(offset[0] * 1.0)))):
+#             cropped_img = img[offset[1]*i:min(offset[1]*i+tile_size[1], img_shape[0]), offset[0]*j:min(offset[0]*j+tile_size[0], img_shape[1])]
+#             # Debugging the tiles
+#             io.imsave("debug_" + str(i) + "_" + str(j) + ".png", cropped_img)
+
+# @measureTime
+# def cv2Test():
+#     img = cv2.imread("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/c4.TIF", 1) # 512x512
+
+#     # Don't forget, cv2 works with shape = (y, x)
+#     img_shape = img.shape
+
+#     tile_size = (665, 490)
+#     offset = (665, 490)
+
+#     for i in range(int(math.ceil(img_shape[0]/(offset[1] * 1.0)))):
+#         for j in range(int(math.ceil(img_shape[1]/(offset[0] * 1.0)))):
+#             cropped_img = img[offset[1]*i:min(offset[1]*i+tile_size[1], img_shape[0]), offset[0]*j:min(offset[0]*j+tile_size[0], img_shape[1])]
+#             # Debugging the tiles
+#             cv2.imwrite("debug_" + str(i) + "_" + str(j) + ".png", cropped_img)
+# skimageTest()
+# cv2Test()
+# conclusion: cv2 is significantly faster
+
+## testing for optimal divison
+
+@measureTime
+def findOptimalDivisor(number, target_quotient):
+    divisors = [i for i in range(1,number) if number % i==0]
+    quotients = [number/divisor for divisor in divisors]
+    min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
+    best_divisor = number/min_loss
+    return best_divisor
+findOptimalDivisor(3066, 1000)

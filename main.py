@@ -59,6 +59,7 @@ from icecream import ic
 # communISS
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
+from image_processing.tiling import calculateOptimalTileSize, writeTiles
 from decorators import measureTime
 
 # Variables that are needed in multiples places:
@@ -245,25 +246,35 @@ if __name__ == '__main__':
 
     # Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
-    # if not os.path.isdir(f"{output_dir}transforms/"):
-    #     os.mkdir(f"{output_dir}transforms/")
-    # transform_dir = f"{output_dir}transforms/"
+    if not os.path.isdir(f"{output_dir}transforms/"):
+        os.mkdir(f"{output_dir}transforms/")
+    transform_dir = f"{output_dir}transforms/"
 
     # calculate registration per row
-    # for index, row in image_df.iterrows():
-    #     calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
+    for index, row in image_df.iterrows():
+        calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
         
     # # create registration dir if it doesn't exist already
-    # if not os.path.isdir(f"{output_dir}registered/"):
-    #     os.mkdir(f"{output_dir}registered/")
-    # registered_dir = f"{output_dir}registered/"
+    if not os.path.isdir(f"{output_dir}registered/"):
+        os.mkdir(f"{output_dir}registered/")
+    registered_dir = f"{output_dir}registered/"
 
     # #actually warp the images using the transforms
-    # for index, row in image_df.iterrows():
-    #     transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
-    #     registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
-    #     writeRigidTransformed(row['Image_path'], transform_file, registered_file)
+    for index, row in image_df.iterrows():
+        transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
+        registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
+        writeRigidTransformed(row['Image_path'], transform_file, registered_file)
     
+    # Create tile directory
+    if not os.path.isdir(f"{output_dir}tiled/"):
+        os.mkdir(f"{output_dir}tiled/")
+    tiled_dir = f"{output_dir}tiled/"
+
+    #Tile the images
+    for index, row in image_df.iterrows(): 
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
+        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{tiled_dir}r{row['Round']}_c{row['Channel']}")
+
 
     # tiling/paralelizing
     # registrataion step 2
