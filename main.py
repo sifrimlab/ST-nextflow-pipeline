@@ -59,8 +59,9 @@ from icecream import ic
 # communISS
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
+from decorators import measureTime
 
-# variables that are needed in multiples places:
+# Variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
 
 ## helper functions:
@@ -98,6 +99,8 @@ def parseCodebook(pathToCSV: str):
         raise Exception("Your genes are only combinations of numbers. You might have changed the order of the columns around.")
     return codebook_dict
 
+
+@measureTime
 def formatISSImages(input_dir, silent = False):
     '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
         
@@ -147,7 +150,7 @@ def formatISSImages(input_dir, silent = False):
         if "ROUND" in root_base.upper():
             # extract round number of this directory, this is done by finding digits in the dir names
             round_number = re.findall(r'\d+', root_base)[0]
-            
+    
             # extract all .tif files
             file_list = [f for f in files if f.upper().endswith(tif_suffixes)]
             # append all round files to the dataframe with the correct info
@@ -202,9 +205,9 @@ def addBackslash(path: str):
 #############################
 ## Test parameters:
 ## input_dir = /media/tool/starfish_test_data/ExampleInSituSequencing
-## Codebook = /media/tool/starfish_test_data/ExampleInSituSequencing/output/codebook.json
+## Codebook = /media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv
 ## Codebook = /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook.csv
-## command to run: python main.py /media/tool/starfish_test_data/ExampleInSituSequencing /media/tool/starfish_test_data/ExampleInSituSequencing/output/codebook.json
+## command to run: python main.py /media/tool/starfish_test_data/ExampleInSituSequencing /media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv
 ##############################
 
 if __name__ == '__main__':
@@ -241,7 +244,7 @@ if __name__ == '__main__':
     
     # Normalize images
 
-    # calculate registration transformation step 1
+    # Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
     if not os.path.isdir(f"{output_dir}transforms/"):
         os.mkdir(f"{output_dir}transforms/")
@@ -259,7 +262,8 @@ if __name__ == '__main__':
     #actually warp the images using the transforms
     for index, row in image_df.iterrows():
         transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
-        writeRigidTransformed(row['Image_path'], transform_file, f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff")
+        registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
+        writeRigidTransformed(row['Image_path'], transform_file, registered_file)
     
 
     # tiling/paralelizing
