@@ -57,7 +57,7 @@ import cv2
 import glob
 
 # communISS
-from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages, makeDir
+from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages, makeDir, addDirIntoPath
 
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     tiled_dir = os.path.join(output_dir, "tiled") + "/"
     makeDir(tiled_dir)
 
-    # Now we will actually tile the images
+    ## Tiling the images
     # Iterate over every row, meaning go over every tif image
     for row in image_df.itertuples(): 
         # Get round number of the current iteration
@@ -173,13 +173,20 @@ if __name__ == '__main__':
         filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
         makeDir(filtered_dir)
         writeFilteredImages(tiled_df, filtered_dir)
-    
+        
+        # Update the dataframe with the new "current working images"
+        for col in ('Image_path', 'Reference', 'DAPI'):
+            tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("filtered","tiled"))
+    tiled_df.to_csv("tiled_filtered.csv")
     # Registrataion step 2
     # Make dir if it doesn't exist already
     if write_intermediate:
         registered2_dir = os.path.join(filtered_dir, "registered2") + "/"
         makeDir(registered2_dir)
-        
+
+        #update the dataframe
+
+    
 
 
     # spot detection/decoding

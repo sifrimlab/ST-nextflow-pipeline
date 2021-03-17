@@ -168,3 +168,10 @@ def addBackslash(path: str):
 def makeDir(path: str):
     if not os.path.isdir(path):
         os.mkdir(path)
+
+
+def addDirIntoPath(path, string_to_add, after_which_dir):
+    split_path = path.split(after_which_dir)
+    # print(split_path)
+    split_path.insert(1, after_which_dir + "/" + string_to_add)
+    return "".join(split_path)
