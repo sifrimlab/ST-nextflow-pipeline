@@ -55,12 +55,15 @@ from skimage.morphology import white_tophat
 from icecream import ic
 import cv2
 import glob
+import shutil
+#temp
+import SimpleITK as sitk
 
 # communISS
 from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages, makeDir, addDirIntoPath
 
 from image_processing.normalization.normalization import numpyNormalization
-from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
+from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed, performRigidTransform
 from image_processing.filtering import writeFilteredImages
 from image_processing.tiling import calculateOptimalTileSize, writeTiles
 from decorators import measureTime
@@ -68,7 +71,7 @@ from decorators import measureTime
 # Variables that are needed in multiples places:
 tif_suffixes = ("TIFF","TIF")
 seperate_aux_images = False
-write_intermediate = True
+write_intermediate_images = True
 #############################
 ## Test parameters:
 ## input_dir = /media/tool/starfish_test_data/ExampleInSituSequencing
@@ -169,7 +172,7 @@ if __name__ == '__main__':
     tiled_df.to_csv("tiled_images.csv")
 
     # Filtering: (white tophat)
-    if write_intermediate:
+    if write_intermediate_images:
         filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
         makeDir(filtered_dir)
         writeFilteredImages(tiled_df, filtered_dir)
@@ -178,13 +181,28 @@ if __name__ == '__main__':
         for col in ('Image_path', 'Reference', 'DAPI'):
             tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("filtered","tiled"))
     tiled_df.to_csv("tiled_filtered.csv")
+
     # Registrataion step 2
     # Make dir if it doesn't exist already
-    if write_intermediate:
+    if write_intermediate_images:
         registered2_dir = os.path.join(filtered_dir, "registered2") + "/"
         makeDir(registered2_dir)
+        for row in tiled_df.itertuples():
+            round_dir = f"{registered2_dir}Round{row.Round}/"
+            makeDir(round_dir)
+            registered_image = performRigidTransform(sitk.ReadImage(row.Reference,sitk.sitkFloat32), sitk.ReadImage(row.Image_path,sitk.sitkFloat32))
+            sitk.WriteImage(registered_image, os.path.join(round_dir, f"Round{row.Round}_Channel{row.Channel}_Tile{row.Tile}.tif"))
+            print(f"Rigid local registration of tile {row.Tile} complete.")
+            # Copy the ref and dapi tiles to the next dir if not already there
+            if not os.path.isfile(f"{round_dir}Round{round_number}_REF_Tile{row.Tile}.tif"):
+                shutil.copy(row.Reference, round_dir)
+            if not os.path.isfile(f"{round_dir}Round{round_number}_DAPI_Tile{row.Tile}.tif"):
+                shutil.copy(row.DAPI, round_dir)  
 
         #update the dataframe
+        for col in ('Image_path', 'Reference', 'DAPI'):
+            tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("registered2", "filtered"))
+    tiled_df.to_csv("tiled_filtered_registered.csv")
 
     
 

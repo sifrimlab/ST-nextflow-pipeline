@@ -119,12 +119,12 @@ from decorators import measureTime
 #     print(row.DAPI)
 
 ##Test with adapting pandas dataframe
-import pandas as pd
-df = pd.read_csv("./tiled_images.csv")
-def addDirIntoPath(path, string_to_add, after_which_dir):
-    split_path = path.split(after_which_dir)
-    # print(split_path)
-    split_path.insert(1, after_which_dir + "/" + string_to_add)
-    return "".join(split_path)
-df['Image_path'] = df['Image_path'].apply(addDirIntoPath, args=("filtered","tiled"))
-df.to_csv("adapted.csv")
+# import pandas as pd
+# df = pd.read_csv("./tiled_images.csv")
+# def addDirIntoPath(path, string_to_add, after_which_dir):
+#     split_path = path.split(after_which_dir)
+#     # print(split_path)
+#     split_path.insert(1, after_which_dir + "/" + string_to_add)
+#     return "".join(split_path)
+# df['Image_path'] = df['Image_path'].apply(addDirIntoPath, args=("filtered","tiled"))
+# df.to_csv("adapted.csv")

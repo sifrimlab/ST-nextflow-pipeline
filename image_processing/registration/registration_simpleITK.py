@@ -3,7 +3,7 @@ import sys
 import os
 
 
-def calculateRigidTransform(ref: str, target: str, round: int, channel: int, output_dir: str = "", silent=False):
+def calculateRigidTransform(reference_image: str, target_image: str, round: int, channel: int, output_dir: str = "", silent=False):
     """Calculates and writes the rigid transformation necessary to register the target onto the reference. 
 
     Parameters
@@ -19,9 +19,9 @@ def calculateRigidTransform(ref: str, target: str, round: int, channel: int, out
     output_dir : str, optional
         Directory where the transformation will be written to. By default this is "", which is functionaly the current working directory.
     """
-    fixed = sitk.ReadImage(ref, sitk.sitkFloat32)
+    fixed = sitk.ReadImage(reference_image, sitk.sitkFloat32)
 
-    moving = sitk.ReadImage(target, sitk.sitkFloat32)
+    moving = sitk.ReadImage(target_image, sitk.sitkFloat32)
 
     R = sitk.ImageRegistrationMethod()
     R.SetMetricAsCorrelation()
@@ -70,3 +70,16 @@ def writeRigidTransformed(target_img_path: str, transform_file: str, output_file
     # Write image to the given destination
     sitk.WriteImage(resampled, output_file)
     print(f"Warped image written to {output_file}.")
+
+def performRigidTransform(reference_image, target_image):
+    R = sitk.ImageRegistrationMethod()
+    R.SetMetricAsCorrelation()
+    R.SetOptimizerAsRegularStepGradientDescent(4.0, .01, 200)
+    R.SetInitialTransform(sitk.TranslationTransform(reference_image.GetDimension()))
+    R.SetInterpolator(sitk.sitkLinear)
+    outTx = R.Execute(reference_image, target_image)
+
+    target_resampled = sitk.Resample(target_image, reference_image, outTx, sitk.sitkLinear, 0.0, target_image.GetPixelID())
+    # uncomment to return a ndarray istead of a sitk image object
+    # array = sitk.GetArrayFromImage(target_resampled)
+    return target_resampled
