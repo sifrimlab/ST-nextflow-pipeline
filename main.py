@@ -55,7 +55,7 @@ from skimage.morphology import white_tophat
 from icecream import ic
 
 # communISS
-from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages
+from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages, makeDir
 
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
@@ -97,8 +97,7 @@ if __name__ == '__main__':
         raise ValueError("Inputted codebook file does not exist")
     
     # creating output dir
-    if not os.path.isdir(output_dir):
-        os.mkdir(output_dir)
+    makeDir(output_dir)
 
     # parse input images into pandas
     image_df = formatISSImages(input_dir=input_dir, silent=False, seperate_aux_files_per_round=seperate_aux_images)
@@ -112,8 +111,7 @@ if __name__ == '__main__':
     # Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
     transform_dir = os.path.join(output_dir, "transforms") + "/"
-    if not os.path.isdir(transform_dir):
-        os.mkdir(transform_dir)
+    makeDir(transform_dir)
     
 
     # calculate registration per row
@@ -122,8 +120,7 @@ if __name__ == '__main__':
         
     # # create registration dir if it doesn't exist already
     registered_dir = os.path.join(output_dir, "registered") + "/"
-    if not os.path.isdir(registered_dir):
-        os.mkdir(registered_dir)
+    makeDir(registered_dir)
     # #actually warp the images using the transforms
     for index, row in image_df.iterrows():
         # Format filenames correctly
@@ -134,8 +131,7 @@ if __name__ == '__main__':
     
     # Create tile directories
     tiled_dir = os.path.join(output_dir, "tiled") + "/"
-    if not os.path.isdir(tiled_dir):
-        os.mkdir(tiled_dir)
+    makeDir(tiled_dir)
 
     # Iterate over every row, meaning go over every tif image
     for index, row in image_df.iterrows(): 
@@ -166,8 +162,9 @@ if __name__ == '__main__':
 
     # White tophat
     filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
-    if not os.path.isdir(filtered_dir):
-        os.mkdir(filtered_dir)
+    makeDir(filtered_dir)
+    for index, row in tiled_df.iterrows(): 
+        print(row['Image_path'])
     #filtered = white_tophat(img) #--> i'll integrate that in somewhere, don't know where yet, for know I'm saving everything in new dirs for debugging purposes
 
     # registrataion step 2

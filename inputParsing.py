@@ -164,3 +164,7 @@ def addBackslash(path: str):
         if not path.endswith("/"):
             path += "/"
     return path
+
+def makeDir(path: str):
+    if not os.path.isdir(path):
+        os.mkdir(path)
