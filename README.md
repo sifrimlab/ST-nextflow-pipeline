@@ -1,4 +1,8 @@
 # communISS: In Situ Sequencing image processing end-to-end pipeline
+@licence: Property of LMIB
+@authors: David Wouters
+@maintainer: David Wouters
+@e-mail: david.wouters1@student.kuleuven.be
 
 ### Installation
 
