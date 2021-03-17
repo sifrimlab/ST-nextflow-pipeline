@@ -44,11 +44,10 @@ def formatTiledISSImages(input_dir):
     # Create dataframe to be filled in while looping over all files
     df = pd.DataFrame(columns=['Tile', 'Round', 'Channel', 'Image_path', 'Reference','DAPI' ])
     #loop over the entire Tiled dir
-    for root, dirs, files in os.walk(input_dir):
+    for entry in os.listdir(input_dir):
         # If the current root is a Round dir, we want to extract the files
-        root_base = (root.split("/"))[-1]
-        if root_base.startswith("Round"):
-            for file in files:
+        if os.path.isdir(os.path.join(input_dir,entry)) and entry.startswith("Round"):
+            for file in os.listdir(os.path.join(input_dir,entry)):
                 # Extract relevent information for the filenames by first splitting off the .tif extension, then splitting into "_", then taking the last character of each element
                 numbers_extracted_from_file_name = [int(element[-1]) if element[-1].isdigit() else element[-1] for element in file.split(".")[0].split("_")]
                 round_n, channel_n, tile_n = numbers_extracted_from_file_name
@@ -57,12 +56,10 @@ def formatTiledISSImages(input_dir):
                 dapi_file = f"Round{round_n}_DAPI_Tile{tile_n}.tif"
                  # beware that if it's an aux image, channel_n will be a letter, not a digit
                 if isinstance(channel_n, int):
-                    df = df.append({'Tile': tile_n, 'Round': round_n, 'Channel': channel_n, 'Image_path': f"{root}/{file}", 'Reference': f"{root}/{reference_file}",'DAPI' : f"{root}/{dapi_file}"}, ignore_index=True)
+                    df = df.append({'Tile': tile_n, 'Round': round_n, 'Channel': channel_n, 'Image_path': os.path.join(input_dir,entry, file), 'Reference': os.path.join(input_dir,entry, reference_file),'DAPI' : os.path.join(input_dir,entry, dapi_file)}, ignore_index=True)
     # Return a sorted df
     return df.sort_values(['Tile', 'Round', 'Channel'])
                 
-formatTiledISSImages("/media/tool/starfish_test_data/communISS_output/tiled/")
-
 def formatISSImages(input_dir, silent = False, seperate_aux_files_per_round=False):
     '''This function takes the input_dir that contains the ISS data and returns a pandas Dataframe representing that input dir.
         
