@@ -52,14 +52,16 @@ import argparse
 import os
 import pandas as pd
 from skimage.morphology import white_tophat
-from skimage import io
 from icecream import ic
 import cv2
+import glob
+
 # communISS
 from inputParsing import addBackslash, formatISSImages, parseCodebook, formatTiledISSImages, makeDir
 
 from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed
+from image_processing.filtering import writeFilteredImages
 from image_processing.tiling import calculateOptimalTileSize, writeTiles
 from decorators import measureTime
 
@@ -93,19 +95,21 @@ if __name__ == '__main__':
     input_dir = os.path.abspath(args.input_dir_arg) + "/"
     output_dir = os.path.abspath(args.output_dir_arg) + "/"
     codebook_path = os.path.abspath(args.codebook)
+    # raise errors if the input files don't exist.
     if not os.path.isdir(input_dir):
         raise ValueError("Inputted directory is not a directory or does not exists")
     if not os.path.isfile(codebook_path):
         raise ValueError("Inputted codebook file does not exist")
     
-    # creating output dir
+    # Create output dir
     makeDir(output_dir)
 
-    # parse input images into pandas
+    # Parse detected input images into pandas dataframe.
     image_df = formatISSImages(input_dir=input_dir, silent=True, seperate_aux_files_per_round=seperate_aux_images)
-    # image_df.to_csv("images.csv")
+    # Write df to csv for self-check purposes.
+    image_df.to_csv("images.csv")
 
-    # parse codebook
+    # Parse codebook
     codebook_dict = parseCodebook(codebook_path)
     
     # Normalize images
@@ -116,66 +120,67 @@ if __name__ == '__main__':
     makeDir(transform_dir)
     
 
-    # calculate registration per row
-    # for row in image_df.itertuples():
-    #     calculateRigidTransform(row.Image_path, row.Reference, row.Round, row.Channel, transform_dir)
+    # Calculate registration per row
+    for row in image_df.itertuples():
+        calculateRigidTransform(row.Image_path, row.Reference, row.Round, row.Channel, transform_dir)
         
-    # # create registration dir if it doesn't exist already
+    # # Create registration dir if it doesn't exist already
     registered_dir = os.path.join(output_dir, "registered") + "/"
     makeDir(registered_dir)
-    # #actually warp the images using the transforms
-    # for row in image_df.itertuples():
-    #     # Format filenames correctly
-    #     transform_file = f"{transform_dir}transform_r{row.Round}_c{row.Channel}.txt"
-    #     registered_file = f"{registered_dir}r{row.Round}_c{row.Channel}_registered.tiff"
-    #     # Actually register the images
-    #     writeRigidTransformed(row.Image_path, transform_file, registered_file)
+    # Actually warp the images using the transforms
+    for row in image_df.itertuples():
+        # Format filenames correctly
+        transform_file = f"{transform_dir}transform_r{row.Round}_c{row.Channel}.txt"
+        registered_file = f"{registered_dir}r{row.Round}_c{row.Channel}_registered.tiff"
+        # Actually register the images
+        writeRigidTransformed(row.Image_path, transform_file, registered_file)
     
     # Create tile directories
     tiled_dir = os.path.join(output_dir, "tiled") + "/"
     makeDir(tiled_dir)
 
+    # Now we will actually tile the images
     # Iterate over every row, meaning go over every tif image
-    # for row in image_df.itertuples(): 
-    #     # Get round number of the current iteration
-    #     round_number= row.Round
-    #     # Create a dir for it if it doesn't exist already
-    #     if not os.path.isdir(f"{tiled_dir}Round{round_number}/"):
-    #         os.mkdir(f"{tiled_dir}Round{round_number}/")
-    #     # Define the dir path
-    #     round_dir = f"{tiled_dir}Round{round_number}/"
-    #     # Define channel number of current iteration
-    #     channel_number=row.Channel
+    for row in image_df.itertuples(): 
+        # Get round number of the current iteration
+        round_number= row.Round
 
-    #     # Calculate the optimal size to get the image to a certain resolution (to be filled in)
-    #     tile_x_size, tile_y_size = calculateOptimalTileSize(row.Image_path, 500,500)
+        # Define the dir path
+        round_dir = f"{tiled_dir}Round{round_number}/"
+        # Create a dir for it if it doesn't exist already
+        makeDir(round_dir)
 
-    #     # Tile the current image
-    #     writeTiles(row.Image_path, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
-    #     # Then also tile its aux images if not done so already for this round
-    #     if not os.path.isfile(f"{round_dir}Round{round_number}_REF_tile1.tif"):
-    #         writeTiles(row.Reference, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
-    #     if not os.path.isfile(f"{round_dir}Round{round_number}_DAPI_tile1.tif"):
-    #         writeTiles(row.DAPI, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_DAPI")
+        # Define channel number of current iteration
+        channel_number=row.Channel
 
-    # Create a new dataframe to represent them.
+        # Calculate the optimal size to get the image to a certain resolution (to be filled in by user. #TODO need to create an argument for this)
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row.Image_path, 500,500)
+
+        # Tile the current image
+        writeTiles(row.Image_path, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
+        # Then also tile its aux images if not done so already for this round
+        if not glob.glob(f"{round_dir}Round{round_number}_REF_Tile*"):
+            writeTiles(row.Reference, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
+        if not glob.glob(f"{round_dir}Round{round_number}_DAPI_Tile*"):
+            writeTiles(row.DAPI, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_DAPI")
+
+    # Create a new dataframe to represent the tile images.
     tiled_df = formatTiledISSImages(tiled_dir)
     tiled_df.to_csv("tiled_images.csv")
 
-    # White tophat
-    filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
-    makeDir(filtered_dir)
-    for row in tiled_df.itertuples():
-        if write_intermediate:
-            round_path = os.path.join(filtered_dir, f"Round{str(row.Round)}") + "/"
-            makeDir(round_path)
-            cv2.imwrite(os.path.join(round_path, row.Image_path.split("/")[-1]), white_tophat(cv2.imread(row.Image_path)))       
-
-        
-    #filtered = white_tophat(img) #--> i'll integrate that in somewhere, don't know where yet, for know I'm saving everything in new dirs for debugging purposes
-
-    # registrataion step 2
+    # Filtering: (white tophat)
+    if write_intermediate:
+        filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
+        makeDir(filtered_dir)
+        writeFilteredImages(tiled_df, filtered_dir)
     
+    # Registrataion step 2
+    # Make dir if it doesn't exist already
+    if write_intermediate:
+        registered2_dir = os.path.join(filtered_dir, "registered2") + "/"
+        makeDir(registered2_dir)
+        
+
 
     # spot detection/decoding
     # Visualization

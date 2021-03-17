@@ -53,8 +53,8 @@ def formatTiledISSImages(input_dir):
                 numbers_extracted_from_file_name = [int(element[-1]) if element[-1].isdigit() else element[-1] for element in file.split(".")[0].split("_")]
                 round_n, channel_n, tile_n = numbers_extracted_from_file_name
                 # The reference and dapi filenames are hardcoded. This shouldn't be a problem because the tiled images are created by the code.
-                reference_file = f"Round{round_n}_REF_tile{tile_n}.tif"
-                dapi_file = f"Round{round_n}_DAPI_tile{tile_n}.tif"
+                reference_file = f"Round{round_n}_REF_Tile{tile_n}.tif"
+                dapi_file = f"Round{round_n}_DAPI_Tile{tile_n}.tif"
                  # beware that if it's an aux image, channel_n will be a letter, not a digit
                 if isinstance(channel_n, int):
                     df = df.append({'Tile': tile_n, 'Round': round_n, 'Channel': channel_n, 'Image_path': f"{root}/{file}", 'Reference': f"{root}/{reference_file}",'DAPI' : f"{root}/{dapi_file}"}, ignore_index=True)

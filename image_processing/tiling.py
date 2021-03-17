@@ -33,7 +33,21 @@ def writeTiles(img_path, tile_size_x, tile_size_y, output_file_prefix, offset_x=
     print(f"Tiles written to {output_file_prefix}_TileX.tif")
 
 
-def findOptimalDivisor(number, target_quotient):
+def findOptimalDivisor(number: int, target_quotient: int):
+    """Finds the optimal int divisor for the given number that results in the quotient as close to the given quotient as possible
+
+    Parameters
+    ----------
+    number : int
+        The number that will be divided by the optimal divisor
+    target_quotient : int
+        The quotient that you want the result of the division to be as close to as possible
+
+    Returns
+    -------
+    int
+        Returns the result of the optimal divison
+    """
     divisors = [i for i in range(1,number) if number % i==0]
     quotients = [number/divisor for divisor in divisors]
     min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
