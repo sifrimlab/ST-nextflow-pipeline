@@ -115,46 +115,46 @@ if __name__ == '__main__':
     
 
     # calculate registration per row
-    for index, row in image_df.iterrows():
-        calculateRigidTransform(row["Image_path"], row["Reference"], row["Round"], row["Channel"], transform_dir)
+    for row in image_df.itertuples():
+        calculateRigidTransform(row.Image_path, row.Reference, row.Round, row.Channel, transform_dir)
         
     # # create registration dir if it doesn't exist already
     registered_dir = os.path.join(output_dir, "registered") + "/"
     makeDir(registered_dir)
     # #actually warp the images using the transforms
-    for index, row in image_df.iterrows():
+    for row in image_df.itertuples():
         # Format filenames correctly
-        transform_file = f"{transform_dir}transform_r{row['Round']}_c{row['Channel']}.txt"
-        registered_file = f"{registered_dir}r{row['Round']}_c{row['Channel']}_registered.tiff"
+        transform_file = f"{transform_dir}transform_r{row.Round}_c{row.Channel}.txt"
+        registered_file = f"{registered_dir}r{row.Round}_c{row.Channel}_registered.tiff"
         # Actually register the images
-        writeRigidTransformed(row['Image_path'], transform_file, registered_file)
+        writeRigidTransformed(row.Image_path, transform_file, registered_file)
     
     # Create tile directories
     tiled_dir = os.path.join(output_dir, "tiled") + "/"
     makeDir(tiled_dir)
 
     # Iterate over every row, meaning go over every tif image
-    for index, row in image_df.iterrows(): 
+    for row in image_df.itertuples(): 
         # Get round number of the current iteration
-        round_number= row['Round']
+        round_number= row.Round
         # Create a dir for it if it doesn't exist already
         if not os.path.isdir(f"{tiled_dir}Round{round_number}/"):
             os.mkdir(f"{tiled_dir}Round{round_number}/")
         # Define the dir path
         round_dir = f"{tiled_dir}Round{round_number}/"
         # Define channel number of current iteration
-        channel_number=row['Channel']
+        channel_number=row.Channel
 
         # Calculate the optimal size to get the image to a certain resolution (to be filled in)
-        tile_x_size, tile_y_size = calculateOptimalTileSize(row['Image_path'], 500,500)
+        tile_x_size, tile_y_size = calculateOptimalTileSize(row.Image_path, 500,500)
 
         # Tile the current image
-        writeTiles(row['Image_path'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
+        writeTiles(row.Image_path, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
         # Then also tile its aux images if not done so already for this round
         if not os.path.isfile(f"{round_dir}Round{round_number}_REF_tile1.tif"):
-            writeTiles(row['Reference'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
+            writeTiles(row.Reference, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
         if not os.path.isfile(f"{round_dir}Round{round_number}_DAPI_tile1.tif"):
-            writeTiles(row['DAPI'], tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_DAPI")
+            writeTiles(row.DAPI, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_DAPI")
 
     # Create a new dataframe to represent them.
     tiled_df = formatTiledISSImages(tiled_dir)
@@ -163,8 +163,8 @@ if __name__ == '__main__':
     # White tophat
     filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
     makeDir(filtered_dir)
-    for index, row in tiled_df.iterrows(): 
-        print(row['Image_path'])
+    for row in tiled_df.itertuples(): 
+        row.Image_path
     #filtered = white_tophat(img) #--> i'll integrate that in somewhere, don't know where yet, for know I'm saving everything in new dirs for debugging purposes
 
     # registrataion step 2
