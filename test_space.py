@@ -107,7 +107,13 @@ from decorators import measureTime
 # plt.show()
 
 ## playing with os.path.join
-import os
-base_dir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
-new_dir = "formatted"
-print(os.path.join(base_dir, new_dir)+"/")
+# import os
+# base_dir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
+# new_dir = "formatted"
+# print(os.path.join(base_dir, new_dir)+"/")
+
+## playing with iterating over pandas
+import pandas as pd
+df = pd.read_csv("tiled_images.csv")
+for row in df.itertuples():
+    print(row.DAPI)
