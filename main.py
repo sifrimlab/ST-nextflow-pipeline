@@ -115,14 +115,14 @@ if __name__ == '__main__':
     
 
     # calculate registration per row
-    for index, row in image_df.itertuples():
+    for row in image_df.itertuples():
         calculateRigidTransform(row.Image_path, row.Reference, row.Round, row.Channel, transform_dir)
         
     # # create registration dir if it doesn't exist already
     registered_dir = os.path.join(output_dir, "registered") + "/"
     makeDir(registered_dir)
     # #actually warp the images using the transforms
-    for index, row in image_df.itertuples():
+    for row in image_df.itertuples():
         # Format filenames correctly
         transform_file = f"{transform_dir}transform_r{row.Round}_c{row.Channel}.txt"
         registered_file = f"{registered_dir}r{row.Round}_c{row.Channel}_registered.tiff"
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     makeDir(tiled_dir)
 
     # Iterate over every row, meaning go over every tif image
-    for index, row in image_df.itertuples(): 
+    for row in image_df.itertuples(): 
         # Get round number of the current iteration
         round_number= row.Round
         # Create a dir for it if it doesn't exist already
