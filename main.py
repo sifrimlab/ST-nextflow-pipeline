@@ -72,52 +72,57 @@ from decorators import measureTime
 tif_suffixes = ("TIFF","TIF")
 seperate_aux_images = False
 write_intermediate_images = True
+
 #############################
 ## Test parameters:
 ## input_dir = /media/tool/starfish_test_data/ExampleInSituSequencing
 ## Codebook = /media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv
 ## Codebook = /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook.csv
 ## command to run: python main.py /media/tool/starfish_test_data/ExampleInSituSequencing /media/tool/starfish_test_data/communISS_output /media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv
+## Command to run on personal laptop: python main.py /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook.csv /media/david/Puzzles/starfish_test_data/communISS_output
 ##############################
 
+
 if __name__ == '__main__':
-    # code the argparser for commandline utility
+    
+    ## Argparser for commandline utility
     parser = argparse.ArgumentParser(prog='communISH', description='Run a rudimentary ISS pipeline')
-    # input dir for images
+    # Input dir for images
     parser.add_argument('input_dir_arg',help='Path to your input directory')
-    #output dir for images
+    # Output dir for images
     parser.add_argument('output_dir_arg',help='Path to your output directory')
-    # input path for codebook
+    # Input path for codebook
     parser.add_argument('codebook', help='Path to your codebook')
-    # flag to see if the user wants to customize or not
+    # Flag to see if the user wants to customize or not
     parser.add_argument('--default',action='store_true', help='Flag to indicate whether to run the default pipeline')
     args = parser.parse_args()
 
-    # Parsing the actual arguments.
+    ## Parsing the actual input
     # Rest of the pipeline works with absolute paths behind the scenes for the images to avoid any mistakes.
     input_dir = os.path.abspath(args.input_dir_arg) + "/"
     output_dir = os.path.abspath(args.output_dir_arg) + "/"
     codebook_path = os.path.abspath(args.codebook)
+
     # raise errors if the input files don't exist.
     if not os.path.isdir(input_dir):
         raise ValueError("Inputted directory is not a directory or does not exists")
     if not os.path.isfile(codebook_path):
         raise ValueError("Inputted codebook file does not exist")
     
-    # Create output dir
+    ## Create output dir
     makeDir(output_dir)
 
-    # Parse detected input images into pandas dataframe.
-    image_df = formatISSImages(input_dir=input_dir, silent=True, seperate_aux_files_per_round=seperate_aux_images)
+    ## Parse detected input images into pandas dataframe.
+    image_df = formatISSImages(input_dir=input_dir, silent=False, seperate_aux_files_per_round=seperate_aux_images)
     # Write df to csv for self-check purposes.
     image_df.to_csv("images.csv")
 
-    # Parse codebook
+    ## Parse codebook
     codebook_dict = parseCodebook(codebook_path)
     
-    # Normalize images
+    ## Normalize images
 
-    # Calculate registration transformation step 1
+    ## Calculate registration transformation step 1
     # First create transform dir if it doesn't exist yet
     transform_dir = os.path.join(output_dir, "transforms") + "/"
     makeDir(transform_dir)
@@ -127,10 +132,12 @@ if __name__ == '__main__':
     for row in image_df.itertuples():
         calculateRigidTransform(row.Image_path, row.Reference, row.Round, row.Channel, transform_dir)
         
-    # # Create registration dir if it doesn't exist already
+    # Create registration dir if it doesn't exist already
     registered_dir = os.path.join(output_dir, "registered") + "/"
     makeDir(registered_dir)
-    # Actually warp the images using the transforms
+
+    # Actually warp the images using the calculated transforms
+    # Loop over each row in the dataframe (eg.: each ISS image)
     for row in image_df.itertuples():
         # Format filenames correctly
         transform_file = f"{transform_dir}transform_r{row.Round}_c{row.Channel}.txt"
@@ -145,15 +152,15 @@ if __name__ == '__main__':
     ## Tiling the images
     # Iterate over every row, meaning go over every tif image
     for row in image_df.itertuples(): 
-        # Get round number of the current iteration
+        # Get round number of the current image
         round_number= row.Round
 
-        # Define the dir path
+        # Define the dir path (eg.: "../Round1/")
         round_dir = f"{tiled_dir}Round{round_number}/"
         # Create a dir for it if it doesn't exist already
         makeDir(round_dir)
 
-        # Define channel number of current iteration
+        # Define channel number of current image
         channel_number=row.Channel
 
         # Calculate the optimal size to get the image to a certain resolution (to be filled in by user. #TODO need to create an argument for this)
@@ -161,6 +168,7 @@ if __name__ == '__main__':
 
         # Tile the current image
         writeTiles(row.Image_path, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_Channel{channel_number}")
+
         # Then also tile its aux images if not done so already for this round
         if not glob.glob(f"{round_dir}Round{round_number}_REF_Tile*"):
             writeTiles(row.Reference, tile_x_size, tile_y_size, f"{round_dir}Round{round_number}_REF")
@@ -169,20 +177,23 @@ if __name__ == '__main__':
 
     # Create a new dataframe to represent the tile images.
     tiled_df = formatTiledISSImages(tiled_dir)
+    # Save dataframe for self-check purposes
     tiled_df.to_csv("tiled_images.csv")
 
-    # Filtering: (white tophat)
+    ## Filtering: (white tophat)
     if write_intermediate_images:
+        # Create dir if it doesn't exist already
         filtered_dir = os.path.join(tiled_dir, "filtered") + "/"
         makeDir(filtered_dir)
+        # Filter images and write them to the dir
         writeFilteredImages(tiled_df, filtered_dir)
         
-        # Update the dataframe with the new "current working images"
+        # Update the dataframe with the paths to the new working directory"
         for col in ('Image_path', 'Reference', 'DAPI'):
             tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("filtered","tiled"))
     tiled_df.to_csv("tiled_filtered.csv")
 
-    # Registrataion step 2
+    ## Registrataion step 2
     # Make dir if it doesn't exist already
     if write_intermediate_images:
         registered2_dir = os.path.join(filtered_dir, "registered2") + "/"
@@ -192,7 +203,7 @@ if __name__ == '__main__':
             makeDir(round_dir)
             registered_image = performRigidTransform(sitk.ReadImage(row.Reference,sitk.sitkFloat32), sitk.ReadImage(row.Image_path,sitk.sitkFloat32))
             sitk.WriteImage(registered_image, os.path.join(round_dir, f"Round{row.Round}_Channel{row.Channel}_Tile{row.Tile}.tif"))
-            print(f"Rigid local registration of tile {row.Tile} complete.")
+            print(f"Rigid local registration of tile {row.Tile}, round {row.Round}, channel {row.Channel} complete.")
             # Copy the ref and dapi tiles to the next dir if not already there
             if not os.path.isfile(f"{round_dir}Round{round_number}_REF_Tile{row.Tile}.tif"):
                 shutil.copy(row.Reference, round_dir)
