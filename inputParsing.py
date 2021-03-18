@@ -46,7 +46,7 @@ def formatTiledISSImages(input_dir):
     #loop over the entire Tiled dir
     for entry in os.listdir(input_dir):
         # If the current root is a Round dir, we want to extract the files
-        if os.path.isdir(os.path.join(input_dir,entry)) and entry.startswith("Round"):
+        if os.path.isdir(os.path.join(input_dir,entry)) and entry.upper().startswith("ROUND"):
             for file in os.listdir(os.path.join(input_dir,entry)):
                 # Extract relevent information for the filenames by first splitting off the .tif extension, then splitting into "_", then taking the last character of each element
                 numbers_extracted_from_file_name = [int(element[-1]) if element[-1].isdigit() else element[-1] for element in file.split(".")[0].split("_")]
@@ -85,11 +85,9 @@ def formatISSImages(input_dir, silent = False, seperate_aux_files_per_round=Fals
     tif_suffixes = ("TIFF","TIF")
 
     # loop over directory
-    for root, dirs, files in os.walk(input_dir):
-        # Isolate the current directory in the walk
-        root_base = (root.split("/"))[-1]
+    for entry in os.listdir(input_dir):
         # First check if the auxillary images are found
-        if (any(i in root_base.upper() for i in aux_dir_names)):
+        if os.path.isdir(os.path.join(input_dir,entry)) and entry.upper().startswith("ROUND"):
             try:
                 # check if ref is found
                 reference = [f for f in files if "REF" in f.upper()][0]
