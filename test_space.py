@@ -1,4 +1,4 @@
-from image_processing.image_similarity.image_similarities import getHistogram
+from image_processing.similarity.image_similarities import getHistogram
 from image_processing.normalization.normalization import numpyNormalization
 import matplotlib.pyplot as plt
 from skimage import io
@@ -37,10 +37,10 @@ img_list = ["/media/tool/starfish_test_data/MERFISH/seperate_stacks/16-bit/MERFI
 
 
 ## Tiling testing:
-from skimage import io
-import cv2
-import math
-from decorators import measureTime
+# from skimage import io
+# import cv2
+# import math
+# from decorators import measureTime
 
 # @measureTime
 # def skimageTest():
@@ -128,3 +128,13 @@ from decorators import measureTime
 #     return "".join(split_path)
 # df['Image_path'] = df['Image_path'].apply(addDirIntoPath, args=("filtered","tiled"))
 # df.to_csv("adapted.csv")
+
+## testing blobdetectors
+from skimage.feature import blob_log
+import cv2
+
+img_name = "/media/david/Puzzles/starfish_test_data/communISS_output/tiled/filtered/Round1/Round1_Channel5_Tile4.tif"
+img = cv2.imread(img_name,-1)
+array = blob_log(img,0.5,3)
+print(array[:,0:2])
+

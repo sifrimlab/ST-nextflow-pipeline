@@ -2,6 +2,8 @@ import os
 import cv2
 from skimage.morphology import white_tophat
 from inputParsing import makeDir
+
+
 def writeFilteredImages(tiled_dataframe, output_dir):
     """Filters all images in the dataframe with white tiphat, and writes the resulting images into a new folder output dir
 

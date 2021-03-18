@@ -66,6 +66,7 @@ from image_processing.normalization.normalization import numpyNormalization
 from image_processing.registration.registration_simpleITK import calculateRigidTransform, writeRigidTransformed, performRigidTransform
 from image_processing.filtering import writeFilteredImages
 from image_processing.tiling import calculateOptimalTileSize, writeTiles
+from image_processing.spotDetection import laplacianOfGaussianBlobDetector
 from decorators import measureTime
 
 # Variables that are needed in multiples places:
@@ -188,7 +189,7 @@ if __name__ == '__main__':
         # Filter images and write them to the dir
         writeFilteredImages(tiled_df, filtered_dir)
         
-        # Update the dataframe with the paths to the new working directory"
+        # Update the dataframe with the paths to the new "working" directory
         for col in ('Image_path', 'Reference', 'DAPI'):
             tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("filtered","tiled"))
     tiled_df.to_csv("tiled_filtered.csv")
@@ -215,10 +216,14 @@ if __name__ == '__main__':
             tiled_df[col] = tiled_df[col].apply(addDirIntoPath, args=("registered2", "filtered"))
     tiled_df.to_csv("tiled_filtered_registered.csv")
 
-    
+    # spot detection
+    spots_array_df= pd.DataFrame(columns=('Tile', 'Round', 'Channel', 'Tile', 'X', 'Y', 'Intensity'))
+    for row in tiled_df.itertuples():
+        image = cv2.imread(row.Image_path, -1)
+        spots = laplacianOfGaussianBlobDetector(image, min_sigma=1,max_sigma=3)
+        spots_array_df.append(spots)
+    #barcode decoding
 
-
-    # spot detection/decoding
     # Visualization
 
     
