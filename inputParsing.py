@@ -46,7 +46,7 @@ def formatTiledISSImages(input_dir):
     #loop over the entire Tiled dir
     for entry in os.listdir(input_dir):
         # If the current root is a Round dir, we want to extract the files
-        if os.path.isdir(os.path.join(input_dir,entry)) and entry.startswith("Round"):
+        if os.path.isdir(os.path.join(input_dir,entry)) and entry.upper().startswith("ROUND"):
             for file in os.listdir(os.path.join(input_dir,entry)):
                 # Extract relevent information for the filenames by first splitting off the .tif extension, then splitting into "_", then taking the last character of each element
                 numbers_extracted_from_file_name = [int(element[-1]) if element[-1].isdigit() else element[-1] for element in file.split(".")[0].split("_")]
@@ -84,23 +84,22 @@ def formatISSImages(input_dir, silent = False, seperate_aux_files_per_round=Fals
     channel_suffixes = ("CHANNEL", "C")
     tif_suffixes = ("TIFF","TIF")
 
-    # loop over directory
-    for root, dirs, files in os.walk(input_dir):
-        # Isolate the current directory in the walk
-        root_base = (root.split("/"))[-1]
+    # Loop over input directory
+    for entry in os.listdir(input_dir):
+        full_entry_path = os.path.join(input_dir, entry)
         # First check if the auxillary images are found
-        if (any(i in root_base.upper() for i in aux_dir_names)):
+        if os.path.isdir(full_entry_path) and (any(i in entry.upper() for i in aux_dir_names)):
             try:
-                # check if ref is found
-                reference = [f for f in files if "REF" in f.upper()][0]
-                reference_full = f"{root}/{reference}"
+                # check if ref is found, if so
+                reference = [f for f in os.listdir(full_entry_path) if "REF" in f.upper()][0]
+                reference_full = os.path.join(full_entry_path, reference)
             except:
                 reference_full=""
                 print("No reference image found!")
             try: 
                 # check if dapi is found, after this continue to next iteration because finding round images in the aux dir, because later on I'll give a warning if the ref column is empty.
-                dapi = [f for f in files if "DAPI" in f.upper()][0]
-                dapi_full = f"{root}/{dapi}"
+                dapi = [f for f in os.listdir(full_entry_path) if "DAPI" in f.upper()][0]
+                dapi_full =  os.path.join(full_entry_path, dapi)
                 continue
             except:
                 dapi_full=""
@@ -108,16 +107,15 @@ def formatISSImages(input_dir, silent = False, seperate_aux_files_per_round=Fals
                 continue
         
         # If it reaches here, it needs to search for round dirs instead
-        if "ROUND" in root_base.upper():
+        if "ROUND" in entry.upper():
             # extract round number of this directory, this is done by finding digits in the dir names
-            round_number = re.findall(r'\d+', root_base)[0]
-    
+            round_number = re.findall(r'\d+', entry)[0]
             # extract all .tif files
-            file_list = [f for f in files if f.upper().endswith(tif_suffixes)]
+            file_list = [f for f in os.listdir(full_entry_path) if f.upper().endswith(tif_suffixes) and (any(i in f.upper() for i in channel_suffixes))]
             # append all round files to the dataframe with the correct info
             for file in file_list:
                 channel_number = re.findall(r'\d+', file)[0]
-                image_path = f"{root}/{file}"
+                image_path = os.path.join(full_entry_path, file)
                 df = df.append({'Round': round_number, 'Channel': channel_number, 'Image_path': image_path,'Reference': reference_full, 'DAPI' : dapi_full} ,ignore_index=True)
     if (silent == False):
         print("Used .tif images are:\n{}\n If there are files in here that are not supposed to be taken into account for the analysis, we suggest removing them from the input directory. \n"
