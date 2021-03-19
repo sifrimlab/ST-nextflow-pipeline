@@ -11,14 +11,14 @@ params.n_channels = 4
 channel_images = Channel.fromPath( '/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF', type: 'file' )
 
 params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
-params.transform_path = "/home/nacho/Documents/Code/comunISS_nextflow/image_processing/registration/calculateTransform.py"
-params.register_path = "/home/nacho/Documents/Code/comunISS_nextflow/image_processing/registration/rigidRegister.py"
+params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
+params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
 
-params.tiling_path = "/home/nacho/Documents/Code/comunISS_nextflow/image_processing/tiling_nextflow.py"
+params.tiling_path = "/home/nacho/Documents/Code/communISS/image_processing/tiling_nextflow.py"
 params.target_x_reso=500
 params.target_y_reso=500
 
-params.filtering_path= "/home/nacho/Documents/Code/comunISS_nextflow/image_processing/filtering.py"
+params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
 
 process register{
     //makes sure that if you echo somehting, it doesn't get surpressed
