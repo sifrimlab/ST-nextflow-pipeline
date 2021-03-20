@@ -41,4 +41,5 @@ def filterWithWhiteTophat(image):
     return white_tophat(image)
 
 img = io.imread(sys.argv[1])
-io.imsave("filtered.tif", filterWithWhiteTophat(img))
+prefix = os.path.splitext(sys.argv[1])
+io.imsave(f"{prefix}.tif", filterWithWhiteTophat(img))

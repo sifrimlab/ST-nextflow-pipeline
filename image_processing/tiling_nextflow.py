@@ -1,6 +1,7 @@
 import cv2
 import math
 import sys
+import os
 from skimage import io
 
 '''
@@ -17,7 +18,7 @@ def calculateOptimalTileSize(img_path, target_X, target_Y):
     return int(optimal_x), int(optimal_y)
 
 
-def writeTiles(img_path, tile_size_x, tile_size_y):
+def writeTiles(img_path, prefix,tile_size_x, tile_size_y, ):
     # img = cv2.imread(img_path, 1)
     img = io.imread(img_path)
     # Don't forget, cv2 works with shape = (y, x), meaning rows, columns
@@ -32,7 +33,7 @@ def writeTiles(img_path, tile_size_x, tile_size_y):
             multiplier = (int(math.ceil(img_shape[1]/(offset[0] * 1.0)))) 
             cropped_img = img[offset[1]*i:min(offset[1]*i+tile_size[1], img_shape[0]), offset[0]*j:min(offset[0]*j+tile_size[0], img_shape[1])]
             tile_number = multiplier*int(i) + int(j) +1
-            cv2.imwrite(f"tiled_{tile_number}.tif", cropped_img)
+            cv2.imwrite(f"{prefix}_tiled_{tile_number}.tif", cropped_img)
 
 
 def findOptimalDivisor(number: int, target_quotient: int):
@@ -52,10 +53,11 @@ def findOptimalDivisor(number: int, target_quotient: int):
     """
     divisors = [i for i in range(1,number) if number % i==0]
     quotients = [number/divisor for divisor in divisors]
-    print(target_quotient)
     min_loss = min(quotients, key=lambda x:abs(int(x)-int(target_quotient)))
     return min_loss
 
 image = sys.argv[1]
+prefix = os.path.splitext(image)[0]
 tile_x, tile_y = calculateOptimalTileSize(image,sys.argv[2], sys.argv[3])
-writeTiles(image, tile_size_x=tile_x, tile_size_y=tile_y)
+print(tile_x, tile_y)
+writeTiles(image, prefix, tile_size_x=tile_x, tile_size_y=tile_y)
