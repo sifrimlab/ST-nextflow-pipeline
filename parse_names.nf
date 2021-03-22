@@ -1,6 +1,6 @@
 params.n_rounds=4
 params.n_channels=4
-
+params.n_tiles=4
 
 round = Channel.fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF", type: 'file')
 datasets = Channel
@@ -17,6 +17,10 @@ params.target_x_reso=500
 params.target_y_reso=500
 
 params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
+
+params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
+params.min_sigma = 1
+params.max_sigma = 3
 
 process register{
     publishDir "registered", mode: 'symlink'
@@ -79,6 +83,7 @@ process filter {
 
 process filter_ref {
     publishDir "filtered_ref", mode: 'symlink'
+
     input:
     path image from tiled_ref.flatten()
     output:
@@ -87,27 +92,47 @@ process filter_ref {
     """
     python ${params.filtering_path} ${image}
     """
-
 }
 
-process local_registration {
-    echo true
+
+
+// process combine_channels {
+//     input:
+//     val chan_nr from (1..n_channels)
+//     val tile_nr from (1..n_tiles)
+//     path ref_image from filtered_ref_images
+//     path chan_image from filtered_images
+// }
+
+// process local_registration {
+//     echo true
+//     input:
+//     file image from filtered_images
+//     file ref_image from filtered_ref_images
+
+//     // output:
+//     // file "local_registered.tif" into locally_registered_images
+
+//     """
+//     echo ${image} ${ref_image}
+//     """
+//     // python ${params.register_path} ${ref_image} ${image}
+
+// }
+
+process spot_detection {
+    publishDir "blobs", mode: 'symlink'
+
     input:
-    file image from filtered_images
-    file ref_image from filtered_ref_images
+    path image from filtered_images
 
-    // output:
-    // file "local_registered.tif" into locally_registered_images
+    output:
+    path "*.csv" into blobs
 
     """
-    echo ${image} ${ref_image}
+    python ${params.spot_detection_path} ${image} ${params.min_sigma} ${params.max_sigma}
     """
-    // python ${params.register_path} ${ref_image} ${image}
-
-}
-
-    // .into { datasets_clustalw; datasets_tcoffee }
-    
+}    
 
 
 
