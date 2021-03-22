@@ -6,6 +6,7 @@ round = Channel.fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing
 datasets = Channel
                 .fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
                 .map { file -> tuple(file.baseName, file) }
+
 params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
 params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
 params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
@@ -17,8 +18,8 @@ params.target_y_reso=500
 
 params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
 
-
 process register{
+    publishDir "registered", mode: 'symlink'
     //makes sure that if you echo somehting, it doesn't get surpressed
 
     //pipes the output ALSO into the given dir instead with a symlink. If 
@@ -29,7 +30,7 @@ process register{
     path image from round
 
     output:
-    path "${image.baseName}.tif" into transforms
+    path "${image.baseName}_registered.tif" into transforms
 
     """
     python ${params.register_path} ${params.reference} ${image}
@@ -37,10 +38,8 @@ process register{
 
     }
 
-
-
 process tile_round {
-
+    publishDir "tiled_round", mode: 'symlink'
     input: 
     path image from transforms
 
@@ -52,6 +51,7 @@ process tile_round {
     """
 }
 process tile_ref {
+    publishDir "tiled_ref", mode: 'symlink'
     input:
     path image from params.reference
 
@@ -64,12 +64,13 @@ process tile_ref {
 }
 
 process filter {
+    publishDir "filtered_round", mode: 'symlink'
     input: 
     //flatmap is really important here to make sure all tiles go into a different map.
-    path image from tiled.flatMap()
+    path image from tiled.flatten()
 
     output:
-    path "${image.baseName}.tif" into filtered_images
+    path "${image.baseName}_filtered.tif" into filtered_images
 
     """
     python ${params.filtering_path} ${image}
@@ -77,10 +78,11 @@ process filter {
 }
 
 process filter_ref {
+    publishDir "filtered_ref", mode: 'symlink'
     input:
-    path image from tiled_ref.flatMap()
+    path image from tiled_ref.flatten()
     output:
-    path "${image.baseName}.tif" into filtered_ref_images //1, filtered_ref_images2, filtered_ref_images3
+    path "${image.baseName}_filtered.tif" into filtered_ref_images1, filtered_ref_images2, filtered_ref_images3, filtered_ref_images4
 
     """
     python ${params.filtering_path} ${image}
