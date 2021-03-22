@@ -2,20 +2,20 @@ params.n_rounds=4
 params.n_channels=4
 
 
-round = Channel.fromPath("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF", type: 'file')
+round = Channel.fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF", type: 'file')
 datasets = Channel
-                .fromPath("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
+                .fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
                 .map { file -> tuple(file.baseName, file) }
-params.reference = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
-params.transform_path = "/home/david/Documents/communISS/image_processing/registration/calculateTransform.py"
-params.register_path = "/home/david/Documents/communISS/image_processing/registration/rigidRegister.py"
+params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
+params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
+params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
 
 
-params.tiling_path = "/home/david/Documents/communISS/image_processing/tiling_nextflow.py"
+params.tiling_path = "/home/nacho/Documents/Code/communISS/image_processing/tiling_nextflow.py"
 params.target_x_reso=500
 params.target_y_reso=500
 
-params.filtering_path= "/home/david/Documents/communISS/image_processing/filtering.py"
+params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
 
 
 process register{
@@ -42,10 +42,10 @@ process register{
 process tile_round {
 
     input: 
-    file image from transforms
+    path image from transforms
 
     output: 
-    file "${image.baseName}_tiled_*.tif" into tiled
+    path "${image.baseName}_tiled_*.tif" into tiled
     
     """
     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
@@ -56,7 +56,7 @@ process tile_ref {
     path image from params.reference
 
     output:
-    file "${image.baseName}_tiled_*.tif" into tiled_ref
+    path "${image.baseName}_tiled_*.tif" into tiled_ref
 
     """
     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
@@ -66,10 +66,10 @@ process tile_ref {
 process filter {
     input: 
     //flatmap is really important here to make sure all tiles go into a different map.
-    file image from tiled.flatMap()
+    path image from tiled.flatMap()
 
     output:
-    file "${image.baseName}.tif" into filtered_images
+    path "${image.baseName}.tif" into filtered_images
 
     """
     python ${params.filtering_path} ${image}
@@ -78,9 +78,9 @@ process filter {
 
 process filter_ref {
     input:
-    file image from tiled_ref.flatMap()
+    path image from tiled_ref.flatMap()
     output:
-    file "${image.baseName}.tif" into filtered_ref_images
+    path "${image.baseName}.tif" into filtered_ref_images //1, filtered_ref_images2, filtered_ref_images3
 
     """
     python ${params.filtering_path} ${image}
