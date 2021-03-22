@@ -29,7 +29,7 @@ process register{
     path image from round
 
     output:
-    file "${image.baseName}.tif" into transforms
+    path "${image.baseName}.tif" into transforms
 
     """
     python ${params.register_path} ${params.reference} ${image}
