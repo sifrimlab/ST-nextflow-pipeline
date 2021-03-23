@@ -1,5 +1,6 @@
 from skimage import io
 from skimage.feature import blob_log
+from skimage import exposure
 import cv2
 import os
 import sys
@@ -16,7 +17,12 @@ def laplacianOfGaussianBlobDetector(image, min_sigma=None, max_sigma=None):
 
 image = io.imread(sys.argv[1])
 prefix = os.path.splitext(sys.argv[1])[0]
-min_sigma=sys.argv[2]
-max_sigma=sys.argv[3]
-np.savetxt(f"{prefix}.csv", laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma), delimiter=',', header="X,Y, Sigma")
+if len(sys.argv)>2:
+    min_sigma=sys.argv[2]
+    max_sigma=sys.argv[3]
+else:
+    min_sigma=None
+    max_sigma=None
+image = exposure.equalize_hist(image)
+np.savetxt(f"{prefix}_blobs.csv", laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma), delimiter=',', header="X,Y, Sigma")
 
