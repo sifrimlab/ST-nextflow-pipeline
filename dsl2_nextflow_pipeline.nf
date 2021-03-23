@@ -119,6 +119,28 @@ process local_registration {
 
 }
 
+process spot_detection_reference {
+    publishDir "$params.outDir/blobs", mode: 'symlink'
+    echo true
+
+    input:
+    tuple val(tile_nr), path(ref_image) 
+
+    output:
+    path "${ref_image.baseName}_blobs.csv"
+
+    """
+    python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
+    """
+}
+
+// process barcode_decoding {
+//     publishDir "$params.outDir/barcodesDecoded", mode: 'symlink'
+
+//     input:
+//     path 
+// }
+
 
 workflow {
     //load data
@@ -129,16 +151,24 @@ workflow {
     tile_round(register.out)
     tile_ref(params.reference)
 
+    //if you don't wanna filter:
+    tile_ref.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
+    tile_round.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped}
+    
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
     
     filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
     filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped} 
-    // filtered_ref_images_mapped.view()
-    // filtered_round_images_mapped.view()
+
     filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
     local_registration(combined_filtered_tiles)
-    local_registration.out.view()
+    
+    spot_detection_reference(filtered_ref_images_mapped)
+    
+    spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
+    
+
 
 }
 
