@@ -28,59 +28,60 @@ params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processi
 params.min_sigma = 1
 params.max_sigma = 3
 
+nextflow.enable.dsl=2
+
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
     input:
     // val x from numbers
-    path image from round
+    path image 
 
     output:
-    path "${image.baseName}_registered.tif" into transforms
+    path "${image.baseName}_registered.tif" 
 
     """
     python ${params.register_path} ${params.reference} ${image}
     """
 
-    }
+}
 
 process tile_round {
     publishDir "$params.outDir/tiled_round/", mode: 'symlink'
     input: 
-    path image from transforms
+    path image 
 
     output: 
-    path "${image.baseName}_tiled_*.tif" into tiled
+    path "${image.baseName}_tiled_*.tif"
     
     """
     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
     """
 }
 
-
 process tile_ref {
     publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
     input:
-    path image from params.reference
+    path image
 
     output:
-    path "${image.baseName}_tiled_*.tif" into tiled_ref
+    path "${image.baseName}_tiled_*.tif"
 
     """
     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
     """
 }
 
-process test {
+process filter_round{
     // echo true
     publishDir "$params.outDir/filtered_round/", mode: 'symlink'
     
     input: 
     //flatmap is really important here to make sure all tiles go into a different map.
-    path image from tiled.flatten()
+    path image 
 
     output:
-    path "${image.baseName}_filtered.tif" into filtered_images
+    path "${image.baseName}_filtered.tif"
 
     script:
     // channel_nr=image.toString() =~ /c\d/
@@ -89,71 +90,55 @@ process test {
     """
 }
 
-filtered_images.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_images_mapped}
-
-
 process filter_ref {
-    publishDir "$params.baseDir/filtered_ref/", mode: 'symlink'
+    publishDir "$params.outDir/filtered_ref/", mode: 'symlink'
 
     input:
-    path image from tiled_ref.flatten()
+    path image 
     output:
-    path "${image.baseName}_filtered.tif" into filtered_ref_images //1, filtered_ref_images2, filtered_ref_images3, filtered_ref_images4
+    path "${image.baseName}_filtered.tif" 
 
     """
     python ${params.filtering_path} ${image}
     """
 }
-//Branch might be another way of doing this.
-filtered_ref_images.map(){file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped}
-// process unpackTuples {
-//     echo true
-//     input: 
-//     each tuple val(ref_tile_nr), path(ref_image) from filtered_ref_images_mapped
-//     tuple val(tile_nr), path(image) from filtered_images_mapped
 
-//     script:
-//     if (tile_nr.toString() == ref_tile_nr.toString()){
-//         """
-//         echo ${tile_nr} ${ref_tile_nr}
-//         """        
-//     }
-//     else{
-//         """
-//         echo 'test'
-//         """
-//     }
+process local_registration {
+    publishDir "$params.outDir/local_register/", mode: 'symlink'
 
-// }
+    input: 
+    tuple val(x), path(ref_image), path(round_image) 
+
+    output:
+    path "${round_image.baseName}_registered.tif"
+
+    script:
+    """
+    python ${params.register_path} ${ref_image} ${round_image}
+    """        
+
+}
 
 
-// process local_registration {
-//     echo true
-//     input:
-//     file image from filtered_images
-//     file ref_image from filtered_ref_images
+workflow {
+    //load data
+    round1 = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
 
-//     // output:
-//     // file "local_registered.tif" into locally_registered_images
+    register(round1) //output = register.out
 
-//     """
-//     echo ${image} ${ref_image}
-//     """
-//     // python ${params.register_path} ${ref_image} ${image}
+    tile_round(register.out)
+    tile_ref(params.reference)
 
-// }
+    filter_ref(tile_ref.out.flatten())
+    filter_round(tile_round.out.flatten())
+    
+    filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
+    filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped} 
+    // filtered_ref_images_mapped.view()
+    // filtered_round_images_mapped.view()
+    filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
+    local_registration(combined_filtered_tiles)
+    local_registration.out.view()
 
-// process spot_detection {
-//     publishDir "blobs", mode: 'symlink'
-
-//     input:
-//     path image from filtered_images
-
-//     output:
-//     path "*.csv" into blobs
-
-//     """
-//     python ${params.spot_detection_path} ${image} ${params.min_sigma} ${params.max_sigma}
-//     """
-// }    
+}
 
