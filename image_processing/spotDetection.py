@@ -31,5 +31,5 @@ else:
 array = laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma)
 array = np.insert(array, 0, tile_number, axis=1)
 array = array.astype(int)
-np.savetxt(f"{prefix}_blobs.csv", array, delimiter=',',fmt='%i', header='Tile,X,Y,Sigma')
+np.savetxt(f"{prefix}_blobs.csv", array, delimiter=',',fmt='%i', header='Tile,X,Y,Sigma',comments='')
 

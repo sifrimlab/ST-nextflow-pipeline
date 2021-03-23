@@ -48,6 +48,6 @@ def filterWithWhiteTophat(image, radius):
 img = io.imread(sys.argv[1])
 prefix = os.path.splitext(sys.argv[1])[0]
 radius = int(sys.argv[2])
-print(radius)
+
 # Writing filtered image
 cv2.imwrite(f"{prefix}_filtered.tif", filterWithWhiteTophat(img, radius))

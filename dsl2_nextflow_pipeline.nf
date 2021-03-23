@@ -5,7 +5,7 @@ params.n_tiles=4
 params.baseDir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
 
 // params.rounds="$baseDir/Round*/*.TIF"
-params.outDir="results"
+params.outDir="/home/nacho/Documents/Code/communISS/results"
 round = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
 
 // datasets = Channel
