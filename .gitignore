@@ -2,3 +2,6 @@
 image_processing_env/
 communiss_env/
 __pycache__/
+.nextflow*
+work/
+results/
