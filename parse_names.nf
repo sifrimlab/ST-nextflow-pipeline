@@ -5,7 +5,7 @@ params.n_tiles=4
 params.baseDir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
 
 // params.rounds="$baseDir/Round*/*.TIF"
-params.outdir="results"
+params.outDir="results"
 round = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
 
 // datasets = Channel
@@ -29,7 +29,7 @@ params.min_sigma = 1
 params.max_sigma = 3
 
 process register{
-    publishDir "$params.outdir/registered/", mode: 'symlink'
+    publishDir "$params.outDir/registered/", mode: 'symlink'
 
     input:
     // val x from numbers
@@ -45,7 +45,7 @@ process register{
     }
 
 process tile_round {
-    publishDir "$params.outdir/tiled_round/", mode: 'symlink'
+    publishDir "$params.outDir/tiled_round/", mode: 'symlink'
     input: 
     path image from transforms
 
@@ -59,7 +59,7 @@ process tile_round {
 
 
 process tile_ref {
-    publishDir "$params.baseDir/tiled_ref", mode: 'symlink'
+    publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
     input:
     path image from params.reference
 
@@ -71,9 +71,9 @@ process tile_ref {
     """
 }
 
-process filter {
+process test {
     // echo true
-    publishDir "$params.baseDir/filtered_round", mode: 'symlink'
+    publishDir "$params.outDir/filtered_round/", mode: 'symlink'
     
     input: 
     //flatmap is really important here to make sure all tiles go into a different map.
@@ -93,7 +93,7 @@ filtered_images.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.se
 
 
 process filter_ref {
-    publishDir "$params.baseDir/filtered_ref", mode: 'symlink'
+    publishDir "$params.baseDir/filtered_ref/", mode: 'symlink'
 
     input:
     path image from tiled_ref.flatten()
@@ -104,28 +104,27 @@ process filter_ref {
     python ${params.filtering_path} ${image}
     """
 }
-
+//Branch might be another way of doing this.
 filtered_ref_images.map(){file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped}
+// process unpackTuples {
+//     echo true
+//     input: 
+//     each tuple val(ref_tile_nr), path(ref_image) from filtered_ref_images_mapped
+//     tuple val(tile_nr), path(image) from filtered_images_mapped
 
-process unpackTuples {
-    echo true
-    input: 
-    tuple val(ref_tile_nr), path(ref_image) from filtered_ref_images_mapped
-    tuple val(tile_nr), path(image) from filtered_images_mapped
+//     script:
+//     if (tile_nr.toString() == ref_tile_nr.toString()){
+//         """
+//         echo ${tile_nr} ${ref_tile_nr}
+//         """        
+//     }
+//     else{
+//         """
+//         echo 'test'
+//         """
+//     }
 
-    script:
-    if (tile_nr.toString() == ref_tile_nr.toString()){
-        """
-        echo ${tile_nr} ${ref_tile_nr}
-        """        
-    }
-    else{
-        """
-        echo 'test'
-        """
-    }
-
-}
+// }
 
 
 // process combine_channels {
