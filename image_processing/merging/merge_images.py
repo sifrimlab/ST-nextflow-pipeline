@@ -1,10 +1,9 @@
 ##opencv solution
 import numpy as np
 import cv2
+import sys
 
 
-ref_name = "/home/nacho/Documents/Code/image_processing/image_similarity/imgs/ref_tile48.tif"
-target_name = "/home/nacho/Documents/Code/image_processing/image_similarity/imgs/registered_48.tif"
 
 def createComposite(img1, img2):
     A = cv2.cv2.imread(img1, cv2.cv2.IMREAD_ANYDEPTH)
@@ -17,3 +16,7 @@ def createComposite(img1, img2):
     merged = cv2.cv2.merge((zeros,B,A))
     
     return merged
+
+img1 = sys.argv[1]
+img2 = sys.argv[2]
+cv2.imwrite("composite.tif", createComposite(img1, img2))
