@@ -23,11 +23,18 @@ params.target_x_reso=500
 params.target_y_reso=500
 
 params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
+//starfish: masking radius = 15
 
 params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
 params.min_sigma = 1
 params.max_sigma = 3
-
+/**
+   min_sigma=1,
+   max_sigma=10,
+   num_sigma=30,
+   threshold=0.01,
+   measurement_type='mean'
+**/
 nextflow.enable.dsl=2
 
 process register{
@@ -146,24 +153,31 @@ workflow {
     //load data
     round1 = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
 
+    //register data
     register(round1) //output = register.out
 
+    //tile data
     tile_round(register.out)
     tile_ref(params.reference)
 
     //if you don't wanna filter:
-    tile_ref.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
-    tile_round.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped}
+    // tile_ref.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
+    // tile_round.out.flatten().map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped}
     
+    //filter with white_tophat
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
     
+    //map filtered images to their respective tile
     filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
     filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped} 
 
+    //combine ref and rounds into a dataobject that allows for local registration per tile
     filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
+    //register each tile seperately
     local_registration(combined_filtered_tiles)
     
+    //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
     
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
