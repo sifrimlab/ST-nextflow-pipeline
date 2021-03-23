@@ -1,7 +1,7 @@
 import os
 import cv2
 import sys
-from skimage.morphology import white_tophat
+from skimage.morphology import white_tophat, disk
 from skimage import io
 # from inputParsing import makeDir
 
@@ -30,17 +30,24 @@ from skimage import io
 
 #         print(f"Filtered images of tile {row.Tile} written to {round_path}")
 
-def filterWithWhiteTophat(image):
+def filterWithWhiteTophat(image, radius):
     """Wrapper for skimage's white tophat filter
 
     Parameters
     ----------
     image : np.ndarray
         Image to be filtered.
+    radius: int
+        Radius of the morphological disk.
     """
-    return white_tophat(image)
+    selem = disk(radius)
+    return white_tophat(image,selem)
 
+
+# Input parsing
 img = io.imread(sys.argv[1])
 prefix = os.path.splitext(sys.argv[1])[0]
-print(prefix)
-cv2.imwrite(f"{prefix}_filtered.tif", filterWithWhiteTophat(img))
+radius = int(sys.argv[2])
+print(radius)
+# Writing filtered image
+cv2.imwrite(f"{prefix}_filtered.tif", filterWithWhiteTophat(img, radius))

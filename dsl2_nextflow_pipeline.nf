@@ -23,7 +23,7 @@ params.target_x_reso=500
 params.target_y_reso=500
 
 params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
-//starfish: masking radius = 15
+params.filter_radius=15
 
 params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
 params.min_sigma = 1
@@ -93,7 +93,7 @@ process filter_round{
     script:
     // channel_nr=image.toString() =~ /c\d/
     """
-    python ${params.filtering_path} ${image}
+    python ${params.filtering_path} ${image} ${params.filter_radius}
     """
 }
 
@@ -106,7 +106,7 @@ process filter_ref {
     path "${image.baseName}_filtered.tif" 
 
     """
-    python ${params.filtering_path} ${image}
+    python ${params.filtering_path} ${image} ${params.filter_radius}
     """
 }
 
@@ -182,7 +182,5 @@ workflow {
     
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
     
-
-
 }
 
