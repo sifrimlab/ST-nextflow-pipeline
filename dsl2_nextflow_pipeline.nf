@@ -2,10 +2,6 @@ params.n_rounds=4
 params.n_channels=4
 params.n_tiles=4
 
-
-round = Channel.fromPath("$params.dataDir/Round1/*.TIF", type: 'file')
-
-
 // datasets = Channel
 //                 .fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
 //                 .map { file -> tuple(file.baseName, file) }
@@ -28,7 +24,7 @@ params.max_sigma = 3
 nextflow.enable.dsl=2
 
 log.info """\
-         communISS Pipeline   
+         COMMUNISS PIPELINE   
          =============================
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
@@ -36,6 +32,8 @@ log.info """\
          # of Channels : ${params.n_channels}
          """
          .stripIndent()
+
+
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
@@ -150,10 +148,10 @@ process spot_detection_reference {
 
 workflow {
     //load data
-    round1 = Channel.fromPath("$params.dataDir/Round1/*.TIF", type: 'file')
+    rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file')
 
     //register data
-    register(round1) //output = register.out
+    register(rounds) //output = register.out
 
     //tile data
     tile_round(register.out)
@@ -172,6 +170,7 @@ workflow {
     filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped} 
 
     //combine ref and rounds into a dataobject that allows for local registration per tile
+    //TODO It's clear that this mapping is a bottleneck, since nextflow waits until all round images are filtered before going to local registration, and that shouldn't be hapenning
     filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
     //register each tile seperately
     local_registration(combined_filtered_tiles)
