@@ -2,13 +2,8 @@ params.n_rounds=4
 params.n_channels=4
 params.n_tiles=4
 
-//this should all be in the config file
-// params.baseDir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
 
-// // params.rounds="$baseDir/Round*/*.TIF"
-// params.outDir="/home/nacho/Documents/Code/communISS/results"
-round = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
-// params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
+round = Channel.fromPath("$params.dataDir/Round1/*.TIF", type: 'file')
 
 
 // datasets = Channel
@@ -16,18 +11,11 @@ round = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
 //                 .map { file -> tuple(file.baseName, file) }
 
 
-// params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
-// params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
-
-
-// params.tiling_path = "/home/nacho/Documents/Code/communISS/image_processing/tiling_nextflow.py"
 params.target_x_reso=500
 params.target_y_reso=500
 
-// params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
 params.filter_radius=15
 
-// params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
 params.min_sigma = 1
 params.max_sigma = 3
 /**
@@ -39,6 +27,15 @@ params.max_sigma = 3
 **/
 nextflow.enable.dsl=2
 
+log.info """\
+         communISS Pipeline   
+         =============================
+         Data dir: ${params.dataDir}
+         Output dir : ${params.outDir}
+         # of Rounds : ${params.n_rounds}
+         # of Channels : ${params.n_channels}
+         """
+         .stripIndent()
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
@@ -153,7 +150,7 @@ process spot_detection_reference {
 
 workflow {
     //load data
-    round1 = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
+    round1 = Channel.fromPath("$params.dataDir/Round1/*.TIF", type: 'file')
 
     //register data
     register(round1) //output = register.out
