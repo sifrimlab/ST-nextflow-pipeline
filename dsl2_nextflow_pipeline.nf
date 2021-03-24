@@ -2,30 +2,32 @@ params.n_rounds=4
 params.n_channels=4
 params.n_tiles=4
 
-params.baseDir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
+//this should all be in the config file
+// params.baseDir = "/media/tool/starfish_test_data/ExampleInSituSequencing"
 
-// params.rounds="$baseDir/Round*/*.TIF"
-params.outDir="/home/nacho/Documents/Code/communISS/results"
+// // params.rounds="$baseDir/Round*/*.TIF"
+// params.outDir="/home/nacho/Documents/Code/communISS/results"
 round = Channel.fromPath("$params.baseDir/Round1/*.TIF", type: 'file')
+// params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
+
 
 // datasets = Channel
 //                 .fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
 //                 .map { file -> tuple(file.baseName, file) }
 
-params.reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
 
-params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
-params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
+// params.transform_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/calculateTransform.py"
+// params.register_path = "/home/nacho/Documents/Code/communISS/image_processing/registration/rigidRegister.py"
 
 
-params.tiling_path = "/home/nacho/Documents/Code/communISS/image_processing/tiling_nextflow.py"
+// params.tiling_path = "/home/nacho/Documents/Code/communISS/image_processing/tiling_nextflow.py"
 params.target_x_reso=500
 params.target_y_reso=500
 
-params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
+// params.filtering_path= "/home/nacho/Documents/Code/communISS/image_processing/filtering.py"
 params.filter_radius=15
 
-params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
+// params.spot_detection_path= "/home/nacho/Documents/Code/communISS/image_processing/spotDetection.py"
 params.min_sigma = 1
 params.max_sigma = 3
 /**
