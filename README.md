@@ -7,7 +7,7 @@
 ### Running the pipeline
 - ***Run***: nextflow clone WoutDavid/communISS ; cd communISS
 - edit the nextflow.config file with specifications of your project (path to data, n_rounds etc...)
-- ***Run***: nextflow run dsl2_nextflow_pipeline.nf -with-conda communISS.yaml
+- ***Run***: nextflow run dsl2_nextflow_pipeline.nf -with-conda communISS.yaml --dataDir '/path/to/data/directory/'
 
 
 ### File explanation
