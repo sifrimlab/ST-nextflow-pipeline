@@ -5,9 +5,15 @@
 - (Ana)Conda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 ### Running the pipeline
-- ***Run***: nextflow clone WoutDavid/communISS ; cd communISS
+- 	```bash
+	nextflow clone WoutDavid/communISS ; cd communISS
+	```
 - edit the nextflow.config file with specifications of your project (path to data, n_rounds etc...)
-- ***Run***: nextflow run dsl2_nextflow_pipeline.nf -with-conda communISS.yaml --dataDir '/path/to/data/directory/'
+- ```bash
+  nextflow run  dsl2_nextflow_pipeline.nf		\
+					--with_conda comunISS.yaml	\
+					--dataDir '/path/to/data/'	\
+	```
 
 
 ### File explanation
