@@ -138,12 +138,19 @@ process spot_detection_reference {
     python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
     """
 }
-// process spot_detection_round {
-//     publishDir "params.outDir/hybs", mode: 'symlink'
+process spot_detection_round {
+    publishDir "$params.outDir/hybs", mode: 'symlink'
 
+    input:
+    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
 
+    output:
+    path "${round_image.baseName}_hybs.csv"
 
-// }
+    """
+    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+    """
+}
 
 // process barcode_decoding {
 //     publishDir "$params.outDir/barcodesDecoded", mode: 'symlink'
@@ -176,11 +183,14 @@ workflow {
     //register each tile seperately
     local_registration(combined_filtered_tiles)
     
-    local_registration.out.map() {file -> tuple((file.baseName=~ /Round\d/)[0], file) }.set {round_images_mapped} 
-    round_images_mapped.groupTuple().map()
+    local_registration.out.map() {file -> tuple((file.baseName=~ /tiled_\d/)[0],(file.baseName=~ /Round\d/)[0],(file.baseName=~ /c\d/)[0], file) }.set {round_images_mapped}
+    // round_images_mapped.groupTuple().map() {round, files -> tuple((file.baseName=~ /Round\d/)[0], file) }.set {round_images_mapped} 
+
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
-    
+    spot_detection_round(round_images_mapped)
+
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
+    spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true)
     
 }
