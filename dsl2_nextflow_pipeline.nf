@@ -151,7 +151,7 @@ process spot_detection_round {
     path "${round_image.baseName}_hybs.csv"
 
     """
-    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr} ${params.num_sigma} ${params.threshold}
+    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
     """
 }
 
