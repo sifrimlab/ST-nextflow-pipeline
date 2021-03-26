@@ -155,6 +155,20 @@ process spot_detection_round {
     """
 }
 
+process gather_intensities {
+    publishDir "$params.outDir/intensities", mode: 'symlink'
+
+    input:
+    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image)
+
+    output:
+    path "intensities.csv"
+
+    """
+    python ${params.gather_intensity_path} ${round_path} ${tile_nr} ${round_nr} ${channel_nr}
+    """
+}
+
 // process barcode_decoding {
 //     publishDir "$params.outDir/barcodesDecoded", mode: 'symlink'
 
@@ -191,9 +205,11 @@ workflow {
 
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
-    spot_detection_round(round_images_mapped)
+    // spot_detection_round(round_images_mapped)
 
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
-    spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true)
+    // spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true)
+
+    // look at spot coördinates in all rounds and channels and check the intensity, pool it into one csv.
     
 }

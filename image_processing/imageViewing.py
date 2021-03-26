@@ -16,7 +16,7 @@ blobs = "/home/nacho/Documents/Code/communISS/results/blobs/concat_blobs.csv"
  v
 '''
 
-def plotSpotsOnWholeImage(path_to_img, path_to_spotsCSV, tile_grid_shape, tile_size_x, tile_size_y, plotlib=False):
+def plotSpotsOnWholeImage(path_to_img, path_to_spotsCSV, tile_grid_shape, tile_size_x, tile_size_y, plotlib=True):
     df = pd.read_csv(path_to_spotsCSV)
     image = cv2.imread(path_to_img)
     empty_image = np.zeros(image.shape)
@@ -38,15 +38,16 @@ def plotSpotsOnWholeImage(path_to_img, path_to_spotsCSV, tile_grid_shape, tile_s
         empty_image[y_coordinate, x_coordinate]=255
     if plotlib==True:
         fig, axs = plt.subplots(1, 2)
-        axs[0, 0].imshow(image)
-        axs[0, 0].set_title('Original image')
-        axs[0, 1].imshow(empty_image)
-        axs[0, 1].set_title("Detected spots")
-        for ax in axs.flat:
+        axs[0].imshow(image)
+        axs[0].set_title('Original image')
+        axs[1].imshow(empty_image)
+        axs[1].set_title("Detected spots")
+        for ax in axs:
             ax.set(xlabel='X-coordinates', ylabel='y-coordinates')
+        plt.show()
 
     else:
         cv2.imshow("Original", image)
         cv2.imshow("Detected spots", empty_image)
         cv2.waitKey(0)
-plotSpotsOnWholeImage(reference, blobs, (2,2), 665, 490, plotlib=True)
+# plotSpotsOnWholeImage(reference, blobs, (2,2), 665, 490)
