@@ -40,4 +40,4 @@ def plotSpotsOnWholeImage(path_to_img, path_to_spotsCSV, tile_grid_shape, tile_s
     cv2.imshow("Original", image)
     cv2.imshow("Detected spots", empty_image)
     cv2.waitKey(0)
-plotSpotsOnWholeImage(reference, blobs, (2,2),665, 490)
+plotSpotsOnWholeImage(reference, blobs, (2,2), 665, 490)

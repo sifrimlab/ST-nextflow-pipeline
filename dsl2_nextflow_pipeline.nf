@@ -13,7 +13,10 @@ params.target_y_reso=500
 params.filter_radius=15
 
 params.min_sigma = 1
-params.max_sigma = 3
+params.max_sigma = 10
+params.num_sigma = 30
+params.threshold=0.01
+
 /**
    min_sigma=1,
    max_sigma=10,
@@ -148,7 +151,7 @@ process spot_detection_round {
     path "${round_image.baseName}_hybs.csv"
 
     """
-    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr} ${params.num_sigma} ${params.threshold}
     """
 }
 
