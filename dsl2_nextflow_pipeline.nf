@@ -2,7 +2,6 @@ params.n_rounds=4
 params.n_channels=4
 params.n_tiles=4
 
-
 params.target_x_reso=500
 params.target_y_reso=500
 
@@ -39,7 +38,6 @@ process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
     input:
-    // val x from numbers
     tuple val(round_nr), path(image) 
 
     output:
@@ -82,7 +80,6 @@ process filter_round{
     publishDir "$params.outDir/filtered_round/", mode: 'symlink'
     
     input: 
-    //flatmap is really important here to make sure all tiles go into a different map.
     path image 
 
     output:
