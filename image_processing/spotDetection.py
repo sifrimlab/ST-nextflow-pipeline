@@ -36,7 +36,7 @@ else:
     round_bool = False
 
 # image = exposure.equalize_hist(image)
-array = laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma)
+array = laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma) # --> returns array: [rows, columns, sigma] = [Y, X, sigma] in image terms
 array = np.insert(array, 0, tile_number, axis=1)
 if round_bool:
     array = np.insert(array, 1, round_number, axis=1)
@@ -44,7 +44,7 @@ if round_bool:
 array = array.astype(int)
 
 if not round_bool:
-    np.savetxt(f"{prefix}_blobs.csv", array, delimiter=',',fmt='%i', header='Tile,X,Y,Sigma',comments='')
+    np.savetxt(f"{prefix}_blobs.csv", array, delimiter=',',fmt='%i', header='Tile,Y,X,Sigma',comments='')
 else:
-    np.savetxt(f"{prefix}_hybs.csv", array,delimiter=',',fmt='%i', header='Tile,Round,Channel,X,Y,Sigma',comments='' )
+    np.savetxt(f"{prefix}_hybs.csv", array,delimiter=',',fmt='%i', header='Tile,Round,Channel,Y,X,Sigma',comments='' )
 
