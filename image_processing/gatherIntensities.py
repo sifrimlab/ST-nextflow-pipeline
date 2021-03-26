@@ -1,11 +1,9 @@
 import pandas as pd
-import numpy as np
 from skimage import io
 from csv import writer
 import sys
 import os
 import re
-from icecream import ic
 ## The idea here is to create a new csv that has positions for the round/channel intensities to go, and to update that csv every time a new image is inputted
 #input example: [tiled_4, Round3, c2, /home/nacho/Documents/Code/communISS/work/b0/ca1a59e73e0fbcee5b7290a8185dcc/Round3_c2_registered_tiled_4_filtered_registered.tif]
 # reference = io.imread("/home/nacho/Documents/Code/communISS/results/filtered_ref/REF_tiled_1_filtered.tif")
