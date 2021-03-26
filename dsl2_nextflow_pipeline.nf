@@ -2,10 +2,6 @@ params.n_rounds=4
 params.n_channels=4
 params.n_tiles=4
 
-// datasets = Channel
-//                 .fromPath("/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/*.TIF")
-//                 .map { file -> tuple(file.baseName, file) }
-
 
 params.target_x_reso=500
 params.target_y_reso=500
@@ -24,6 +20,8 @@ params.threshold=0.01
    threshold=0.01,
    measurement_type='mean'
 **/
+
+params
 nextflow.enable.dsl=2
 
 log.info """\
@@ -141,31 +139,32 @@ process spot_detection_reference {
     python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
     """
 }
-process spot_detection_round {
-    publishDir "$params.outDir/hybs", mode: 'symlink'
+// process spot_detection_round {
+//     publishDir "$params.outDir/hybs", mode: 'symlink'
 
-    input:
-    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
+//     input:
+//     tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
 
-    output:
-    path "${round_image.baseName}_hybs.csv"
+//     output:
+//     path "${round_image.baseName}_hybs.csv"
 
-    """
-    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
-    """
-}
+//     """
+//     python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+//     """
+// }
 
 process gather_intensities {
     publishDir "$params.outDir/intensities", mode: 'symlink'
 
     input:
+    path blobs
     tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image)
 
     output:
-    path "intensities.csv"
+    path "${round_image.baseName}_intensities.csv"
 
     """
-    python ${params.gather_intensity_path} ${round_path} ${tile_nr} ${round_nr} ${channel_nr}
+    python ${params.gather_intensity_path} ${blobs} ${round_image} ${tile_nr} ${round_nr} ${channel_nr}
     """
 }
 
@@ -207,8 +206,13 @@ workflow {
     spot_detection_reference(filtered_ref_images_mapped)
     // spot_detection_round(round_images_mapped)
 
-    spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true)
-    // spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true)
+    spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
+    blobs_value_channel = blobs.first() //Needs to be a value channel to allow it to iterate multiple times in gather_intensities
+
+    // Gather intensities into one big csv that contains all
+    gather_intensities(blobs_value_channel, round_images_mapped)
+    gather_intensities.out.collectFile(name: "$params.outDir/intensities/concat_intensities.csv", sort:true, keepHeader:true).set {intensities}
+
 
     // look at spot coördinates in all rounds and channels and check the intensity, pool it into one csv.
     
