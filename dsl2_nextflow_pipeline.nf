@@ -49,6 +49,19 @@ process register{
 
 }
 
+process calculate_tile_size{
+
+    input:
+    path image
+    output:
+    env tile_size_x
+    env tile_size_y    
+    """
+    tile_shape=(`python $params.calculateOptimalTileSize_path $image  500 500`)
+    tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
+    """
+}
+
 process tile_round {
     publishDir "$params.outDir/tiled_round/", mode: 'symlink'
     input: 
@@ -178,10 +191,15 @@ workflow {
     rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
     //register data
     register(rounds) //output = register.out
+
+    //take one tile and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
+    calculate_tile_size(register.out.first()) 
+    
     // tile data
     tile_round(register.out)
     tile_ref(params.reference)
 
+    
     //filter with white_tophat
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
