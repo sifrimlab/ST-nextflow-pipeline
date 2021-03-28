@@ -9,6 +9,26 @@ import re
 from icecream import ic
 # Beware, not giving min/max sigma's prompts skimage to calculate it, which takes at least twice as long, so for largescale use this is not a good idea
 def laplacianOfGaussianBlobDetector(image, min_sigma=None, max_sigma=None, num_sigma=None, threshold=None):
+    """Wrapper for the skimage.feature.blob_log function.
+
+    Parameters
+    ----------
+    image : nd.array
+        Image on which spot detection is to be performed.
+    min_sigma : int, optional
+        [description], by default None
+    max_sigma : int, optional
+        [description], by default None
+    num_sigma : int, optional
+        [description], by default None
+    threshold : int, optional
+        [description], by default None
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
     if min_sigma is None or max_sigma is None:
         blobs=blob_log(image)
         print("No sigma's received as input for the spot detection. This will increase computation time.")
@@ -20,6 +40,10 @@ def laplacianOfGaussianBlobDetector(image, min_sigma=None, max_sigma=None, num_s
     return blobs
 
 
+## Argument parsing:
+'''
+    python spotDetection.py image_path tile_number min_sigma max_sigma round_number channel_number num_sigma threshold
+'''
 image = io.imread(sys.argv[1])
 prefix = os.path.splitext(sys.argv[1])[0]
 tile_number = re.findall(r'\d+', sys.argv[2])[0]
@@ -37,6 +61,7 @@ if len(sys.argv)>5:
     round_number = re.findall(r'\d+', sys.argv[5])[0]
     channel_number = re.findall(r'\d+', sys.argv[6])[0]
 else:
+    # If there are less than 5 arguments, that means this script was called from the spotDetection on the reference image, which is indicated by round_bool.
     round_bool = False
 if len(sys.argv)>7:
     num_sigma=sys.argv[7]
@@ -45,8 +70,8 @@ else:
     num_sigma=None
     threshold=None
 
-# image = exposure.equalize_hist(image)
 array = laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma, num_sigma, threshold) # --> returns array: [rows, columns, sigma] = [Y, X, sigma] in image terms
+# Insert columns into the array of spots based on the metadata of the input image.
 array = np.insert(array, 0, tile_number, axis=1)
 if round_bool:
     array = np.insert(array, 1, round_number, axis=1)

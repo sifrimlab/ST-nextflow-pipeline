@@ -10,7 +10,22 @@ from skimage import io
     However, tileWriter still does support irregular tiles, it's just not nice to have irregular tiles for downstream functionality.
 '''
 def calculateOptimalTileSize(img_path, target_X, target_Y):
-    # img = cv2.imread(img_path, 0)
+    """Calculates the optimal tile size to cut the given image into to get tiles the size of target_X, target_Y
+
+    Parameters
+    ----------
+    img_path : str
+        Path to input image.
+    target_X : int
+        Desired X-resolution.
+    target_Y : int
+        Desired Y-resolution
+
+    Returns
+    -------
+    int, int
+        Returns optimal X and Y-resolutions to tile the input image in to get the target resolution, while retaining evenly sized tiles.
+    """
     img=io.imread(img_path)
     shape = img.shape
     optimal_x = findOptimalDivisor(shape[1], target_X)

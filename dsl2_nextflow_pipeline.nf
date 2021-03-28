@@ -20,9 +20,9 @@ params.threshold=0.01
    measurement_type='mean'
 **/
 
-params
 nextflow.enable.dsl=2
 
+// Prints a nice intro message before running the pipeline
 log.info """\
          COMMUNISS PIPELINE   
          =============================
@@ -33,7 +33,9 @@ log.info """\
          """
          .stripIndent()
 
+process crop_images {
 
+}
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
@@ -178,12 +180,6 @@ process gather_intensities {
     """
 }
 
-// process barcode_decoding {
-//     publishDir "$params.outDir/barcodesDecoded", mode: 'symlink'
-
-//     input:
-//     path 
-// }
 
 
 workflow {
@@ -229,6 +225,5 @@ workflow {
     gather_intensities.out.collectFile(name: "$params.outDir/intensities/concat_intensities.csv", sort:true, keepHeader:true).set {intensities}
 
 
-    // look at spot coördinates in all rounds and channels and check the intensity, pool it into one csv.
     
 }
