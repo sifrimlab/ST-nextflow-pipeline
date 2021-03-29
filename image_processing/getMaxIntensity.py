@@ -14,8 +14,9 @@ df_total = "/home/nacho/Documents/Code/communISS/results/intensities/concat_inte
 
 
 # End result: each tile is not in a different df, stored inside the df_dict.
-def getMaxIntensityPerRound(path_to_intensity_csv: str, n_tiles: int):
+def getMaxIntensityPerRound(path_to_intensity_csv: str,):
     df_total = pd.read_csv(path_to_intensity_csv)
+    n_tiles = df_total['Tile'].max()
     unique_tiles = df_total.Tile.unique()
     df_dict = {tile : pd.DataFrame for tile in unique_tiles}
     for key in df_dict.keys():
@@ -28,7 +29,7 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str, n_tiles: int):
         df_filtered.to_csv(f"tile{i}_max.csv")
 
 
-getMaxIntensityPerRound(df_total, 4)
+getMaxIntensityPerRound(df_total)
 
 
 
