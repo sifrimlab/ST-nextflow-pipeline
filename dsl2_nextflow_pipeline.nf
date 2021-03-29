@@ -179,6 +179,21 @@ process gather_intensities {
     """
 }
 
+process get_max_intensities {
+    publishDir "$params.outDir/intensities", mode: 'symlink'
+
+    input:
+    path all_intensities
+
+    output:
+    path "tile*_max_intensities.csv"
+
+    """
+    python ${params.getMaxIntensity_path} ${all_intensities}
+    """
+
+}
+
 
 
 workflow {
@@ -222,5 +237,9 @@ workflow {
     // Gather intensities into one big csv that contains all
     gather_intensities(blobs_value_channel, round_images_mapped)
     gather_intensities.out.collectFile(name: "$params.outDir/intensities/concat_intensities.csv", sort:true, keepHeader:true).set {intensities}
+
+    // Get max intensity channel from each round/X/Y combination
+    get_max_intensities(intensities.first())
+    get_max_intensities.out.flatten().view()
     
 }
