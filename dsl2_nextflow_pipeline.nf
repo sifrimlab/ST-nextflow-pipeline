@@ -19,7 +19,7 @@ params.threshold=0.01
    threshold=0.01,
    measurement_type='mean'
 **/
-
+params.codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
 nextflow.enable.dsl=2
 
 // Prints a nice intro message before running the pipeline
@@ -191,6 +191,19 @@ process get_max_intensities {
     """
     python ${params.getMaxIntensity_path} ${all_intensities}
     """
+}
+process decode_sequential_max_intensity {
+    publishDir "$params.outDir/decoded", mode: 'symlink'
+
+    input:
+    path max_intensities
+
+    output:
+    path "decoded_tile*.csv"
+
+    """
+    python ${params.decoding_path} ${max_intensities} ${params.codebook}
+    """
 
 }
 
@@ -229,7 +242,7 @@ workflow {
 
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
-    spot_detection_round(round_images_mapped)
+    // spot_detection_round(round_images_mapped)
 
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Needs to be a value channel to allow it to iterate multiple times in gather_intensities
@@ -240,6 +253,11 @@ workflow {
 
     // Get max intensity channel from each round/X/Y combination
     get_max_intensities(intensities.first())
-    get_max_intensities.out.flatten().view()
+
+    // Decode the max intensities
+    decode_sequential_max_intensity(get_max_intensities.out.flatten())
+
+    // Pool them into one file
+    decode_sequential_max_intensity.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
     
 }
