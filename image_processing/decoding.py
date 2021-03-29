@@ -4,33 +4,33 @@ import csv
 n_tiles = 4
 n_channels = 4 
 n_rounds=4
-codebook = pd.read_csv("/media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv")
+# codebook = pd.read_csv("/media/tool/starfish_test_data/ExampleInSituSequencing/codebook.csv")
 
-df_total = pd.read_csv("/home/nacho/Documents/Code/communISS/results/intensities/concat_intensities.csv")
+df_total = "/home/nacho/Documents/Code/communISS/results/intensities/concat_intensities.csv"
+# df_total = pd.read_csv("fake_intensities.csv")
 # First I split the df up into a dataframe for each tile, cause the tiles don't need to interact with each other.
-unique_tiles = df_total.Tile.unique()
-df_dict = {tile : pd.DataFrame for tile in unique_tiles}
 
-for key in df_dict.keys():
-    df_dict[key] = df_total[:][df_total.Tile == key]
+
+
 
 # End result: each tile is not in a different df, stored inside the df_dict.
-
-# Let's just start with tile 2, now we can 
-for i in range(1, n_tiles+1):
-    df = df_dict[i].drop(columns='Tile') # Tile column doesn't matter anymore
-    df.groupby(['Round','Y','X']).max().to_csv(f"tile{i}_max.csv")
-
-# max_int = 0
-# winning_channel = 0
-# for row in df2.itertuples():
-#     if row.Round == 1 and row.Y == 47 and row.X == 576:
-#         if row.Intensity > max_int:
-#             max_int = row.Intensity
-#             winning_channel = row.Channel
-# print(max_int, winning_channel)
+def getMaxIntensityPerRound(path_to_intensity_csv: str, n_tiles: int):
+    df_total = pd.read_csv(path_to_intensity_csv)
+    unique_tiles = df_total.Tile.unique()
+    df_dict = {tile : pd.DataFrame for tile in unique_tiles}
+    for key in df_dict.keys():
+        df_dict[key] = df_total[:][df_total.Tile == key]
+    for i in range(1, n_tiles+1):
+        df = df_dict[i].drop(columns='Tile') # Tile column doesn't matter anymore
+        df_filtered = df.sort_values('Intensity', ascending=False).drop_duplicates(['Round','Y','X'])
+        # Different implementation; gets ALL maxima, but slightly slower: df_filtered = df[df.groupby(['Round','Y','X'])['Intensity'].transform(max)== df['Intensity']]
+        # Print out into different csv's to fascilitate parallelizing in nextflow
+        df_filtered.to_csv(f"tile{i}_max.csv")
 
 
+getMaxIntensityPerRound(df_total, 4)
 
-# This is a cool pandas excerpt to count how many unique combinations exist in a dataframe.
-#df2.groupby(['Y','X', 'Round']).size().reset_index().rename(columns={0:'count'})
+
+
+
+

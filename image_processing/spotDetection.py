@@ -69,7 +69,6 @@ if len(sys.argv)>7:
 else:
     num_sigma=None
     threshold=None
-
 array = laplacianOfGaussianBlobDetector(image, min_sigma, max_sigma, num_sigma, threshold) # --> returns array: [rows, columns, sigma] = [Y, X, sigma] in image terms
 # Insert columns into the array of spots based on the metadata of the input image.
 array = np.insert(array, 0, tile_number, axis=1)
@@ -81,5 +80,5 @@ array = array.astype(int)
 if not round_bool:
     np.savetxt(f"{prefix}_blobs.csv", array, delimiter=',',fmt='%i', header='Tile,Y,X,Sigma',comments='')
 else:
-    np.savetxt(f"{prefix}_hybs.csv", array,delimiter=',',fmt='%i', header='Tile,Round,Channel,Y,X,Sigma',comments='' )
+    np.savetxt(f"{prefix}_hybs.csv", array,delimiter=',',fmt='%i', header='Tile,Round,Channel,Y,X,Sigma',comments='')
 

@@ -33,9 +33,9 @@ log.info """\
          """
          .stripIndent()
 
-process crop_images {
+// process crop_images {
 
-}
+// }
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
@@ -101,7 +101,6 @@ process filter_round{
     path "${image.baseName}_filtered.tif"
 
     script:
-    // channel_nr=image.toString() =~ /c\d/
     """
     python ${params.filtering_path} ${image} ${params.filter_radius}
     """
@@ -151,19 +150,19 @@ process spot_detection_reference {
     python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
     """
 }
-// process spot_detection_round {
-//     publishDir "$params.outDir/hybs", mode: 'symlink'
+process spot_detection_round {
+    publishDir "$params.outDir/hybs", mode: 'symlink'
 
-//     input:
-//     tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
+    input:
+    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
 
-//     output:
-//     path "${round_image.baseName}_hybs.csv"
+    output:
+    path "${round_image.baseName}_hybs.csv"
 
-//     """
-//     python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
-//     """
-// }
+    """
+    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+    """
+}
 
 process gather_intensities {
     publishDir "$params.outDir/intensities", mode: 'symlink'
@@ -215,7 +214,7 @@ workflow {
 
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
-    // spot_detection_round(round_images_mapped)
+    spot_detection_round(round_images_mapped)
 
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Needs to be a value channel to allow it to iterate multiple times in gather_intensities
@@ -223,7 +222,5 @@ workflow {
     // Gather intensities into one big csv that contains all
     gather_intensities(blobs_value_channel, round_images_mapped)
     gather_intensities.out.collectFile(name: "$params.outDir/intensities/concat_intensities.csv", sort:true, keepHeader:true).set {intensities}
-
-
     
 }
