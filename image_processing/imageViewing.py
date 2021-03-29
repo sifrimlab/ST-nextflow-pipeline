@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import cv2
-
+from typing import Tuple
 reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
 blobs = "/home/nacho/Documents/Code/communISS/results/blobs/concat_blobs.csv"
 
@@ -16,7 +16,7 @@ blobs = "/home/nacho/Documents/Code/communISS/results/blobs/concat_blobs.csv"
  v
 '''
 
-def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: tuple(int,int), tile_size_x: int, tile_size_y: int, plotlib=True,path_to_original_img=""):
+def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int, path_to_original_img=""):
     """Takes a csv of spots as calculated by spotDetection.py and plots them on an untiled empty canvas that has the size of the original image.
 
     Parameters
@@ -30,27 +30,25 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: tuple(int,int)
         Number of columns in the tiled images, or the size of the X-axis.
     tile_size_y : int
         Number of rows in the tiled images, or the size of the Y-axis.
-    plotlib : bool, optional
-        Boolean to indicate whether you want to plot with matplotlib or opencv2, by default True
+
     path_to_img : str, optional
         Path to input image of which the spots originate
     """
     # Parse input
     df = pd.read_csv(path_to_spotsCSV)
-    if path_to_original_img:
-        image = cv2.imread(path_to_original_img)
-        # Create an empty image the size of the original image.
-        empty_image = np.zeros(image.shape)
-
-
+    
     ## Calculate image properties:
     n_total_tiles = tile_grid_shape[0]*tile_grid_shape[1]
+    
     # Create range list of the tiles
     total_tiles_list = list(range(1,n_total_tiles+1))
     # Reshape the range list into the tile grid of the original image.
     tile_array = np.reshape(total_tiles_list, tile_grid_shape)
-    if "empty_image" in dir():     
-        empty_image=np.zeros(tile_array.shape)
+
+    # Creating an empty array the size of an original image
+    original_x = tile_grid_shape[0] * tile_size_x 
+    original_y = tile_grid_shape[1] * tile_size_y
+    empty_image=np.zeros((original_y, original_x))
     # Iterate over each spot in the csv
     for row in df.itertuples():
         # extract X and Y coordinates of the respective tile the spot belongs to
@@ -66,18 +64,17 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: tuple(int,int)
 
         # Give the pixel belonging to the spot a value.
         empty_image[y_coordinate, x_coordinate]=255
-    if plotlib==True:
+    if path_to_original_img:
         fig, axs = plt.subplots(1, 2)
+        image = cv2.imread(path_to_original_img)
         axs[0].imshow(image)
         axs[0].set_title('Original image')
         axs[1].imshow(empty_image)
         axs[1].set_title("Detected spots")
         for ax in axs:
             ax.set(xlabel='X-coordinates', ylabel='y-coordinates')
+            plt.show()
+    else: 
+        plt.imshow(empty_image, cmap='gray')
         plt.show()
-
-    else:
-        cv2.imshow("Original", image)
-        cv2.imshow("Detected spots", empty_image)
-        cv2.waitKey(0)
-# plotSpotsOnWholeImage(reference, blobs, (2,2), 665, 490)
+plotSpotsOnWholeImage(blobs, (2,2), 665, 490)
