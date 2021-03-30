@@ -39,17 +39,31 @@
 // [3, [B, D]]
 
 //The following excerpt is a testing grounds for printing 2 variables in a python script, capturing it with bash and assigning it to a process output
-params.calculateOptimalTileSize_path= "/home/david/Documents/communISS/image_processing/calculateOptimalTileSize.py"
-process test_output {
-    echo true
-    output:
-    env tile_size_x into test
-    env tile_size_y into test2
+// params.calculateOptimalTileSize_path= "/home/david/Documents/communISS/image_processing/calculateOptimalTileSize.py"
+// process test_output {
+//     echo true
+//     output:
+//     env tile_size_x into test
+//     env tile_size_y into test2
 
-    """
-    tile_shape=(`python $params.calculateOptimalTileSize_path /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c2.TIF  500 500`)
-    tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
+//     """
+//     tile_shape=(`python $params.calculateOptimalTileSize_path /media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c2.TIF  500 500`)
+//     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     
-    """
+//     """
 
+// }
+
+
+// The following is a testing grounds for defining a function that checks a backslash
+def checkBackslash(input_string){
+     if (input_string ==~ /.*\/$/){
+        return_string = input_string
+         
+     }
+     else {
+        return_string = input_string + "/"
+     }
+     return return_string
 }
+println(checkBackslash("home/nacho/Documents/Code/communISS/scripting_testspace.nf"))

@@ -39,6 +39,7 @@ def helpMessage() {
         ....
     
     If your extensions deviate from the above pattern (eg.: .tif instead of .TIF), you'll have to make some changes
+
     2)  Locate the absolute path of your decoding scheme: you're going to need it.
         It should be a csv file that is built up as such: (! With header, and the header needs to be exactly as such, deviations from this will cause errors.!)
 
@@ -47,14 +48,47 @@ def helpMessage() {
         CCT7,451312
         ...
 
+    3) Usage:
+        If all of your data is structure as described above, you can easily run the default pipeline using the following command
+
+        nextflow run main.py --dataDir /path/to/data/dir --outDir /path/to/output/dir --codebook /path/to/codebook.csv 
+
+        For customization: here is an overview of all arguments that can be added:
+
+        Required arguments:
+         --dataDir
+         --outDir
+         --codebook
+        
+        Optional arguments:
+         --help
+         --with_conda
+
+         Functionality parameters:
+         --target_x_reso
+         --target_y_reso
+         --filter_radius
+         --min_sigma 
+         --max_sigma
     """
     .stripIndent()
 
 }
-
 if (params.help){
     helpMessage()
     exit 0
+}
+
+// Input parsing/validation
+def checkBackslash(input_string){
+     if (input_string ==~ /.*\/$/){
+        return_string = input_string
+         
+     }
+     else {
+        return_string = input_string + "/"
+     }
+     return return_string
 }
 
 // Prints a nice intro message before running the pipeline
@@ -64,6 +98,7 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          Image processing dir: ${params.image_processing_dir}
+         -----------------------------
          """
          .stripIndent()
 
