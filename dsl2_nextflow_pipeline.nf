@@ -1,4 +1,10 @@
-/*
+#!/usr/bin/env nextflow
+nextflow.enable.dsl=2
+
+def helpMessage() {
+    log.info """\
+    COMMUNISS PIPELINE   
+    =============================
     Welcome to the starting point of the ISS pipeline. This pipeline is designed to be completely modular and adaptable to your specific usecase,
     However, if you would like to just run a pipeline where you don't have to make any decisions or understand what it's doing, then the default settings will be just fine.
     Be warned that this may cause incredibly boring and unsatisfying results.
@@ -41,11 +47,15 @@
         CCT7,451312
         ...
 
-*/
+    """
+    .stripIndent()
 
+}
 
-
-nextflow.enable.dsl=2
+if (params.help){
+    helpMessage()
+    exit 0
+}
 
 // Prints a nice intro message before running the pipeline
 log.info """\
