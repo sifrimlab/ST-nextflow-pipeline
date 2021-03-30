@@ -1,0 +1,19 @@
+## Registration:
+
+## Filtering:
+# Actually used in pipeline so far:
+   - Mask radius of 15 pixels for morphological disk
+## Spot detection 
+# From other sources:
+starfish: 
+/**
+   min_sigma=1,
+   max_sigma=10,
+   num_sigma=30,
+   threshold=0.01,
+   measurement_type='mean'
+**/
+
+# Actually used in pipeline so far:
+    - Reference: params.min_sigma = 1 params.max_sigma = 10
+    - Rounds: params.min_sigma = 1 params.max_sigma = 10

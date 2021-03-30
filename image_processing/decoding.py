@@ -16,7 +16,7 @@ def decodeSequentialMaxIntensity(path_to_max_intensity_csv: str, path_to_codeboo
         if has_header:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                codebook_dict[str(row['barcode'])] = row['gene']
+                codebook_dict[str(row['Barcode']).strip()] = row['Gene'].strip()
         else :
             print("No header was found in the codebook, this might result in unexpected behaviour.")
             for line in csvfile:

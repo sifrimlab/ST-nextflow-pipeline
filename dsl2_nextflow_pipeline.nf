@@ -1,25 +1,50 @@
-params.n_rounds=4
-params.n_channels=4
-params.n_tiles=4
+/*
+    Welcome to the starting point of the ISS pipeline. This pipeline is designed to be completely modular and adaptable to your specific usecase,
+    However, if you would like to just run a pipeline where you don't have to make any decisions or understand what it's doing, then the default settings will be just fine.
+    Be warned that this may cause incredibly boring and unsatisfying results.
+    
+    Below you will find a set of requirements you have to make sure your data fulfills before running any sort of pipeline:
 
-params.target_x_reso=500
-params.target_y_reso=500
+    1) The layout of your ISS directory should follow this scheme:
 
-params.filter_radius=15
+    dataDir
+    |
+    |_______DO
+    |           |____REF.TIF
+    |           |____DAPI.TIF
+    |
+    |________Round1
+        |       |____channel1.TIF
+        |       |____channel2.TIF
+        |       |____channel3.TIF
+        |       |____channel4.TIF
+        |
+        |____Round2
+        |       |____channel1.TIF
+        |       |____channel2.TIF
+        |       |____channel3.TIF
+        |       |____channel4.TIF
+        |
+        |____RoundN
+        |       |____channel1.TIF
+        |       |____channel2.TIF
+        |       |____channel3.TIF
+        |       |____channel4.TIF
+        ....
+    
+    If your extensions deviate from the above pattern (eg.: .tif instead of .TIF), you'll have to make some changes
+    2)  Locate the absolute path of your decoding scheme: you're going to need it.
+        It should be a csv file that is built up as such: (! With header, and the header needs to be exactly as such, deviations from this will cause errors.!)
 
-params.min_sigma = 1
-params.max_sigma = 10
-params.num_sigma = 30
-params.threshold=0.01
+        Gene,Code
+        BRCA2,124354
+        CCT7,451312
+        ...
 
-/**
-   min_sigma=1,
-   max_sigma=10,
-   num_sigma=30,
-   threshold=0.01,
-   measurement_type='mean'
-**/
-params.codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+*/
+
+
+
 nextflow.enable.dsl=2
 
 // Prints a nice intro message before running the pipeline
@@ -28,8 +53,7 @@ log.info """\
          =============================
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
-         # of Rounds : ${params.n_rounds}
-         # of Channels : ${params.n_channels}
+         Image processing dir: ${params.image_processing_dir}
          """
          .stripIndent()
 
@@ -212,10 +236,11 @@ process decode_sequential_max_intensity {
 workflow {
     //load data
     rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
-    //register data
-    register(rounds) //output = register.out
 
-    //take one tile and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
+    //register data
+    register(rounds) 
+
+    //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
     calculate_tile_size(register.out.first()) 
     
     // tile data
@@ -238,7 +263,6 @@ workflow {
     local_registration(combined_filtered_tiles)
     
     local_registration.out.map() {file -> tuple((file.baseName=~ /tiled_\d/)[0],(file.baseName=~ /Round\d/)[0],(file.baseName=~ /c\d/)[0], file) }.set {round_images_mapped}
-    // round_images_mapped.groupTuple().map() {round, files -> tuple((file.baseName=~ /Round\d/)[0], file) }.set {round_images_mapped} 
 
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
