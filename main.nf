@@ -293,7 +293,7 @@ process plot_decoded_spots {
 }
 
 
-workflow {
+workflow old {
     //load data
     rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
 
