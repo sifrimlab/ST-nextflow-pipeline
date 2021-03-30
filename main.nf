@@ -125,8 +125,8 @@ process calculate_tile_size{
     input:
     path image
     output:
-    env tile_size_x
-    env tile_size_y    
+    env tile_size_x, emit: tile_size_x
+    env tile_size_y, emit: tile_size_y
     """
     tile_shape=(`python $params.calculateOptimalTileSize_path $image  500 500`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
@@ -344,5 +344,5 @@ workflow {
     // Pool them into one file
     decode_sequential_max_intensity.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
     
-    plot_decoded_spots(calculate_tile_size.out[0], calculate_tile_size.out[1], decoded_genes)
+    plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
 }
