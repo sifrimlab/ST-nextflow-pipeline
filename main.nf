@@ -98,6 +98,7 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          Image processing dir: ${params.image_processing_dir}
+         target tile size: ${params.target_x_reso} x ${params.target_y_reso}
          -----------------------------
          """
          .stripIndent()
@@ -105,205 +106,197 @@ log.info """\
 // process crop_images {
 
 // }
-// process register{
-//     publishDir "$params.outDir/registered/", mode: 'symlink'
+process register{
+    publishDir "$params.outDir/registered/", mode: 'symlink'
 
-//     input:
-//     tuple val(round_nr), path(image) 
+    input:
+    tuple val(round_nr), path(image) 
 
-//     output:
-//     path "${round_nr}_${image.baseName}_registered.tif" 
+    output:
+    path "${round_nr}_${image.baseName}_registered.tif" 
 
-//     """
-//     python ${params.register_path} ${params.reference} ${image} ${round_nr}
-//     """
-
-// }
-
-// process calculate_tile_size{
-
-//     input:
-//     path image
-//     output:
-//     env tile_size_x
-//     env tile_size_y    
-//     """
-//     tile_shape=(`python $params.calculateOptimalTileSize_path $image  500 500`)
-//     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
-//     """
-// }
-
-// process tile_round {
-//     publishDir "$params.outDir/tiled_round/", mode: 'symlink'
-//     input: 
-//     path image 
-
-//     output: 
-//     path "${image.baseName}_tiled_*.tif"
-    
-//     """
-//     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
-//     """
-// }
-
-// process tile_ref {
-//     publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
-//     input:
-//     path image
-
-//     output:
-//     path "${image.baseName}_tiled_*.tif"
-
-//     """
-//     python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
-//     """
-// }
-
-// process filter_round{
-//     // echo true
-//     publishDir "$params.outDir/filtered_round/", mode: 'symlink'
-    
-//     input: 
-//     path image 
-
-//     output:
-//     path "${image.baseName}_filtered.tif"
-
-//     script:
-//     """
-//     python ${params.filtering_path} ${image} ${params.filter_radius}
-//     """
-// }
-
-// process filter_ref {
-//     publishDir "$params.outDir/filtered_ref/", mode: 'symlink'
-
-//     input:
-//     path image 
-//     output:
-//     path "${image.baseName}_filtered.tif" 
-
-//     """
-//     python ${params.filtering_path} ${image} ${params.filter_radius}
-//     """
-// }
-
-// process local_registration {
-//     publishDir "$params.outDir/local_register/", mode: 'symlink'
-
-//     input: 
-//     tuple val(x), path(ref_image), path(round_image) 
-
-//     output:
-//     path "${round_image.baseName}_registered.tif"
-
-//     script:
-//     """
-//     python ${params.register_path} ${ref_image} ${round_image}
-//     """        
-
-// }
-
-
-
-// process spot_detection_reference {
-//     publishDir "$params.outDir/blobs", mode: 'symlink'
-
-//     input:
-//     tuple val(tile_nr), path(ref_image) 
-
-//     output:
-//     path "${ref_image.baseName}_blobs.csv"
-
-//     """
-//     python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
-//     """
-// }
-// process spot_detection_round {
-//     publishDir "$params.outDir/hybs", mode: 'symlink'
-
-//     input:
-//     tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
-
-//     output:
-//     path "${round_image.baseName}_hybs.csv"
-
-//     """
-//     python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
-//     """
-// }
-
-// process gather_intensities {
-//     publishDir "$params.outDir/intensities", mode: 'symlink'
-
-//     input:
-//     path blobs
-//     tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image)
-
-//     output:
-//     path "${round_image.baseName}_intensities.csv"
-
-//     """
-//     python ${params.gather_intensity_path} ${blobs} ${round_image} ${tile_nr} ${round_nr} ${channel_nr}
-//     """
-// }
-
-// process get_max_intensities {
-//     publishDir "$params.outDir/intensities", mode: 'symlink'
-
-//     input:
-//     path all_intensities
-
-//     output:
-//     path "tile*_max_intensities.csv"
-
-//     """
-//     python ${params.getMaxIntensity_path} ${all_intensities}
-//     """
-// }
-// process decode_sequential_max_intensity {
-//     publishDir "$params.outDir/decoded", mode: 'symlink'
-
-//     input:
-//     path max_intensities
-
-//     output:
-//     path "decoded_tile*.csv"
-
-//     """
-//     python ${params.decoding_path} ${max_intensities} ${params.codebook}
-//     """
-
-// }
-// process plot_decoded_spots {
-//     publishDir "$params.outDir/decoded", mode: 'copy'
-
-//     input:
-//     val tile_size_x
-//     val tile_size_y
-//     path decoded_genes
-
-//     output:
-//     path "decoded_genes_plotted.pdf"
-//     path "decoded_genes_plotted-1.png"
-//     """
-//     python ${params.image_viewing_path} ${params.reference} ${decoded_genes} 2,2 ${tile_size_x} ${tile_size_y}
-//     pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
-//     """
-// }
-
-workflow {
-    include {
-        iss as iss;
-    } from './modules/workflows/iss'
-
-    rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
-    iss(rounds)
+    """
+    python ${params.register_path} ${params.reference} ${image} ${round_nr}
+    """
 
 }
-workflow old {
+
+process calculate_tile_size{
+
+    input:
+    path image
+    output:
+    env tile_size_x, emit: tile_size_x
+    env tile_size_y, emit: tile_size_y
+    """
+    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso}`)
+    tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
+    """
+}
+
+process tile_round {
+    publishDir "$params.outDir/tiled_round/", mode: 'symlink'
+    input: 
+    path image 
+
+    output: 
+    path "${image.baseName}_tiled_*.tif"
+    
+    """
+    python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
+    """
+}
+
+process tile_ref {
+    publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
+    input:
+    path image
+
+    output:
+    path "${image.baseName}_tiled_*.tif"
+
+    """
+    python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
+    """
+}
+
+process filter_round{
+    // echo true
+    publishDir "$params.outDir/filtered_round/", mode: 'symlink'
+    
+    input: 
+    path image 
+
+    output:
+    path "${image.baseName}_filtered.tif"
+
+    script:
+    """
+    python ${params.filtering_path} ${image} ${params.filter_radius}
+    """
+}
+
+process filter_ref {
+    publishDir "$params.outDir/filtered_ref/", mode: 'symlink'
+
+    input:
+    path image 
+    output:
+    path "${image.baseName}_filtered.tif" 
+
+    """
+    python ${params.filtering_path} ${image} ${params.filter_radius}
+    """
+}
+
+process local_registration {
+    publishDir "$params.outDir/local_register/", mode: 'symlink'
+
+    input: 
+    tuple val(x), path(ref_image), path(round_image) 
+
+    output:
+    path "${round_image.baseName}_registered.tif"
+
+    script:
+    """
+    python ${params.register_path} ${ref_image} ${round_image}
+    """        
+
+}
+
+
+
+process spot_detection_reference {
+    publishDir "$params.outDir/blobs", mode: 'symlink'
+
+    input:
+    tuple val(tile_nr), path(ref_image) 
+
+    output:
+    path "${ref_image.baseName}_blobs.csv"
+
+    """
+    python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
+    """
+}
+process spot_detection_round {
+    publishDir "$params.outDir/hybs", mode: 'symlink'
+
+    input:
+    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
+
+    output:
+    path "${round_image.baseName}_hybs.csv"
+
+    """
+    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+    """
+}
+
+process gather_intensities {
+    publishDir "$params.outDir/intensities", mode: 'symlink'
+
+    input:
+    path blobs
+    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image)
+
+    output:
+    path "${round_image.baseName}_intensities.csv"
+
+    """
+    python ${params.gather_intensity_path} ${blobs} ${round_image} ${tile_nr} ${round_nr} ${channel_nr}
+    """
+}
+
+process get_max_intensities {
+    publishDir "$params.outDir/intensities", mode: 'symlink'
+
+    input:
+    path all_intensities
+
+    output:
+    path "tile*_max_intensities.csv"
+
+    """
+    python ${params.getMaxIntensity_path} ${all_intensities}
+    """
+}
+process decode_sequential_max_intensity {
+    publishDir "$params.outDir/decoded", mode: 'symlink'
+
+    input:
+    path max_intensities
+
+    output:
+    path "decoded_tile*.csv"
+
+    """
+    python ${params.decoding_path} ${max_intensities} ${params.codebook}
+    """
+
+}
+process plot_decoded_spots {
+    publishDir "$params.outDir/decoded", mode: 'copy'
+
+    input:
+    val tile_size_x
+    val tile_size_y
+    path decoded_genes
+
+    output:
+    path "decoded_genes_plotted.pdf"
+    path "decoded_genes_plotted-1.png"
+    """
+    python ${params.image_viewing_path} ${params.reference} ${decoded_genes} 2,2 ${tile_size_x} ${tile_size_y}
+    pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
+    """
+}
+
+
+workflow {
     //load data
-    rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
+    rounds = Channel.fromPath("$params.dataDir/Round*/*.tif", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
 
     //register data
     register(rounds) 
@@ -352,5 +345,5 @@ workflow old {
     // Pool them into one file
     decode_sequential_max_intensity.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
     
-    plot_decoded_spots(calculate_tile_size.out[0], calculate_tile_size.out[1], decoded_genes)
+    plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
 }
