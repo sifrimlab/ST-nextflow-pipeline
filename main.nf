@@ -98,6 +98,7 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          Image processing dir: ${params.image_processing_dir}
+         target tile size: ${params.target_x_reso} x ${params.target_y_reso}
          -----------------------------
          """
          .stripIndent()
@@ -128,7 +129,7 @@ process calculate_tile_size{
     env tile_size_x, emit: tile_size_x
     env tile_size_y, emit: tile_size_y
     """
-    tile_shape=(`python $params.calculateOptimalTileSize_path $image  500 500`)
+    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     """
 }
@@ -295,7 +296,7 @@ process plot_decoded_spots {
 
 workflow {
     //load data
-    rounds = Channel.fromPath("$params.dataDir/Round*/*.TIF", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
+    rounds = Channel.fromPath("$params.dataDir/Round*/*.tif", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
 
     //register data
     register(rounds) 
