@@ -67,33 +67,47 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
     total_n_tiles, tile_grid_array, original_x, original_y = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)
     # Create empty image size of the original image
     empty_image=np.zeros((original_y, original_x))
-    # Iterate over each spot in the csv
-    for row in df.itertuples():
-        # extract X and Y coordinates of the respective tile the spot belongs to
-        row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
-        # unpacking the array structure of the return tuple of np.where
-        y_tile_location, x_tile_location = row_location[0], col_location[0]
-        # Calculate how many pixels to add in order to plot the spot in the correct tile in the original image
-        x_adder = x_tile_location * tile_size_x 
-        y_adder = y_tile_location * tile_size_y
-        # Calculate the position in the original image
-        x_coordinate = row.X + x_adder
-        y_coordinate = row.Y + y_adder
 
-        # Give the pixel belonging to the spot a value.
-        empty_image[y_coordinate, x_coordinate]=255
     if path_to_original_img:
-        fig, axs = plt.subplots(1, 2)
+        fig, axs = plt.subplots(1,2)
         image = cv2.imread(path_to_original_img)
         axs[0].imshow(image)
         axs[0].set_title('Original image')
         axs[1].imshow(empty_image)
         axs[1].set_title("Detected spots")
+        for row in df.itertuples():
+            # extract X and Y coordinates of the respective tile the spot belongs to
+            row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
+            # unpacking the array structure of the return tuple of np.where
+            y_tile_location, x_tile_location = row_location[0], col_location[0]
+            # Calculate how many pixels to add in order to plot the spot in the correct tile in the original image
+            x_adder = x_tile_location * tile_size_x 
+            y_adder = y_tile_location * tile_size_y
+            # Calculate the position in the original image
+            x_coordinate = row.X + x_adder
+            y_coordinate = row.Y + y_adder
+
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=3)
+            axs[1].add_patch(circ)
         for ax in axs:
             ax.set(xlabel='X-coordinates', ylabel='y-coordinates')
-            plt.show()
+        plt.show()
     else: 
-        plt.imshow(empty_image, cmap='gray')
+        fig,ax = plt.subplots(1,1)
+        ax.imshow(empty_image, cmap='gray')
+        for row in df.itertuples():
+            # extract X and Y coordinates of the respective tile the spot belongs to
+            row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
+            # unpacking the array structure of the return tuple of np.where
+            y_tile_location, x_tile_location = row_location[0], col_location[0]
+            # Calculate how many pixels to add in order to plot the spot in the correct tile in the original image
+            x_adder = x_tile_location * tile_size_x 
+            y_adder = y_tile_location * tile_size_y
+            # Calculate the position in the original image
+            x_coordinate = row.X + x_adder
+            y_coordinate = row.Y + y_adder
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=3)
+            ax.add_patch(circ)
         plt.show()
 
 
@@ -134,10 +148,13 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
     legendWithoutDuplicateLabels(ax2)
     plt.savefig("decoded_genes_plotted.pdf")
 
-reference_image = sys.argv[1]
-decoded_genes = sys.argv[2]
-tile_grid_shape = make_tuple(sys.argv[3])
-tile_size_x = int(sys.argv[4])
-tile_size_y = int(sys.argv[5])
-plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+# reference_image = sys.argv[1]
+# decoded_genes = sys.argv[2]
+# tile_grid_shape = make_tuple(sys.argv[3])
+# tile_size_x = int(sys.argv[4])
+# tile_size_y = int(sys.argv[5])
+# plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
 # plotSpotsOnWholeImage(blobs, (2,2), 665, 490)
+
+
+plotSpotsOnWholeImage("/media/tool/moved_from_m2/cartana_test_stitched/results/blobs/concat_blobs.csv", (9,23), 2349, 919 )

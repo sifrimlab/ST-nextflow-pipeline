@@ -1,10 +1,11 @@
 # importing the module 
 import os
+import cv2
+from icecream import ic
 from PIL import Image
 # important for giant tiff files, otherwise PIL thinks it's malware
 Image.MAX_IMAGE_PIXELS = None
-import cv2
-from icecream import ic
+
 
 
 def getResolution(filepath):

@@ -106,6 +106,28 @@ log.info """\
 // process crop_images {
 
 // }
+process calculate_tile_size{
+
+    input:
+    path image
+    output:
+    env tile_size_x, emit: tile_size_x
+    env tile_size_y, emit: tile_size_y
+    """
+    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso`)
+    tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
+    """
+}
+process pad {
+    input:
+    path image
+    output:
+    path "${image.baseName}_padded.tif"
+
+    """
+    python ${params.pad_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
+    """
+}
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
@@ -121,18 +143,7 @@ process register{
 
 }
 
-process calculate_tile_size{
 
-    input:
-    path image
-    output:
-    env tile_size_x, emit: tile_size_x
-    env tile_size_y, emit: tile_size_y
-    """
-    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso`)
-    tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
-    """
-}
 
 process tile_round {
     publishDir "$params.outDir/tiled_round/", mode: 'symlink'
@@ -296,7 +307,7 @@ process plot_decoded_spots {
 
 workflow {
     //load data
-    rounds = Channel.fromPath("$params.dataDir/Round*/*.tif", type: 'file').map { file -> tuple((file.parent=~ /Round\d/)[0], file) }
+    rounds = Channel.fromPath("$params.dataDir/Round*/*.tif", type: 'file').map { file -> tuple((file.parent=~ /Round\d+/)[0], file) }
 
     //register data
     register(rounds) 
@@ -305,7 +316,8 @@ workflow {
     calculate_tile_size(register.out.first())
     tile_size_x_channel =  calculate_tile_size.out.tile_size_x
     tile_size_y_channel =  calculate_tile_size.out.tile_size_y
-    log.info "Calculated tile output in x: ${tile_size_x_channel} x ${tile_size_y_channel}"
+    tile_size_x_channel.subscribe { println "calculated tile size x: $it" }
+    tile_size_y_channel.subscribe { println "calculated tile size y: $it" }
 
     // tile data
     tile_ref(params.reference)
@@ -316,16 +328,15 @@ workflow {
     filter_round(tile_round.out.flatten())
     
     //map filtered images to their respective tile
-    filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_ref_images_mapped} 
-    filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d/)[0], file) }.set {filtered_round_images_mapped} 
+    filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {filtered_ref_images_mapped} 
+    filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {filtered_round_images_mapped} 
 
     //combine ref and rounds into a dataobject that allows for local registration per tile
     //TODO It's clear that this mapping is a bottleneck, since nextflow waits until all round images are filtered before going to local registration, and that shouldn't be hapenning
     filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
     //register each tile seperately
     local_registration(combined_filtered_tiles)
-    
-    local_registration.out.map() {file -> tuple((file.baseName=~ /tiled_\d/)[0],(file.baseName=~ /Round\d/)[0],(file.baseName=~ /c\d/)[0], file) }.set {round_images_mapped}
+    local_registration.out.map() {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
 
     //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
