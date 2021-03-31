@@ -10,6 +10,7 @@ target=sys.argv[2]
 
 prefix = os.path.splitext(target)[0]
 
+## If it's the global first registration step, we want to add the round label to it
 if len(sys.argv)>3:
     round_nr = (sys.argv[3]) + "_"
 else:

@@ -129,7 +129,7 @@ process calculate_tile_size{
     env tile_size_x, emit: tile_size_x
     env tile_size_y, emit: tile_size_y
     """
-    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso}`)
+    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     """
 }
@@ -302,13 +302,15 @@ workflow {
     register(rounds) 
 
     //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
-    calculate_tile_size(register.out.first()) 
-    
-    // tile data
-    tile_round(register.out)
-    tile_ref(params.reference)
+    calculate_tile_size(register.out.first())
+    tile_size_x_channel =  calculate_tile_size.out.tile_size_x
+    tile_size_y_channel =  calculate_tile_size.out.tile_size_y
+    log.info "Calculated tile output in x: ${tile_size_x_channel} x ${tile_size_y_channel}"
 
-    
+    // tile data
+    tile_ref(params.reference)
+    tile_round(register.out)
+
     //filter with white_tophat
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
