@@ -10,9 +10,11 @@
 	```
 - edit the nextflow.config file with specifications of your project (path to data, n_rounds etc...)
 - ```bash
-  nextflow run  dsl2_nextflow_pipeline.nf		\
-					--with_conda comunISS.yaml	\
-					--dataDir '/path/to/data/'	\
+  nextflow run  dsl2_nextflow_pipeline.nf			\
+					--with_conda comunISS.yaml		\
+					--dataDir '/path/to/data/'		\
+					--outDir '/path/to/output/dir/' \
+					--codebook '/path/to/codebook/	\
 	```
 
 
