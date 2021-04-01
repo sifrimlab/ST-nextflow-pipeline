@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2
+
 include {
     global_rigid_register as global_register;
 } from "../processes/registration"

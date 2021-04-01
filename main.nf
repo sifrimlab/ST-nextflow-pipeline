@@ -51,7 +51,7 @@ def helpMessage() {
     3) Usage:
         If all of your data is structure as described above, you can easily run the default pipeline using the following command
 
-        nextflow run main.py --dataDir /path/to/data/dir --outDir /path/to/output/dir --codebook /path/to/codebook.csv 
+        nextflow run main.py --dataDir /path/to/data/dir --outDir /path/to/output/dir --codebook /path/to/codebook.csv --extension tif
 
         For customization: here is an overview of all arguments that can be added:
 
@@ -103,9 +103,38 @@ log.info """\
          """
          .stripIndent()
 
-// process crop_images {
 
-// }
+process pad {
+    publishDir "$params.outDir/padded", mode: 'symlink'
+
+    input:
+    tuple val(round_nr), path(image)
+
+    output:
+    path "${round_nr}_${image.baseName}_padded.tif"
+
+    //${params.target_x_reso} ${params.target_y_reso}
+    """
+    python $params.pad_path $image 22000 22000 $round_nr
+    """
+}
+
+process pad_reference { 
+    publishDir "$params.outDir/padded", mode: 'symlink'
+
+    input:
+    path image
+
+    output:
+    path "${image.baseName}_padded.tif"
+
+    //${params.target_x_reso} ${params.target_y_reso}
+    """
+    python $params.pad_path $image 22000 22000
+    """
+}
+
+
 process calculate_tile_size{
 
     input:
@@ -118,27 +147,18 @@ process calculate_tile_size{
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     """
 }
-process pad {
-    input:
-    path image
-    output:
-    path "${image.baseName}_padded.tif"
 
-    """
-    python ${params.pad_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
-    """
-}
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'
 
     input:
-    tuple val(round_nr), path(image) 
+    path image  
 
     output:
-    path "${round_nr}_${image.baseName}_registered.tif" 
+    path "${image.baseName}_registered.tif" 
 
     """
-    python ${params.register_path} ${params.reference} ${image} ${round_nr}
+    python ${params.register_path} ${params.reference} ${image}
     """
 
 }
@@ -306,56 +326,61 @@ process plot_decoded_spots {
 
 
 workflow {
+    include {
+    iss_round_adder;
+    } from './modules/experiment_workflows/workflows/processes/utils/image_name_parser.nf'
+
+
     //load data
-    rounds = Channel.fromPath("$params.dataDir/Round*/*.tif", type: 'file').map { file -> tuple((file.parent=~ /Round\d+/)[0], file) }
+    rounds = iss_round_adder("$params.dataDir", "$params.extension")
 
-    //register data
-    register(rounds) 
+    pad(rounds)
 
-    //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
-    calculate_tile_size(register.out.first())
+    calculate_tile_size(pad.out.first())
     tile_size_x_channel =  calculate_tile_size.out.tile_size_x
     tile_size_y_channel =  calculate_tile_size.out.tile_size_y
-    tile_size_x_channel.subscribe { println "calculated tile size x: $it" }
-    tile_size_y_channel.subscribe { println "calculated tile size y: $it" }
+    // //register data
+    // register(pad.out) 
+
+    // //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
+    
 
     // tile data
     tile_ref(params.reference)
-    tile_round(register.out)
+    tile_round(pad.out)
 
-    //filter with white_tophat
+    // //filter with white_tophat
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
     
-    //map filtered images to their respective tile
+    // //map filtered images to their respective tile
     filter_ref.out.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {filtered_ref_images_mapped} 
     filter_round.out.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {filtered_round_images_mapped} 
 
-    //combine ref and rounds into a dataobject that allows for local registration per tile
-    //TODO It's clear that this mapping is a bottleneck, since nextflow waits until all round images are filtered before going to local registration, and that shouldn't be hapenning
+    // //combine ref and rounds into a dataobject that allows for local registration per tile
     filtered_ref_images_mapped.combine(filtered_round_images_mapped,by: 0).set { combined_filtered_tiles}
-    //register each tile seperately
+    // //register each tile seperately
     local_registration(combined_filtered_tiles)
     local_registration.out.map() {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
 
-    //detect spots on the reference image
+    // //detect spots on the reference image
     spot_detection_reference(filtered_ref_images_mapped)
     // spot_detection_round(round_images_mapped)
 
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Needs to be a value channel to allow it to iterate multiple times in gather_intensities
 
-    // Gather intensities into one big csv that contains all
+    // // Gather intensities into one big csv that contains all
     gather_intensities(blobs_value_channel, round_images_mapped)
     gather_intensities.out.collectFile(name: "$params.outDir/intensities/concat_intensities.csv", sort:true, keepHeader:true).set {intensities}
 
-    // Get max intensity channel from each round/X/Y combination
+    // // Get max intensity channel from each round/X/Y combination
     get_max_intensities(intensities.first())
 
-    // Decode the max intensities
+    // // Decode the max intensities
     decode_sequential_max_intensity(get_max_intensities.out.flatten())
 
-    // Pool them into one file
+    // // Pool them into one file
     decode_sequential_max_intensity.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
     
     plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
