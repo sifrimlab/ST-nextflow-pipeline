@@ -130,11 +130,11 @@ img_list = ["/media/tool/starfish_test_data/MERFISH/seperate_stacks/16-bit/MERFI
 # df.to_csv("adapted.csv")
 
 ## testing blobdetectors
-from skimage.feature import blob_log
-import cv2
+# from skimage.feature import blob_log
+# import cv2
 
-img_name = "/media/david/Puzzles/starfish_test_data/communISS_output/tiled/filtered/Round1/Round1_Channel5_Tile4.tif"
-img = cv2.imread(img_name,-1)
-array = blob_log(img,0.5,3)
-print(array[:,0:2])
+# img_name = "/media/david/Puzzles/starfish_test_data/communISS_output/tiled/filtered/Round1/Round1_Channel5_Tile4.tif"
+# img = cv2.imread(img_name,-1)
+# array = blob_log(img,0.5,3)
+# print(array[:,0:2])
 

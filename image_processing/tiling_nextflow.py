@@ -28,8 +28,11 @@ def calculateOptimalTileSize(img_path, target_X, target_Y):
     """
     img=io.imread(img_path)
     shape = img.shape
-    optimal_x = findOptimalDivisor(shape[1], target_X)
-    optimal_y = findOptimalDivisor(shape[0], target_Y)
+    def roundUpTo100(x):
+        result = x if x % 100 == 0 else x + 100 - x % 100
+        return result
+    optimal_x = findOptimalDivisor(roundUpTo100(shape[1]), target_X)
+    optimal_y = findOptimalDivisor(roundUpTo100(shape[0]), target_Y)
     return int(optimal_x), int(optimal_y)
 
 

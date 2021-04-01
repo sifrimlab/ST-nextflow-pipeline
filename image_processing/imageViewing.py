@@ -141,20 +141,20 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
         x_coordinate = row.X + x_adder
         y_coordinate = row.Y + y_adder
         gene = row.Gene
-
-        ## Now we plot the dot
-        circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
-        ax2.add_patch(circ)
+        if gene != "":
+            ## Now we plot the dot
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
+            ax2.add_patch(circ)
     legendWithoutDuplicateLabels(ax2)
     plt.savefig("decoded_genes_plotted.pdf")
 
-# reference_image = sys.argv[1]
-# decoded_genes = sys.argv[2]
-# tile_grid_shape = make_tuple(sys.argv[3])
-# tile_size_x = int(sys.argv[4])
-# tile_size_y = int(sys.argv[5])
-# plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+reference_image = sys.argv[1]
+decoded_genes = sys.argv[2]
+tile_grid_shape = make_tuple(sys.argv[3])
+tile_size_x = int(float(sys.argv[4]))
+tile_size_y = int(float(sys.argv[5]))
+plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
 # plotSpotsOnWholeImage(blobs, (2,2), 665, 490)
 
 
-plotSpotsOnWholeImage("/media/tool/moved_from_m2/cartana_test_stitched/results/blobs/concat_blobs.csv", (9,23), 2349, 919 )
+# plotSpotsOnWholeImage("/media/tool/moved_from_m2/cartana_test_stitched/results/blobs/concat_blobs.csv", (9,23), 2349, 919 )

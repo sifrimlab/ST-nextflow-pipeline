@@ -328,13 +328,14 @@ process plot_decoded_spots {
 workflow {
     include {
     iss_round_adder;
-    } from './modules/experiment_workflows/workflows/processes/utils/image_name_parser.nf'
+    } from './src/processes/utils/image_name_parser.nf'
 
 
     //load data
     rounds = iss_round_adder("$params.dataDir", "$params.extension")
 
     pad(rounds)
+    pad_reference(params.reference)
 
     calculate_tile_size(pad.out.first())
     tile_size_x_channel =  calculate_tile_size.out.tile_size_x
@@ -346,7 +347,7 @@ workflow {
     
 
     // tile data
-    tile_ref(params.reference)
+    tile_ref(pad_reference.out)
     tile_round(pad.out)
 
     // //filter with white_tophat

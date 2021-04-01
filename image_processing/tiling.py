@@ -6,7 +6,7 @@ import math
     A future way of doing it might be to find a "best practice" resolution for the entire pipeline and then add padding functionality to this, to force the tiling into a certain resolution.
     However, tileWriter still does support irregular tiles, it's just not nice to have irregular tiles for downstream functionality.
 '''
-def calculateOptimalTileSize(img_path: str, target_X: int, target_Y: int):
+def calculateOptimalTileSize(X: int, Y: int , target_X: int, target_Y: int):
     """Calculates the optimal tile size to cut the given image into to get tiles the size of target_X, target_Y
 
     Parameters
@@ -23,11 +23,14 @@ def calculateOptimalTileSize(img_path: str, target_X: int, target_Y: int):
     int, int
         Returns optimal X and Y-resolutions to tile the input image in to get the target resolution, while retaining evenly sized tiles.
     """
-    
-    img = cv2.imread(img_path, 1)
-    shape = img.shape
-    optimal_x = findOptimalDivisor(shape[1], target_X)
-    optimal_y = findOptimalDivisor(shape[0], target_Y)
+    # Function to round the coördinates up to 100
+    def roundUpTo100(x):
+        result = x if x % 100 == 0 else x + 100 - x % 100
+        return result
+        # find the optimal division to the rounded up coordinate
+    optimal_x = findOptimalDivisor(roundUpTo100(X), target_X)
+    optimal_y = findOptimalDivisor(roundUpTo100(Y), target_Y)
+    # print(f"optimal_x: {optimal_x} ; optimal_y: {optimal_y}")
     return int(optimal_x), int(optimal_y)
 
 
