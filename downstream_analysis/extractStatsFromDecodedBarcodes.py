@@ -4,6 +4,8 @@ from tabulate import tabulate
 from icecream import ic
 import matplotlib.pyplot as plt
 import sys
+import random
+import numpy as np
 
 def countChannelsInBarcodeList(path_to_decoded_genes: str):
     df = pd.read_csv(path_to_decoded_genes)
@@ -33,14 +35,40 @@ def countChannelsInBarcodeList(path_to_decoded_genes: str):
     count_df = pd.DataFrame(rows_list)
     wide_df = count_df.pivot_table(index=["channel_nr"], columns='round_nr', values='count', margins=True, aggfunc='sum')
     wide_df.to_csv("channels_called.csv")
-def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, ratio_recognized_barcodes: int = 0):
+
+    
+def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num_rounds: int, num_channels: int, ratio_recognized_barcodes: int = 0):
     codebook_df = pd.read_csv(path_to_codebook)
     decoded_df = pd.read_csv(path_to_decoded_genes)
     n_genes_to_find=len(codebook_df)
     n_spots= len(decoded_df)
     decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
     unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
+
+    possible_unique_barcodes = num_channels ** num_rounds
     n_unique_barcodes_called = len(unique_df)
+    if ratio_recognized_barcodes != 0:
+        interval = (ratio_recognized_barcodes-3, ratio_recognized_barcodes+3)
+        if n_unique_barcodes_called/possible_unique_barcodes in interval:
+            print()
+
+    def simulateRandomBarcodeCalling(n_spots, n_rounds, n_channels):
+        barcode_list = []
+        for i in range(1, n_spots):
+            # Pick a random int in the allowed range by n_channels, n_rounds amount of times
+            randint = np.random.randint(1,n_channels+1,n_rounds)
+            # Convert them to strings, and then join them, convert them back into one big int
+            string_ints = [str(int) for int in randint]
+            barcode= int("".join(string_ints))
+            barcode_list.append(barcode)
+        #Count occurences of each barcode
+        counted = [barcode_list.count(entry) for entry in barcode_list] 
+
+        d={'Barcode': barcode_list, 'Counted': counted}
+        simulated_df = pd.DataFrame(d).drop_duplicates()
+    
+
+
 
 
 
