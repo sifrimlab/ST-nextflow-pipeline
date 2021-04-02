@@ -321,6 +321,15 @@ process decode_sequential_max_intensity {
     """
 
 }
+process get_decoded_stats {
+    publishDir "$params.outDir/decoded", mode: 'copy'
+    input:
+    path decoded_genes
+
+    """
+    python /home/nacho/Documents/Code/communISS/downstream_analysis/extractStatsFromDecodedBarcodes.py $decoded_genes
+    """
+} 
 process plot_decoded_spots {
     publishDir "$params.outDir/decoded", mode: 'copy'
 
@@ -400,6 +409,8 @@ workflow {
 
     // // Pool them into one file
     decode_sequential_max_intensity.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
+
+    get_decoded_stats(decoded_genes)
     
-    plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
+    // plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
 }
