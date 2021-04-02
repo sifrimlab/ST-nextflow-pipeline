@@ -1,10 +1,16 @@
 import SimpleITK as sitk
 import sys
 import os
+import re
 
+##parse arguments
 reference = sys.argv[1] 
 target=sys.argv[2]
 # output_dir=sys.argv[3]
+
+prefix = os.path.splitext(target)[0]
+
+## If it's the global first registration step, we want to add the round label to it
 
 fixed = sitk.ReadImage(reference, sitk.sitkFloat32)
 moving = sitk.ReadImage(target, sitk.sitkFloat32)
@@ -19,6 +25,5 @@ outTx = R.Execute(fixed, moving)
 # print(f"Calculating transform of round {round}, channel {channel}...")
 # print(f"Finished at iteration {R.GetOptimizerIteration()} with a metric value of {R.GetMetricValue()}")
 # sitk.WriteTransform(outTx, f"transform_r{round}_c{channel}.txt")
-
-# print(str(reference) + str(target))
-print(outTx)
+resampled = sitk.Resample(moving, outTx, sitk.sitkLinear, 0.0, sitk.sitkUInt16)
+sitk.WriteImage(resampled, f"{prefix}_registered.tif")

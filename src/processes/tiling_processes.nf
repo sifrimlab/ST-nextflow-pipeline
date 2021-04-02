@@ -31,12 +31,12 @@ process calculate_biggest_resolution {
     val glob_pattern
 
     output:
-    env max_x_resolution: emit max_x_resolution
-    env max_y_resolution: emit max_y_resolution
+    env max_x_resolution, emit: max_x_resolution
+    env max_y_resolution, emit: max_y_resolution
 
     """
     resolution_shape=(`python $params.getHighestResolution_path $glob_pattern`)
-    max_resolution_x=\${resolution_shape[0]} ; max_resolution_y=\${resolution_shape[1]}
+    max_x_resolution=\${resolution_shape[0]} ; max_y_resolution=\${resolution_shape[1]}
     """
 }
 process calculate_tile_size{
