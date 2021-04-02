@@ -1,9 +1,8 @@
-/*
-    to more dynamically define binDir in the future: use import java.nio.file.Paths
-    and then: Paths.get(workflow.scriptFile.getParent().getParent().toString(), "utils/bin"
-*/
+nextflow.enable.dsl=2
 
-binDir = "$params.srcDir/registration/bin/"
+import java.nio.file.Paths
+
+binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
 
 process register{
     publishDir "$params.outDir/registered/", mode: 'symlink'

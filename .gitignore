@@ -1,4 +1,5 @@
 .vscode/
+.ipynb_checkpoints/
 image_processing_env/
 communiss_env/
 __pycache__/

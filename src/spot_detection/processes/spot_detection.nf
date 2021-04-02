@@ -1,3 +1,9 @@
+nextflow.enable.dsl=2
+import java.nio.file.Paths
+
+binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
+
+
 process spot_detection_reference {
     publishDir "$params.outDir/blobs", mode: 'symlink'
 
