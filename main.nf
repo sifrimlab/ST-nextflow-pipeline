@@ -351,7 +351,7 @@ process plot_decoded_spots {
 workflow {
     include {
     iss_round_adder;
-    } from './src/processes/utils/image_name_parser.nf'
+    } from './src/utils/processes/image_name_parser.nf'
 
 
     //load data
