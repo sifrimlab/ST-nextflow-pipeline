@@ -154,7 +154,10 @@ tile_grid_shape = make_tuple(sys.argv[3])
 tile_size_x = int(float(sys.argv[4]))
 tile_size_y = int(float(sys.argv[5]))
 plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+
+
 # plotSpotsOnWholeImage(blobs, (2,2), 665, 490)
 
 
-# plotSpotsOnWholeImage("/media/tool/moved_from_m2/cartana_test_stitched/results/blobs/concat_blobs.csv", (9,23), 2349, 919 )
+# plotSpotsOnWholeImage("/media/tool/moved_from_m2/cartana_test_stitched/results/blobs/concat_blobs.csv", (10,10), 2200, 2200, path_to_original_image="//media/tool/moved_from_m2/cartana_test_stitched/DO/REF.tif
+# ")

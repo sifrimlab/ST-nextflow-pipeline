@@ -103,7 +103,20 @@ log.info """\
          """
          .stripIndent()
 
+process calculate_biggest_resolution {
+    input: 
+    val glob_pattern
 
+    output:
+    env max_x_resolution, emit: max_x_resolution
+    env max_y_resolution, emit: max_y_resolution
+    script:
+    println(glob_pattern)
+    """
+    resolution_shape=(`python $params.getHighestResolution_path $glob_pattern`)
+    max_x_resolution=\${resolution_shape[0]} ; max_y_resolution=\${resolution_shape[1]}
+    """
+}
 process pad {
     publishDir "$params.outDir/padded", mode: 'symlink'
 
@@ -138,12 +151,13 @@ process pad_reference {
 process calculate_tile_size{
 
     input:
-    path image
+    val max_x_resolution
+    val max_y_resolution
     output:
     env tile_size_x, emit: tile_size_x
     env tile_size_y, emit: tile_size_y
     """
-    tile_shape=(`python $params.calculateOptimalTileSize_path $image  $params.target_x_reso $params.target_y_reso`)
+    tile_shape=(`python $params.calculateOptimalTileSize_path $max_x_resolution $max_y_resolution  $params.target_x_reso $params.target_y_reso`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     """
 }
@@ -319,7 +333,7 @@ process plot_decoded_spots {
     path "decoded_genes_plotted.pdf"
     path "decoded_genes_plotted-1.png"
     """
-    python ${params.image_viewing_path} ${params.reference} ${decoded_genes} 2,2 ${tile_size_x} ${tile_size_y}
+    python ${params.image_viewing_path} ${params.reference} ${decoded_genes} ${params.grid_shape} ${tile_size_x} ${tile_size_y}
     pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
     """
 }
@@ -334,12 +348,15 @@ workflow {
     //load data
     rounds = iss_round_adder("$params.dataDir", "$params.extension")
 
+    calculate_biggest_resolution("$params.dataDir/Round*/*.$params.extension")
+
     pad(rounds)
     pad_reference(params.reference)
 
-    calculate_tile_size(pad.out.first())
+    calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
     tile_size_x_channel =  calculate_tile_size.out.tile_size_x
     tile_size_y_channel =  calculate_tile_size.out.tile_size_y
+    
     // //register data
     // register(pad.out) 
 

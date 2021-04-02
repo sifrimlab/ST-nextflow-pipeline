@@ -28,7 +28,7 @@ def getResolution(filepath):
     #     return width
     # else:
     #     return height
-glob_path="/media/tool/moved_from_m2/cartana_test_stitched/Round*/*" #sys.argv[1]
+glob_path=sys.argv[1]
 
 x__list, y__list = zip(*[getResolution(file) for file in glob.glob(glob_path)])
 max_x = max(x__list)

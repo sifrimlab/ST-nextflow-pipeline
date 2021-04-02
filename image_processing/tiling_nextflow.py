@@ -37,7 +37,6 @@ def calculateOptimalTileSize(img_path, target_X, target_Y):
 
 
 def writeTiles(img_path, prefix,tile_size_x, tile_size_y, ):
-    # img = cv2.imread(img_path, 1)
     img = io.imread(img_path)
     # Don't forget, cv2 works with shape = (y, x), meaning rows, columns
     img_shape=img.shape
