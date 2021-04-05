@@ -104,6 +104,7 @@ log.info """\
          .stripIndent()
 
 process calculate_biggest_resolution {
+    echo = true
     input: 
     val glob_pattern
 
@@ -111,24 +112,28 @@ process calculate_biggest_resolution {
     env max_x_resolution, emit: max_x_resolution
     env max_y_resolution, emit: max_y_resolution
     script:
-    println(glob_pattern)
+
     """
     resolution_shape=(`python $params.getHighestResolution_path $glob_pattern`)
     max_x_resolution=\${resolution_shape[0]} ; max_y_resolution=\${resolution_shape[1]}
+    echo "Calculated max resolution: \$max_x_resolution x \$max_y_resolution"
     """
+
 }
 process pad {
     publishDir "$params.outDir/padded", mode: 'symlink'
 
     input:
     tuple val(round_nr), path(image)
+    val target_x
+    val target_y
 
     output:
     path "${round_nr}_${image.baseName}_padded.tif"
 
     //${params.target_x_reso} ${params.target_y_reso}
     """
-    python $params.pad_path $image 22000 22000 $round_nr
+    python $params.pad_path $image $target_x $target_y $round_nr
     """
 }
 
@@ -137,19 +142,21 @@ process pad_reference {
 
     input:
     path image
+    val target_x
+    val target_y
 
     output:
     path "${image.baseName}_padded.tif"
 
     //${params.target_x_reso} ${params.target_y_reso}
     """
-    python $params.pad_path $image 22000 22000
+    python $params.pad_path $image $target_x $target_y
     """
 }
 
 
 process calculate_tile_size{
-
+    echo = true
     input:
     val max_x_resolution
     val max_y_resolution
@@ -157,8 +164,9 @@ process calculate_tile_size{
     env tile_size_x, emit: tile_size_x
     env tile_size_y, emit: tile_size_y
     """
-    tile_shape=(`python $params.calculateOptimalTileSize_path $max_x_resolution $max_y_resolution  $params.target_x_reso $params.target_y_reso`)
+    tile_shape=(`python $params.calculateOptimalTileSize_path $max_x_resolution $max_y_resolution $params.target_x_reso $params.target_y_reso`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
+    echo "Calculated Tile size: \$tile_size_x x \$tile_size_y" 
     """
 }
 
@@ -359,24 +367,27 @@ workflow {
 
     calculate_biggest_resolution("$params.dataDir/Round*/*.$params.extension")
 
-    pad(rounds)
-    pad_reference(params.reference)
+    //parse resolution output:
+    calculate_biggest_resolution.out.max_x_resolution.set {target_x_pad}
+    calculate_biggest_resolution.out.max_y_resolution.set {target_y_pad}
 
+    pad(rounds, target_x_pad, target_y_pad)
+    pad_reference(params.reference, target_x_pad, target_y_pad)
+
+    //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
     calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
     tile_size_x_channel =  calculate_tile_size.out.tile_size_x
     tile_size_y_channel =  calculate_tile_size.out.tile_size_y
-    
-    // //register data
-    // register(pad.out) 
+    // // //register data
+    register(pad.out) 
 
-    // //take one image and calculate the future tile size, which is stored in calculate_tile_size.out[0] and calculate_tile_size.out[1]
     
 
     // tile data
-    tile_ref(pad_reference.out)
-    tile_round(pad.out)
+    tile_ref(params.reference)
+    tile_round(register.out)
 
-    // //filter with white_tophat
+    //filter with white_tophat
     filter_ref(tile_ref.out.flatten())
     filter_round(tile_round.out.flatten())
     
@@ -412,5 +423,5 @@ workflow {
 
     get_decoded_stats(decoded_genes)
     
-    // plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
+    plot_decoded_spots(calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, decoded_genes)
 }
