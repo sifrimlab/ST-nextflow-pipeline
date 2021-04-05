@@ -16,6 +16,6 @@ process filter_round{
 
     script:
     """
-    python ${params.filtering_path} ${image} ${params.filter_radius}
+    python $binDir/filtering.py ${image} ${params.filter_radius}
     """
 }

@@ -3,7 +3,7 @@ import math
 import sys
 import os
 from skimage import io
-from utils.tilingHelperFunctions import calculateOptimalTileSize, writeTiles
+from modules.tilingHelperFunctions import calculateOptimalTileSize, writeTiles
 
 
 image = sys.argv[1]

@@ -14,7 +14,7 @@ process register{
     path "${image.baseName}_registered.tif" 
 
     """
-    python ${binDir}rigidRegister.py ${params.reference} ${image}
+    python $binDir/rigidRegister.py ${params.reference} ${image}
     """
 
 }
