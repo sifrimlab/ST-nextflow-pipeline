@@ -2,7 +2,9 @@ nextflow.enable.dsl=2
 
 import java.nio.file.Paths
 
-binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
+moduleName = "decoding"
+binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
+
 
 process decode_sequential_max_intensity {
     publishDir "$params.outDir/decoded", mode: 'symlink'

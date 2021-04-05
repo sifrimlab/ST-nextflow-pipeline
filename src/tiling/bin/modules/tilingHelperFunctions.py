@@ -30,11 +30,13 @@ def calculateOptimalTileSize(X: int, Y: int , target_X: int, target_Y: int):
         # find the optimal division to the rounded up coordinate
     optimal_x = findOptimalDivisor(roundUpTo100(X), target_X)
     optimal_y = findOptimalDivisor(roundUpTo100(Y), target_Y)
+    grid_size_x = roundUpTo100(X) / optimal_x
+    grid_size_y = roundUpTo100(Y) / optimal_y
     # print(f"optimal_x: {optimal_x} ; optimal_y: {optimal_y}")
-    return int(optimal_x), int(optimal_y)
+    return int(optimal_x), int(optimal_y), int(grid_size_x), int(grid_size_y)
 
 
-def writeTiles(img_path, prefix,tile_size_x, tile_size_y, ):
+def writeTiles(img_path, prefix,tile_size_x, tile_size_y):
     img = io.imread(img_path)
     # Don't forget, cv2 works with shape = (y, x), meaning rows, columns
     img_shape=img.shape
@@ -71,4 +73,3 @@ def findOptimalDivisor(number: int, target_quotient: int):
     quotients = [number/divisor for divisor in divisors]
     min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
     return min_loss
-

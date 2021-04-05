@@ -1,24 +1,24 @@
 nextflow.enable.dsl=2
 import java.nio.file.Paths
 
-binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
-
+moduleName="spot_detection"
+binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
 
 process spot_detection_reference {
     publishDir "$params.outDir/blobs", mode: 'symlink'
 
     input:
-    tuple val(tile_nr), path(ref_image) 
+    path ref_image
 
     output:
     path "${ref_image.baseName}_blobs.csv"
 
     """
-    python ${params.spot_detection_path} ${ref_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} 
+    python $binDir/spotDetection.py $ref_image $params.min_sigma $params.max_sigma
     """
 }
 
-process gather_intensities {
+process gather_intensities_in_rounds {
     publishDir "$params.outDir/intensities", mode: 'symlink'
 
     input:
@@ -29,11 +29,10 @@ process gather_intensities {
     path "${round_image.baseName}_intensities.csv"
 
     """
-    python ${params.gather_intensity_path} ${blobs} ${round_image} ${tile_nr} ${round_nr} ${channel_nr}
+    python $binDir/gatherIntensities.py ${blobs} ${round_image} ${tile_nr} ${round_nr} ${channel_nr}
     """
 }
-
-process get_max_intensities {
+process get_max_intensities_over_channels {
     publishDir "$params.outDir/intensities", mode: 'symlink'
 
     input:
@@ -43,6 +42,6 @@ process get_max_intensities {
     path "tile*_max_intensities.csv"
 
     """
-    python ${params.getMaxIntensity_path} ${all_intensities}
+    python $binDir/getMaxIntensity.py ${all_intensities}
     """
 }
