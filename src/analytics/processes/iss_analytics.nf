@@ -2,7 +2,8 @@ nextflow.enable.dsl=2
 
 import java.nio.file.Paths
 
-binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
+moduleName= "analytics"
+binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
 
 process get_decoded_stats {
     publishDir "$params.outDir/decoded", mode: 'copy'

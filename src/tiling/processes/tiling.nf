@@ -2,7 +2,9 @@ nextflow.enable.dsl=2
 
 import java.nio.file.Paths
 
-binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
+moduleName = "tiling"
+//workflow.projectDir points to the dir that the initial workflow originates from
+binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
 
 process calculate_biggest_resolution {
     echo = true
@@ -28,10 +30,14 @@ process calculate_tile_size{
     output:
     env tile_size_x, emit: tile_size_x
     env tile_size_y, emit: tile_size_y
+    env grid_size_x, emit: grid_size_x 
+    env grid_size_y, emit: grid_size_y
     """
     tile_shape=(`python $binDir/calculateOptimalTileSize.py $max_x_resolution $max_y_resolution  $params.target_x_reso $params.target_y_reso`)
     tile_size_x=\${tile_shape[0]} ; tile_size_y=\${tile_shape[1]} ;
     echo "Calculated Tile size: \$tile_size_x x \$tile_size_y" 
+    grid_size_x=\${tile_shape[2]} ; grid_size_y=\${tile_shape[3]} ; 
+    echo "Calculated Grid size: \$grid_size_x x \$grid_size_y"
     """
 }
 
@@ -72,12 +78,14 @@ process tile_ref {
     publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
     input:
     path image
+    val tile_size_x
+    val tile_size_y
 
     output:
     path "${image.baseName}_tiled_*.tif"
 
     """
-    python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
+    python $binDir/tiling_script.py $image $tile_size_x $tile_size_y
     """
 }
 
@@ -85,12 +93,13 @@ process tile_round {
     publishDir "$params.outDir/tiled_round/", mode: 'symlink'
     input: 
     path image 
-
+    val tile_size_x
+    val tile_size_y
     output: 
     path "${image.baseName}_tiled_*.tif"
     
     """
-    python ${params.tiling_path} ${image} ${params.target_x_reso} ${params.target_y_reso}
+    python $binDir/tiling_script.py $image $tile_size_x $tile_size_y
     """
 }
 

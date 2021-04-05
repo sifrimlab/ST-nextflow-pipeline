@@ -2,7 +2,22 @@ nextflow.enable.dsl=2
 
 import java.nio.file.Paths
 
-binDir = Paths.get(workflow.scriptFile.getParent().getParent().toString(), "/bin/")
+moduleName="filtering"
+binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
+
+
+process filter_ref {
+    publishDir "$params.outDir/filtered_ref/", mode: 'symlink'
+
+    input:
+    path image 
+    output:
+    path "${image.baseName}_filtered.tif" 
+
+    """
+    python $binDir/filtering.py ${image} ${params.filter_radius}
+    """
+}
 
 process filter_round{
     // echo true
