@@ -25,8 +25,11 @@ process register{
 
 // For this process, you need to map and combine your maxIP and round images to be transformed in the correct way
 process register_with_maxIP {
+
     publishDir "$params.outDir/registered/", mode: 'symlink'
     echo=true
+
+    memory '8 GB'
     input:
     path reference
     tuple val(round_nr), path(maxIP_image), path(round_images)
