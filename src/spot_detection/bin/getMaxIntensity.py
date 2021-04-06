@@ -19,12 +19,15 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str):
         df_dict[key] = df_total[:][df_total.Tile == key]
     # End result: each tile is now in a different df, stored inside the df_dict, with tile nr as key
     for i in range(1, n_tiles+1):
-        df = df_dict[i].drop(columns='Tile') # Tile column doesn't matter anymore
-        df_filtered = df.sort_values('Intensity', ascending=False).drop_duplicates(['Round','Y','X'])
-        # Different implementation; gets ALL maxima, but slightly slower: df_filtered = df[df.groupby(['Round','Y','X'])['Intensity'].transform(max)== df['Intensity']]
-        # Print out into different csv's to fascilitate parallelizing in nextflow
-        df_filtered.to_csv(f"tile{i}_max_intensities.csv")
-
+        try:
+            df = df_dict[i].drop(columns='Tile') # Tile column doesn't matter anymore
+            df_filtered = df.sort_values('Intensity', ascending=False).drop_duplicates(['Round','Y','X'])
+            # Different implementation; gets ALL maxima, but slightly slower: df_filtered = df[df.groupby(['Round','Y','X'])['Intensity'].transform(max)== df['Intensity']]
+            # Print out into different csv's to fascilitate parallelizing in nextflow
+            df_filtered.to_csv(f"tile{i}_max_intensities.csv")
+        except:
+            with open("getMaxIntensity_debug", "a+") as file:
+                file.write(f"Tile {i} did not contain any spots and is thus skipped in downstream analysis. ")
 
 # Argparsing
 path_to_intensity_csv = sys.argv[1]

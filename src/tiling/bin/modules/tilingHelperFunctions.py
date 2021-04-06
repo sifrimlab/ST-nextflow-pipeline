@@ -23,10 +23,6 @@ def calculateOptimalTileSize(X: int, Y: int , target_X: int, target_Y: int):
     int, int
         Returns optimal X and Y-resolutions to tile the input image in to get the target resolution, while retaining evenly sized tiles.
     """
-    # Function to round the coördinates up to 100
-    def roundUpTo100(x):
-        result = x if x % 100 == 0 else x + 100 - x % 100
-        return result
         # find the optimal division to the rounded up coordinate
     optimal_x = findOptimalDivisor(roundUpTo100(X), target_X)
     optimal_y = findOptimalDivisor(roundUpTo100(Y), target_Y)
@@ -34,8 +30,11 @@ def calculateOptimalTileSize(X: int, Y: int , target_X: int, target_Y: int):
     grid_size_y = roundUpTo100(Y) / optimal_y
     # print(f"optimal_x: {optimal_x} ; optimal_y: {optimal_y}")
     return int(optimal_x), int(optimal_y), int(grid_size_x), int(grid_size_y)
-
-
+    
+# Function to round the coördinates up to 100
+def roundUpTo100(x):
+    result = x if x % 100 == 0 else x + 100 - x % 100
+    return result
 def writeTiles(img_path, prefix,tile_size_x, tile_size_y):
     img = io.imread(img_path)
     # Don't forget, cv2 works with shape = (y, x), meaning rows, columns

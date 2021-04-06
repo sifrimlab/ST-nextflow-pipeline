@@ -46,7 +46,7 @@ workflow iss {
         }
         */
 
-        // Map images to a tuple representing 
+        // Map images to a tuple representing their respective rounds
         rounds = iss_round_adder()
 
         tiling("$params.dataDir/Round*/*.$params.extension", rounds, params.reference)

@@ -14,7 +14,7 @@ process get_decoded_stats {
     path "barcode_counts.pdf"
     path "channels_called.csv"
     path "stat_report.txt"
-    path "simulated_random_base_calling.csv"
+    // path "simulated_random_base_calling.csv"
 
     
     """

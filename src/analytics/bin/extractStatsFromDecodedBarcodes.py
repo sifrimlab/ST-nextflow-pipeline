@@ -70,12 +70,6 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         simulated_df.to_csv("simulated_random_base_calling.csv")
     simulateRandomBarcodeCalling(n_spots, num_rounds, num_channels)
     
-    
-    
-
-
-
-
 def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     df = pd.read_csv(path_to_decoded_genes)
     # columns = ,Tile,X,Y,Barcode,Gene
@@ -123,4 +117,4 @@ decoded_genes = sys.argv[1]
 codebook = sys.argv[2]
 countRecognizedBarcodeStats(decoded_genes)
 countChannelsInBarcodeList(decoded_genes)
-evaluateRandomCalling(decoded_genes, codebook, 4, 4)
+# evaluateRandomCalling(decoded_genes, codebook, 4, 4)

@@ -3,6 +3,7 @@ import os
 import sys
 import math
 from matplotlib import pyplot as plt
+from modules.tilingHelperFunctions import roundUpTo100
 from icecream import ic
 from PIL import Image
 # important for giant tiff files, otherwise PIL thinks it's malware
@@ -32,7 +33,9 @@ def pad(filepath, target_width, target_height, expected_width=0, expected_height
 
     #Note hare that i use ceil to round up, this might cause some unwanted behaviour in the future.
     currentWidth, currentHeight = getResolution(filepath)
-
+    target_width = roundUpTo100(target_width)
+    target_height = roundUpTo100(target_height)
+    
     widthToAdd = math.floor((target_width - currentWidth)/2)
     heightToAdd = math.floor((target_height - currentHeight)/2)
     img = cv2.cv2.imread(filepath, cv2.cv2.IMREAD_ANYDEPTH)
