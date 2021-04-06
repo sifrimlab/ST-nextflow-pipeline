@@ -1,6 +1,7 @@
 import numpy as np
 from skimage import io
 import os
+import sys
 # def maxIP(img1, img2):
 #     if not isinstance(img1, np.ndarray):
 #         img1 = io.imread("/media/david/Puzzles/starfish_test_data/MERFISH/seperate_stacks/MERFISH_primary-0001.tif")
@@ -17,6 +18,10 @@ def maxIPstack(img_list):
     maxIP = np.maximum.reduce(parsed_list)
     return maxIP
 
+
 # img_list = [f"/media/tool/moved_from_m2/cartana_test_stitched/Round1/channel{i}.tif" for i in range(1,5)]
-# maxIP = maxIPstack(img_list)
-# io.imsave("/media/tool/moved_from_m2/cartana_test_stitched/Round1/REF.TIF", maxIP)
+round_nr = sys.argv[1]
+lenght = len(sys.argv)
+img_list = [sys.argv[i] for i in range(2, lenght)]
+maxIP = maxIPstack(img_list)
+io.imsave(f"{round_nr}_maxIP.tif", maxIP)

@@ -3,6 +3,7 @@ nextflow.enable.dsl=2
 ///////////////////////
 // Include processes:
 ///////////////////////
+
 include {
     iss_round_adder;
 } from '../src/utils/processes/image_name_parser.nf'
@@ -35,6 +36,7 @@ include {
     plot_decoded_spots
 } from "../src/plotting/processes/plotting.nf"
 
+
 workflow iss {
     main:
         /*
@@ -43,6 +45,8 @@ workflow iss {
             out = QC_FILTER( out ).filtered // Remove concat
         }
         */
+
+        // Map images to a tuple representing 
         rounds = iss_round_adder()
 
         tiling("$params.dataDir/Round*/*.$params.extension", rounds, params.reference)
@@ -62,6 +66,7 @@ workflow iss {
         get_decoded_stats(decoded_genes)
     
         plot_decoded_spots(decoded_genes, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
+
 }
         
         

@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 moduleName = "tiling"
 //workflow.projectDir points to the dir that the initial workflow originates from
-binDir = Paths.get(workflow.projectDir.getParent().toString(), "src/$moduleName/bin/")
+binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process calculate_biggest_resolution {
     echo = true
