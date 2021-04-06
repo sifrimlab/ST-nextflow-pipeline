@@ -7,10 +7,10 @@ include {
 include {
     register as register
 } from "../../registration/processes/rigid_registration.nf"
-
 include {
-    maxIP_per_round
-} from "../../utils/workflows/projections.nf"
+    register_wrt_maxIP
+} from "../../registration/workflows/registration_on_maxIP.nf"
+
 
 workflow standard_iss_tiling {
     // includes a global registration step before tiling
@@ -28,14 +28,12 @@ workflow standard_iss_tiling {
 
         pad_reference(reference, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution) 
         pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+
+        register_wrt_maxIP(pad_reference.out, pad_round.out)
         
-        // maxIP_per_round(pad_round.out)
-        // register_with_maxIP(pad_reference.out, maxIP_per_round.out, pad_round.out)
-        
-        register(pad_reference.out, pad_round.out)
 
         tile_ref(pad_reference.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
-        tile_round(pad_round.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
     emit:
         reference = tile_ref.out.flatten()
         rounds = tile_round.out.flatten()

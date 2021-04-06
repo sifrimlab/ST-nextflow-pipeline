@@ -38,19 +38,21 @@ def countChannelsInBarcodeList(path_to_decoded_genes: str):
 
     
 def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num_rounds: int, num_channels: int, ratio_recognized_barcodes: int = 0):
-    codebook_df = pd.read_csv(path_to_codebook)
-    decoded_df = pd.read_csv(path_to_decoded_genes)
-    n_genes_to_find=len(codebook_df)
-    n_spots= len(decoded_df)
-    decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
-    unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
+    with open("stat_report.txt", "a+") as file:
+        codebook_df = pd.read_csv(path_to_codebook)
+        decoded_df = pd.read_csv(path_to_decoded_genes)
+        n_genes_to_find=len(codebook_df)
+        n_spots= len(decoded_df)
+        decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
+        unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
 
-    possible_unique_barcodes = num_channels ** num_rounds
-    n_unique_barcodes_called = len(unique_df)
-    if ratio_recognized_barcodes != 0:
-        interval = (ratio_recognized_barcodes-3, ratio_recognized_barcodes+3)
-        if n_unique_barcodes_called/possible_unique_barcodes in interval:
-            print()
+        possible_unique_barcodes = num_channels ** num_rounds
+        n_unique_barcodes_called = len(unique_df)
+        file.write(f"Number of genes to find:{n_genes_to_find} \n Number of spots found: {n_spots} \n Possible unique barcodes = {possible_unique_barcodes} \n Number of unique barcodes actually called = {n_unique_barcodes_called}\n")
+        if ratio_recognized_barcodes != 0:
+            interval = (ratio_recognized_barcodes-3, ratio_recognized_barcodes+3)
+            if n_unique_barcodes_called/possible_unique_barcodes in interval:
+                file.write(f"The ratio of recognized  barcodes is suspiciously close to what would've been achieved by random basecalling.")
 
     def simulateRandomBarcodeCalling(n_spots, n_rounds, n_channels):
         barcode_list = []
@@ -63,11 +65,13 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
             barcode_list.append(barcode)
         #Count occurences of each barcode
         counted = [barcode_list.count(entry) for entry in barcode_list] 
-
         d={'Barcode': barcode_list, 'Counted': counted}
         simulated_df = pd.DataFrame(d).drop_duplicates()
+        simulated_df.to_csv("simulated_random_base_calling.csv")
+    simulateRandomBarcodeCalling(n_spots, num_rounds, num_channels)
     
-
+    
+    
 
 
 
@@ -99,13 +103,10 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
         else:
             nr_unrecognized_barcodes += 1
             tile_dict[tile][1] += 1
-
-
-    print(f"Number of recognized barcodes: {nr_recognized_barcodes} \t Number of unrecognized barcodes: {nr_unrecognized_barcodes}. \n Ratio = {round((nr_recognized_barcodes/(nr_unrecognized_barcodes+nr_recognized_barcodes)),3)*100} percent. \n")
-
-    #Add a barcode column to the gene dict, for debugging purposes
+    with open("stat_report.txt", "a+") as file:
+        file.write(f"Number of recognized barcodes: {nr_recognized_barcodes} \t Number of unrecognized barcodes: {nr_unrecognized_barcodes}. \n Ratio = {round((nr_recognized_barcodes/(nr_unrecognized_barcodes+nr_recognized_barcodes)),3)*100} percent. \n")
+    
     gene_dict = {gene: [gene,count, df.loc[df['Gene']==gene].iloc[0]['Barcode']] for gene, count in gene_dict.items()}
-    print("Distribution of recognized barcodes:")
     gene_df = pd.DataFrame.from_dict(list(sorted(gene_dict.values(),key=lambda x: x[1], reverse=True)))
     gene_df.columns=['Gene', 'Counts', 'Barcode']
     gene_df.to_csv("recognized_barcodes.csv")
@@ -119,5 +120,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     # print(tabulate(gene_df, headers=["Gene", "Counts", "Barcode"]))
 
 decoded_genes = sys.argv[1]
+codebook = sys.argv[2]
 countRecognizedBarcodeStats(decoded_genes)
 countChannelsInBarcodeList(decoded_genes)
+evaluateRandomCalling(decoded_genes, codebook, 4, 4)

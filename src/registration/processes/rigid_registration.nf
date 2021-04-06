@@ -23,6 +23,23 @@ process register{
 
 }
 
+// For this process, you need to map and combine your maxIP and round images to be transformed in the correct way
+process register_with_maxIP {
+    publishDir "$params.outDir/registered/", mode: 'symlink'
+    echo=true
+    input:
+    path reference
+    tuple val(round_nr), path(maxIP_image), path(round_images)
+
+    output:
+    path "*_registered.tif"
+
+    """
+    python $binDir/rigidRegisterMaxIP.py $reference $round_nr $maxIP_image $round_images
+    """
+
+}
+
 process local_registration {
     publishDir "$params.outDir/local_register/", mode: 'symlink'
 
