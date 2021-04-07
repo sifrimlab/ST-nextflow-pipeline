@@ -1,0 +1,23 @@
+nextflow.enable.dsl=2
+
+import java.nio.file.Paths
+
+moduleName="file_conversion"
+
+binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
+
+
+process SPLIT_CZI_IN_CHANNELS {
+    input:
+    path image
+
+    output:
+    path "${image.baseName}_c*.tif"
+
+    script:
+    """
+    python $binDir/cziMozaikConverter.py $image 
+    """
+
+
+}

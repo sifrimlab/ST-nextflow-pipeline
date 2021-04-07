@@ -98,7 +98,6 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          BaseDir: ${baseDir}
-         target tile size: ${params.target_x_reso} x ${params.target_y_reso}
          -----------------------------
          """
          .stripIndent()
@@ -113,10 +112,19 @@ log.info """\
 
 
 // Actual workflows
+workflow convert_czi {
+    include{
+    split_czi_rounds_into_channel_tifs
+    } from "./src/file_conversion/workflows/czi_conversion.nf"
+
+    split_czi_rounds_into_channel_tifs("$params.dataDir/*.czi")
+    split_czi_rounds_into_channel_tifs.out.view()
+}
+
 workflow iss {
     include {
     iss as iss_pipeline
     } from "./workflows/iss.nf"
-    
+
     iss_pipeline()
 }
