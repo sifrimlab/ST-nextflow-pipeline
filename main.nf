@@ -108,13 +108,15 @@ log.info """\
 // Include experiment-specific workflows //
 ///////////////////////////////////////////
 
-include {
-    iss as iss_pipeline
-} from "./workflows/iss.nf"
+
 
 
 
 // Actual workflows
 workflow iss {
+    include {
+    iss as iss_pipeline
+    } from "./workflows/iss.nf"
+    
     iss_pipeline()
 }

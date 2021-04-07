@@ -10,6 +10,7 @@ process plot_decoded_spots {
 
     input:
     path decoded_genes
+    path reference
     val tile_size_x
     val tile_size_y
     val grid_size_x
@@ -19,8 +20,10 @@ process plot_decoded_spots {
     output:
     path "decoded_genes_plotted.pdf"
     path "decoded_genes_plotted-1.png"
+    script:
+
     """
-    python $binDir/imageViewing.py ${params.reference} ${decoded_genes} $grid_size_x,$grid_size_y ${tile_size_x} ${tile_size_y}
+    python $binDir/imageViewing.py $reference $decoded_genes $grid_size_x,$grid_size_y $tile_size_x $tile_size_y
     pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
     """
 }

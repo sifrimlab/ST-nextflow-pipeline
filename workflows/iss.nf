@@ -36,38 +36,27 @@ include {
 
 include {
     plot_decoded_spots
-} from "../src/plotting/processes/plotting.nf"
+} from "../src/plotting/processes/plotting.nf" 
 
 
-if (!params.containsKey("reference")){
-    log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
-    params.create_reference_bool = true
-} 
 
 workflow iss {
     main:
-        /*
-        Example of an optional step:
-        if(params.sc.scanpy.containsKey("filter")) {
-            out = QC_FILTER( out ).filtered // Remove concat
-        }
-        */
-
         // Map images to a tuple representing their respective rounds
         rounds = iss_round_adder()
 
-        if (params.create_reference_bool){
-            log.info "It's being created now"
-            params.reference = create_reference_image(rounds.first())
+        if (!params.containsKey("reference")){
+            log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
+            //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
+            params.reference = create_reference_image(rounds.groupTuple(by:0).first()) //Create reference image by taking maxIP on the first round
         }
         
-        params.reference.view()
         tiling("$params.dataDir/Round*/*.$params.extension", rounds, params.reference)
-        
+
         filter_ref(tiling.out.reference)
         filter_round(tiling.out.rounds)
 
-        // Register tiles locally:
+        // // Register tiles locally:
         register(filter_ref.out, filter_round.out)
 
         spot_detection(filter_ref.out, register.out)
@@ -78,7 +67,7 @@ workflow iss {
 
         get_decoded_stats(decoded_genes)
     
-        plot_decoded_spots(decoded_genes, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
+        plot_decoded_spots(decoded_genes, params.reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
 
 }
         

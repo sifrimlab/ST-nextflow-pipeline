@@ -24,8 +24,8 @@ workflow standard_iss_tiling {
     main:
         calculate_biggest_resolution(glob_pattern)
 
-        calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)        
-
+        calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+                
         pad_reference(reference, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution) 
         pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
 
