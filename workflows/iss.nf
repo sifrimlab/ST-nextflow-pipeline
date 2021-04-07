@@ -11,7 +11,9 @@ include {
 include {
     standard_iss_tiling as tiling;
 } from "../src/tiling/workflows/tiling_workflows.nf"
-
+include {
+    create_reference_image
+} from "../src/utils/workflows/projections.nf"
 include {
     filter_ref; filter_round
 } from "../src/filtering/processes/filtering.nf"
@@ -37,6 +39,11 @@ include {
 } from "../src/plotting/processes/plotting.nf"
 
 
+if (!params.containsKey("reference")){
+    log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
+    params.create_reference_bool = true
+} 
+
 workflow iss {
     main:
         /*
@@ -49,6 +56,12 @@ workflow iss {
         // Map images to a tuple representing their respective rounds
         rounds = iss_round_adder()
 
+        if (params.create_reference_bool){
+            log.info "It's being created now"
+            params.reference = create_reference_image(rounds.first())
+        }
+        
+        params.reference.view()
         tiling("$params.dataDir/Round*/*.$params.extension", rounds, params.reference)
         
         filter_ref(tiling.out.reference)
