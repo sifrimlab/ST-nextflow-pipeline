@@ -1,0 +1,3 @@
+- Histogram center of mass
+- Histogram max count
+- histogram divison into tw ocenters of mass
