@@ -29,7 +29,6 @@ process register_with_maxIP {
     publishDir "$params.outDir/registered/", mode: 'symlink'
     echo=true
 
-    memory '8 GB'
     input:
     path reference
     tuple val(round_nr), path(maxIP_image), path(round_images)
