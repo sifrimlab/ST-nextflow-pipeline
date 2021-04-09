@@ -3,6 +3,8 @@ from icecream import ic
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from scipy.signal import find_peaks
 
 def getHistogram(path_to_image):
     image = cv2.imread(path_to_image, 0)
@@ -12,15 +14,21 @@ def getHistogram(path_to_image):
    # plt.xlim([0, 256])
    # plt.show()
 
-def plotHistograms(histogram_list):
-    number_of_hists=len(histogram_list)
-
-    # start with one
+def plotHistograms(hist_dict):
+    # Extract names
+    names=list(hist_dict.keys())
+    # Extract histograms, and cast to histograms if they are not already
+    hist_list = list(hist_dict.values())
+    hist_list = [getHistogram(value)  if isinstance(value, str) else value for value in hist_list]
+    
+    # start with one figure.
     fig = plt.figure()
+    fig.suptitle("Histogram plotting intensities vs times found.", fontsize=14)
     ax = fig.add_subplot(111)
-    ax.plot(histogram_list[0])
+    ax.plot(hist_list[0])
+    ax.set_title(names[0])
     # Then plot more as they pass by the forloop, each time updating the axes geometry
-    for i, hist in enumerate(histogram_list):
+    for i in range(0,len(names)):
         if i==0:
             continue
 
@@ -30,25 +38,72 @@ def plotHistograms(histogram_list):
         
         # add the new
         ax = fig.add_subplot(n+1, 1, n+1)
-        ax.plot(hist)
-        
-    plt.show()
+        ax.plot(hist_list[i])
+        ax.set_title(names[i])
+    return plt
 
-def assesAverageIntensity(histogram_list):
-    average_list = []
-    for hist in histogram_list:
-        hist = hist.astype(int)
-        temp = np.insert(hist, 0,range(1,257), axis=1)
-        average = np.average(temp[:,0], weights=temp[:,1])
-        average_list.append(average)
-        return average_list
+
+def getPeaks(hist):
+    hist = hist[:,0]
+    peaks, properties = find_peaks(hist)
+    peak_values = [hist[i] for i in peaks]
+    # create a dict with peak_values being the key, peaks being the value
+    peak_dict = {peak_value: peak for peak, peak_value in zip(peaks, peak_values)}
+    temp_peak_values = list(peak_dict.keys())
+    first_max = int(max(temp_peak_values))
+    temp_peak_values.remove(first_max)
+    second_max =int(max(temp_peak_values))
+
+    first_max_pixel_value = peak_dict[first_max]
+    second_max_pixel_value = peak_dict[second_max]
+    first_max_tuple = (first_max_pixel_value, first_max)    
+    second_max_tuple = (second_max_pixel_value, second_max)   
+
+    return first_max_pixel_value, second_max_pixel_value
+
+def getAverageIntensity(hist):
+    hist = hist.astype(int)
+    temp = np.insert(hist, 0,range(1,257), axis=1)
+    average = np.average(temp[:,0], weights=temp[:,1])
+    return average
+
 def checkIfEmpty(path_to_image):
     image = io.imread(path_to_image)
     result = np.all((image == 0))
     return result
+
+# Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
+def getIntensityAnalytics(name: str, hist):
+    hist = hist.astype(int)
+    average = getAverageIntensity(hist)
+    first_max_peak, second_max_peak = getPeaks(hist)
+    hist_2D = np.insert(hist, 0,range(0,256), axis=1)
+    without_zero_values = np.copy(hist_2D)
+    # Remove all row's that have a zero in the second column
+    without_zero_values = without_zero_values[without_zero_values[:,1]!=0,:]
+    minimum_pixel_value = min(without_zero_values[:,0])
+    maximum_pixel_value = max(without_zero_values[:,0])
     
-images = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c{i}.TIF" for i in range(2,6)]
-hist_list=[]
-for image in images:
-    hist_list.append(getHistogram(image))
-assesAverageIntensity(hist_list)
+
+
+    # Creating the dicst of attributes:
+    attribute_dict = {}
+    attribute_dict['minimum_pixel_value']=minimum_pixel_value
+    attribute_dict['maximum_pixel_value']=maximum_pixel_value
+    attribute_dict['first_peak']=first_max_peak
+    attribute_dict['second_peak']=second_max_peak
+    attribute_dict['average_intensity']=average
+    return_dict={name:attribute_dict}
+    return return_dict
+   
+
+    
+images = {f"c{i}":f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c{i}.TIF" for i in range(2,6)}
+hist_dict = {}
+for name, image in images.items():
+    hist_dict[name]= getHistogram(image)
+for name, hist in hist_dict.items():
+    print(getIntensityAnalytics(name,hist))
+# plt = plotHistograms(hist_dict)
+# plt.show()
+# assesAverageIntensity(hist_dict)

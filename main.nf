@@ -108,9 +108,6 @@ log.info """\
 ///////////////////////////////////////////
 
 
-
-
-
 // Actual workflows
 workflow convert_czi {
     include{
@@ -120,8 +117,17 @@ workflow convert_czi {
     split_czi_rounds_into_channel_tifs("$params.dataDir/*.czi")
     split_czi_rounds_into_channel_tifs.out.view()
 }
+workflow quality_control{
+    
+    include {
+        intensity_diagnosing
+    } from "./src/quality_control/workflows/intensity_workflows.nf"
+
+    intensity_diagnosing("$params.dataDir/Round1/*.$params.extension")
+}
 
 workflow iss {
+
     include {
     iss as iss_pipeline
     } from "./workflows/iss.nf"
