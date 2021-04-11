@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 
 include {
     iss_round_adder;
-} from '../src/utils/processes/image_name_parser.nf'
+} from '../src/utils/workflows/image_name_parser.nf'
 
 include {
     standard_iss_tiling as tiling;

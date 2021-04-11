@@ -109,6 +109,13 @@ log.info """\
 
 
 // Actual workflows
+workflow rename_files{
+        include {
+        add_parent_dir_to_file_name 
+        } from "./src/utils/processes/file_name_parsing.nf"
+
+add_parent_dir_to_file_name($params.dataDir, $params.round_prefix )
+}
 workflow convert_czi {
     include{
     split_czi_rounds_into_channel_tifs

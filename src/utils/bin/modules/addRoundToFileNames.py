@@ -3,8 +3,8 @@ import sys
 import glob
 import pathlib
 
-dataDir = os.getcwd()
-roundDirName = "Round*"
+dataDir = sys.argv[1]
+roundDirName = sys.argv[2]
 
 round_dirs = glob.glob(os.path.join(dataDir, roundDirName))
 for round_dir in round_dirs:
