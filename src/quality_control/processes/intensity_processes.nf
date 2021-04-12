@@ -44,3 +44,18 @@ process collect_intensity_analytics {
     python $binDir/collectIntensityAnalytics.py $dict_jsons 
     """
 }
+process create_html_report {
+    publishDir "$params.outDir/quality_control", mode: "symlink"
+
+    input: 
+    path template
+    path combined_intensity_analytics
+    path images
+
+    output:
+    path 'quality_control_report.html'
+    script:
+    """
+    python $binDir/createHTMLreport.py $template $combined_intensity_analytics $images
+    """
+}

@@ -130,7 +130,7 @@ workflow quality_control{
         intensity_diagnosing
     } from "./src/quality_control/workflows/intensity_workflows.nf"
 
-    intensity_diagnosing("$params.dataDir/Round1/*.$params.extension")
+    intensity_diagnosing("$params.dataDir/$params.round_prefix/*.$params.extension")
 }
 
 workflow iss {

@@ -23,10 +23,11 @@ def plotHistograms(hist_dict):
     
     # start with one figure.
     fig = plt.figure()
-    fig.suptitle("Histogram plotting intensities vs times found.", fontsize=14)
     ax = fig.add_subplot(111)
     ax.plot(hist_list[0])
     ax.set_title(names[0])
+    ax.set_xlabel("pixel value")
+    ax.set_ylabel("# times encountered")
     # Then plot more as they pass by the forloop, each time updating the axes geometry
     for i in range(0,len(names)):
         if i==0:
@@ -40,6 +41,8 @@ def plotHistograms(hist_dict):
         ax = fig.add_subplot(n+1, 1, n+1)
         ax.plot(hist_list[i])
         ax.set_title(names[i])
+        ax.set_xlabel("pixel value")
+        ax.set_ylabel("# times encountered")
     return plt
 
 
@@ -67,11 +70,6 @@ def getAverageIntensity(hist):
     average = np.average(temp[:,0], weights=temp[:,1])
     return average
 
-def checkIfEmpty(path_to_image):
-    image = io.imread(path_to_image)
-    result = np.all((image == 0))
-    return result
-
 # Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
 def getIntensityAnalytics(name: str, hist):
     hist = hist.astype(int)
@@ -98,17 +96,5 @@ def getIntensityAnalytics(name: str, hist):
 
 def collectIntensityAnalytics(rows_list):
     df = pd.DataFrame.from_dict(rows_list)  
+    df = df.sort_values(by=['image_name'])
     return  df  
-
-    
-#images = {f"c{i}":f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c{i}.TIF" for i in range(2,6)}
-#hist_dict = {}
-#for name, image in images.items():
-#    hist_dict[name]= getHistogram(image)
-#rows_list = []
-#for name, hist in hist_dict.items():
-#    rows_list.append(getIntensityAnalytics(name,hist))
-#collectIntensityAnalytics(rows_list)
-# plt = plotHistograms(hist_dict)
-# plt.show()
-# assesAverageIntensity(hist_dict)
