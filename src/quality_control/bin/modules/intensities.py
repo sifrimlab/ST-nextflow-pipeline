@@ -89,26 +89,26 @@ def getIntensityAnalytics(name: str, hist):
     # Creating the dicst of attributes:
     attribute_dict = {}
     attribute_dict['image_name']=name
-    attribute_dict['minimum_pixel_value']=minimum_pixel_value
-    attribute_dict['maximum_pixel_value']=maximum_pixel_value
-    attribute_dict['first_peak']=first_max_peak
-    attribute_dict['second_peak']=second_max_peak
-    attribute_dict['average_intensity']=average
+    attribute_dict['minimum_pixel_value']=int(minimum_pixel_value)
+    attribute_dict['maximum_pixel_value']=int(maximum_pixel_value)
+    attribute_dict['first_peak']=int(first_max_peak)
+    attribute_dict['second_peak']=int(second_max_peak)
+    attribute_dict['average_intensity']=int(average)
     return attribute_dict
 
 def collectIntensityAnalytics(rows_list):
     df = pd.DataFrame.from_dict(rows_list)  
-    print(df) 
+    return  df  
 
     
-images = {f"c{i}":f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c{i}.TIF" for i in range(2,6)}
-hist_dict = {}
-for name, image in images.items():
-    hist_dict[name]= getHistogram(image)
-rows_list = []
-for name, hist in hist_dict.items():
-    rows_list.append(getIntensityAnalytics(name,hist))
-collectIntensityAnalytics(rows_list)
+#images = {f"c{i}":f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/c{i}.TIF" for i in range(2,6)}
+#hist_dict = {}
+#for name, image in images.items():
+#    hist_dict[name]= getHistogram(image)
+#rows_list = []
+#for name, hist in hist_dict.items():
+#    rows_list.append(getIntensityAnalytics(name,hist))
+#collectIntensityAnalytics(rows_list)
 # plt = plotHistograms(hist_dict)
 # plt.show()
 # assesAverageIntensity(hist_dict)

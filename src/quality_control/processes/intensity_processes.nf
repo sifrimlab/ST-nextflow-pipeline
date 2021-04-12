@@ -20,15 +20,27 @@ process plot_intensity_histogram {
 }
 
 process get_intensity_analytics {
-    publishDir "$params.outDir/quality_control", mode: "symlink"
-
     input:
     path image
     output:
-    path "${image.baseName}_intensity_analytics.txt"
+    path "${image.baseName}_intensity_analytics.json"
 
     script:
     """
-    python $binDir/
+    python $binDir/getIntensityAnalytics.py $image
+    """
+}
+process collect_intensity_analytics {
+    publishDir "$params.outDir/quality_control", mode: "symlink"
+    
+    input:
+    path dict_jsons
+
+    output:
+    path "combined_intensity_analytics.html"
+
+    script:
+    """
+    python $binDir/collectIntensityAnalytics.py $dict_jsons 
     """
 }
