@@ -62,15 +62,15 @@ process pad_round {
     publishDir "$params.outDir/padded", mode: 'symlink'
 
     input:
-    tuple val(round_nr), path(image)
+    path image 
     val target_x
     val target_y
 
     output:
-    path "${round_nr}_${image.baseName}_padded.tif"
+    path "${image.baseName}_padded.tif"
 
     """
-    python $binDir/padImageBlack.py $image $target_x $target_y $round_nr
+    python $binDir/padImageBlack.py $image $target_x $target_y
     """
 }
 

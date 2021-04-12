@@ -58,10 +58,6 @@ image = sys.argv[1]
 prefix = os.path.splitext(image)[0]
 target_x = int(sys.argv[2])
 target_y = int(sys.argv[3])
-if len(sys.argv)>4:
-    round_nr = (sys.argv[4]) + "_"
-else:
-    round_nr=""
 
 image_padded = pad(image, target_x,target_y)
-cv2.imwrite(f"{round_nr}{prefix}_padded.tif", image_padded)
+cv2.imwrite(f"{prefix}_padded.tif", image_padded)
