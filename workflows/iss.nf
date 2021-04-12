@@ -43,15 +43,17 @@ include {
 workflow iss {
     main:
         // Map images to a tuple representing their respective rounds
-        rounds = iss_round_adder()
 
         if (!params.containsKey("reference")){
             log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
             //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
+            rounds = iss_round_adder()
             params.reference = create_reference_image(rounds.groupTuple(by:0).first()) //Create reference image by taking maxIP on the first round
         }
-        
-        tiling("$params.dataDir/Round*/*.$params.extension", rounds, params.reference)
+
+        rounds = Channel.fromPath("$params.dataDir/$params.round_prefix/*.$params.extension")
+         
+        tiling("$params.dataDir/$params.round_prefix/*.$params.extension", rounds, params.reference)
 
         filter_ref(tiling.out.reference)
         filter_round(tiling.out.rounds)
