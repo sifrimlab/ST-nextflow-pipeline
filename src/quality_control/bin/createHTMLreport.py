@@ -24,11 +24,15 @@ h2_list = template_soup.find_all('h2')
 #print(names[0])
 
 h2_list[0].insert_after(table_tag)
+
+# Plot first image 
 image_tag = template_soup.new_tag('img')
 image_tag['src']= image_list[0]
 image_tag['width']= 500
 image_tag['height']= 500
 h2_list[1].insert_after(image_tag)
+
+# then plot the other images right after the previous one
 for i,image in enumerate(image_list):
     if i==0:
         previous_image = image_tag
