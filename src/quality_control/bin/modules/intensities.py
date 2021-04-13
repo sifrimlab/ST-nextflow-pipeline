@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import random # for random color plotting
 from scipy.signal import find_peaks
 
 def getHistogram(path_to_image):
@@ -20,11 +21,16 @@ def plotHistograms(hist_dict):
     # Extract histograms, and cast to histograms if they are not already
     hist_list = list(hist_dict.values())
     hist_list = [getHistogram(value)  if isinstance(value, str) else value for value in hist_list]
-    
+    def getRandomColor():
+        r = random.random()
+        g = random.random()
+        b = random.random()
+        color = (r,g,b)
+        return color
     # start with one figure.
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.plot(hist_list[0])
+    ax.plot(hist_list[0], color=getRandomColor())
     ax.set_title(names[0])
     ax.set_xlabel("pixel value")
     ax.set_ylabel("# times encountered")
@@ -39,7 +45,7 @@ def plotHistograms(hist_dict):
         
         # add the new
         ax = fig.add_subplot(n+1, 1, n+1)
-        ax.plot(hist_list[i])
+        ax.plot(hist_list[i], getRandomColor())
         ax.set_title(names[i])
         ax.set_xlabel("pixel value")
         ax.set_ylabel("# times encountered")
@@ -52,6 +58,8 @@ def getPeaks(hist):
     peak_values = [hist[i] for i in peaks]
     # create a dict with peak_values being the key, peaks being the value
     peak_dict = {peak_value: peak for peak, peak_value in zip(peaks, peak_values)}
+
+    # Create a list of the peak values to find the maxima
     temp_peak_values = list(peak_dict.keys())
     first_max = int(max(temp_peak_values))
     temp_peak_values.remove(first_max)
@@ -62,7 +70,7 @@ def getPeaks(hist):
     first_max_tuple = (first_max_pixel_value, first_max)    
     second_max_tuple = (second_max_pixel_value, second_max)   
 
-    return first_max_pixel_value, second_max_pixel_value
+    return first_max_pixel_value, first_max, second_max_pixel_value, second_max
 
 def getAverageIntensity(hist):
     hist = hist.astype(int)
@@ -73,8 +81,11 @@ def getAverageIntensity(hist):
 # Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
 def getIntensityAnalytics(name: str, hist):
     hist = hist.astype(int)
+    # Get average intensity pixel value weighted by the number of times counted
     average = getAverageIntensity(hist)
-    first_max_peak, second_max_peak = getPeaks(hist)
+    # Get peak information
+    first_max_pixel_value, first_max, second_max_pixel_value, second_max= getPeaks(hist)
+    # Get min and max pixel value by removing pixel values that didn't have a pixel counted
     hist_2D = np.insert(hist, 0,range(0,256), axis=1)
     without_zero_values = np.copy(hist_2D)
     # Remove all row's that have a zero in the second column
@@ -89,8 +100,10 @@ def getIntensityAnalytics(name: str, hist):
     attribute_dict['image_name']=name
     attribute_dict['minimum_pixel_value']=int(minimum_pixel_value)
     attribute_dict['maximum_pixel_value']=int(maximum_pixel_value)
-    attribute_dict['first_peak']=int(first_max_peak)
-    attribute_dict['second_peak']=int(second_max_peak)
+    attribute_dict['first_peak']=int(first_max_pixel_value)
+    attribute_dict['# pixels_in_first_peak']=int(first_max)
+    attribute_dict['second_peak']=int(second_max_pixel_value)
+    attribute_dict['# pixels_in_second_peak']=int(second_max)
     attribute_dict['average_intensity']=int(average)
     return attribute_dict
 

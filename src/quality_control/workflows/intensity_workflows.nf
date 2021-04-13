@@ -20,6 +20,6 @@ workflow intensity_diagnosing{
   collect_intensity_analytics(intensities)
   intensity_table = collect_intensity_analytics.out
 
-  create_html_report("$baseDir/assets/html_report_template.html", intensity_table, plots)
+  create_html_report("$baseDir/assets/html_templates/intensity_report_template.html", intensity_table, plots)
 
 }   

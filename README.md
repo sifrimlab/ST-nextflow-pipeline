@@ -1,29 +1,27 @@
-# communISS: In Situ Sequencing image processing end-to-end pipeline
+# communISS: Spatial Transcriptomics processing end-to-end pipeline
 
 ### What you need to have installed:
 - Nextflow: https://www.nextflow.io/docs/latest/getstarted.html
 - (Ana)Conda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 ### Running the pipeline
+- Update your version of the repo to the most recent stable version:
 - 	```bash
 	nextflow clone WoutDavid/communISS ; cd communISS
 	```
-- edit the nextflow.config file with specifications of your project (path to data, n_rounds etc...)
+- Create a personal config file containing all the parameters you'll need for the functionality you want:
 - ```bash
-  nextflow run  dsl2_nextflow_pipeline.nf			\
-					--with_conda comunISS.yaml		\
-					--dataDir '/path/to/data/'		\
-					--outDir '/path/to/output/dir/' \
-					--codebook '/path/to/codebook/	\
+	nextflow config -profile conda,iss >> standard_iss_experiment.config
+	```
+- *Note that this config file is where you change everything that you want to change, such as data directory, output directory, image format etc.*
+- After making the needed changes to the config file, you can run pipeline by specifying an entry point with "-entry", which takes as argument the name of one of the workflows included in the main.nf file.  
+- ```bash
+  nextflow -C standard_iss_experiment.config run  main.nf	\
+						-entry iss							\
+						--with_conda comunISS.yaml			\
 	```
 
 
-### File explanation
-- *main.py*: Running the pipeline starts from here. See "Running the pipeline" for instructions how to run this from command line.
+### Repository file hierarchy explanation
+- *main.nf*: Running the pipeline should always start from here. Dynamically defined paths in the functionality count on the starting point of the "nextflow run"-command being the main.nf file.
 - *decorators.py*: This file contains several decorators for the entire python pipeline. For end-users this will probably not be relevant, unless you want to perhaps add computation time to your pipeline usage.
-- *test_space.py*: Contains testing code snippets, to be thrown away before shipment.
-- ***image_processing/***: This directory contains all image processing specific python scripts.
-	- *tiling.py*: Tiles images into an even number of tiles.
-	- *rigidRegister.py*: Registers images with respect to a reference image.
-	- *filtering.py*: Filters and image using the white tophat algorithm.
-	- *maxIP.py*: Creates a maximum intensity projection of an image stack.

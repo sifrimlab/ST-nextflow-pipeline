@@ -42,23 +42,23 @@ include {
 
 workflow iss {
     main:
-        // Map images to a tuple representing their respective rounds
-
         if (!params.containsKey("reference")){
             log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
             //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
             rounds = iss_round_adder()
             params.reference = create_reference_image(rounds.groupTuple(by:0).first()) //Create reference image by taking maxIP on the first round
         }
-
+        // Create the channel of round images, reference is implicitely defined in the config file as params.reference
         rounds = Channel.fromPath("$params.dataDir/$params.round_prefix/*.$params.extension")
          
+        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
         tiling("$params.dataDir/$params.round_prefix/*.$params.extension", rounds, params.reference)
 
+        // perform white tophat filtering on both reference and round images
         filter_ref(tiling.out.reference)
         filter_round(tiling.out.rounds)
 
-        // // Register tiles locally:
+        // Register tiles locally:
         register(filter_ref.out, filter_round.out)
 
         spot_detection(filter_ref.out, register.out)

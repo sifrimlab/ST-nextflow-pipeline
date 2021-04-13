@@ -118,11 +118,11 @@ workflow rename_files{
 }
 workflow convert_czi {
     include{
-    split_czi_rounds_into_channel_tifs
+    SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS
     } from "./src/file_conversion/workflows/czi_conversion.nf"
 
-    split_czi_rounds_into_channel_tifs("$params.dataDir/*.czi")
-    split_czi_rounds_into_channel_tifs.out.view()
+    SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS("$params.dataDir/*.czi")
+    SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS.out.view()
 }
 workflow quality_control{
     

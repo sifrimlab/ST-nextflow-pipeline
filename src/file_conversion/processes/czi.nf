@@ -8,6 +8,8 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 
 process SPLIT_CZI_IN_CHANNELS {
+    publishDir "$outDir", mode: 'symlink'
+    memory '2 GB'
     input:
     path image
 

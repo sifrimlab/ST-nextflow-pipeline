@@ -21,7 +21,7 @@ def writeMozaicImages(czi_image, channel_nr,output_prefix=""):
         mosaic_data = mosaic_data[0,0,:,:].astype(np.uint16)
         image_list.append(mosaic_data)
     maxIP = maxIPstack(image_list)
-    output_filename= f"output_prefix_c{channel_nr}.tif"
+    output_filename= f"{ output_prefix }_c{channel_nr}.tif"
     io.imsave(output_filename, maxIP)
 
 
