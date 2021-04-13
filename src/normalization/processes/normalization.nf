@@ -16,6 +16,6 @@ process clip_and_rescale {
 
     script:
     """
-    python $binDir/clipAndRescale.py $image
+    python $binDir/clipAndRescale.py $image $params.clip_percentile
     """
 }

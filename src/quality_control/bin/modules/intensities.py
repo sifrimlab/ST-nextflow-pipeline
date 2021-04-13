@@ -90,8 +90,10 @@ def getIntensityAnalytics(name: str, hist ):
     first_max_pixel_value, first_max, second_max_pixel_value, second_max= getPeaks(hist)
     n_pixels_lower_than_first_peak = np.sum(np.where(image <= first_max_pixel_value, 1,0))
     median_of_pixel_values = (first_max_pixel_value+second_max_pixel_value)/2
+
     n_pixels_lower_than_median_value = np.sum(np.where(image<= median_of_pixel_values, 1,0))
-    ic(n_pixels_lower_than_first_peak, (n_pixels_lower_than_first_peak/n_pixels)*100, n_pixels_lower_than_median_value, (n_pixels_lower_than_median_value/n_pixels)*100)
+    percentage_lower_than_first_peak = (n_pixels_lower_than_first_peak/n_pixels)*100
+    percentage_lower_than_medium = (n_pixels_lower_than_median_value/n_pixels)*100
 
     # Get min and max pixel value by removing pixel values that didn't have a pixel counted
     hist_2D = np.insert(hist, 0,range(0,256), axis=1)
@@ -112,6 +114,9 @@ def getIntensityAnalytics(name: str, hist ):
     attribute_dict['# pixels_in_first_peak']=int(first_max)
     attribute_dict['second_peak']=int(second_max_pixel_value)
     attribute_dict['# pixels_in_second_peak']=int(second_max)
+    attribute_dict['median_pixel_value']=median_of_pixel_values
+    attribute_dict['percentage_lower_than_first_peak']= percentage_lower_than_first_peak
+    attribute_dict['percentage_lower_than_medium']= percentage_lower_than_medium
     attribute_dict['average_intensity']=int(average)
     return attribute_dict
 
