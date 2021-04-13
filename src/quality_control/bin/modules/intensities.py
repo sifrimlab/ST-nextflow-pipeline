@@ -70,6 +70,7 @@ def getPeaks(hist):
     first_max_tuple = (first_max_pixel_value, first_max)    
     second_max_tuple = (second_max_pixel_value, second_max)   
 
+
     return first_max_pixel_value, first_max, second_max_pixel_value, second_max
 
 def getAverageIntensity(hist):
@@ -79,12 +80,19 @@ def getAverageIntensity(hist):
     return average
 
 # Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
-def getIntensityAnalytics(name: str, hist):
+def getIntensityAnalytics(name: str, hist ):
     hist = hist.astype(int)
+    image = cv2.imread(name,0 )
+    n_pixels = np.sum(hist)
     # Get average intensity pixel value weighted by the number of times counted
     average = getAverageIntensity(hist)
     # Get peak information
     first_max_pixel_value, first_max, second_max_pixel_value, second_max= getPeaks(hist)
+    n_pixels_lower_than_first_peak = np.sum(np.where(image <= first_max_pixel_value, 1,0))
+    median_of_pixel_values = (first_max_pixel_value+second_max_pixel_value)/2
+    n_pixels_lower_than_median_value = np.sum(np.where(image<= median_of_pixel_values, 1,0))
+    ic(n_pixels_lower_than_first_peak, (n_pixels_lower_than_first_peak/n_pixels)*100, n_pixels_lower_than_median_value, (n_pixels_lower_than_median_value/n_pixels)*100)
+
     # Get min and max pixel value by removing pixel values that didn't have a pixel counted
     hist_2D = np.insert(hist, 0,range(0,256), axis=1)
     without_zero_values = np.copy(hist_2D)
@@ -111,3 +119,6 @@ def collectIntensityAnalytics(rows_list):
     df = pd.DataFrame.from_dict(rows_list)  
     df = df.sort_values(by=['image_name'])
     return  df  
+test_image_path = "/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c4.TIF"
+
+getIntensityAnalytics(test_image_path, getHistogram(test_image_path))
