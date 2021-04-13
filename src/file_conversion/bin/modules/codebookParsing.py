@@ -5,9 +5,10 @@ from icecream import ic
 
 
 def convertLettersToNumbers(path_to_codebook: str, path_to_conversion_index: str, outfile, index_to_keep=0):
-    codebook = pd.read_csv(path_to_codebook, header=None)
+    codebook = pd.read_csv(path_to_codebook, header=None, sep=",")
     with open(path_to_conversion_index, mode='r') as file:
         reader = csv.reader(file)
+        # new dict where key= numbers, values = letters
         index_dict = {rows[0]:rows[1] for rows in reader}
     copy_barcode_list = list(codebook[0])
     gene_list=list(codebook[1])
