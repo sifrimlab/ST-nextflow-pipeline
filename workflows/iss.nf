@@ -7,7 +7,9 @@ nextflow.enable.dsl=2
 include {
     iss_round_adder;
 } from '../src/utils/workflows/image_name_parser.nf'
-
+include {
+    clip_and_rescale
+} from '../src/normalization/processes/normalization.nf'
 include {
     standard_iss_tiling as tiling;
 } from "../src/tiling/workflows/tiling_workflows.nf"
@@ -50,7 +52,10 @@ workflow iss {
         }
         // Create the channel of round images, reference is implicitely defined in the config file as params.reference
         rounds = Channel.fromPath("$params.dataDir/$params.round_prefix/*.$params.extension")
-         
+
+        // Normalize the round images
+        rounds = clip_and_rescale(rounds)
+        
         // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
         tiling("$params.dataDir/$params.round_prefix/*.$params.extension", rounds, params.reference)
 
@@ -62,7 +67,7 @@ workflow iss {
         register(filter_ref.out, filter_round.out)
 
         spot_detection(filter_ref.out, register.out)
-        
+       
         decoding(spot_detection.out)
         // Pool decoded genes into one file for downstream analysis
         decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
