@@ -74,8 +74,6 @@ workflow iss {
 
         get_decoded_stats(decoded_genes)
     
-        plot_decoded_spots(decoded_genes, params.reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
+        plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
 
 }
-        
-        
