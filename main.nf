@@ -98,7 +98,7 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          BaseDir: ${baseDir}
-         workDir: ${params.workDir}
+         workDir: ${workDir}
          -----------------------------
          """
          .stripIndent()

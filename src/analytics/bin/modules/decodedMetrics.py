@@ -133,9 +133,9 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     plt.ylabel("Number of times recognized")
     plt.savefig("recognized_genes_counts.svg")
 
-if __name__ == '__main__':
-        decoded_genes = "/home/david/Documents/communISS/results/decoded/concat_decoded_genes.csv" 
-        codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
-        countRecognizedBarcodeStats(decoded_genes)
-        evaluateRandomCalling(decoded_genes, codebook, 4,4)
-        countChannelsInBarcodeList(decoded_genes)
+# if __name__ == '__main__':
+#         decoded_genes = "/home/david/Documents/communISS/results/decoded/concat_decoded_genes.csv" 
+#         codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+#         countRecognizedBarcodeStats(decoded_genes)
+#         evaluateRandomCalling(decoded_genes, codebook, 4,4)
+#         countChannelsInBarcodeList(decoded_genes)

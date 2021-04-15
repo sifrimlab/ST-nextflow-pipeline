@@ -1,7 +1,5 @@
 import os 
 import pandas as pd
-from tabulate import tabulate
-from icecream import ic
 import matplotlib.pyplot as plt
 import sys
 import random

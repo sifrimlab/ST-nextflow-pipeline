@@ -7,6 +7,7 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process get_decoded_stats {
     publishDir "$params.outDir/analytics", mode: 'symlink'
+
     input:
     path decoded_genes
 
@@ -20,7 +21,7 @@ process get_decoded_stats {
     path "unique_barcodes_called_counted.html"
 
     script:
-    
+
     """
     python $binDir/extractStatsFromDecodedBarcodes.py $decoded_genes $params.codebook $params.nr_rounds $params.nr_channels
     """
@@ -28,7 +29,6 @@ process get_decoded_stats {
 
 process create_html_report {
     publishDir "$params.outDir/quality_control", mode: "symlink"
-
     input:
     path template
     path recognized_genes_counts
@@ -39,11 +39,17 @@ process create_html_report {
     path channels_called
     path unique_barcodes_called_counted
 
-    output:
-    path 'decoding_analytic_report.html'
-
     script:
     """
     python $binDir/createHTMLreport.py $template $recognized_genes_counts $barcodes_counted $general_stats $recognized_barcodes_per_gene $decoded_stat_report $channels_called $recognized_barcodes_per_gene
-    """                                                                                
+    """
+
+
+    // output:
+    // path 'decoding_analytic_report.html'
+
+    // script:
+    // """
+    // python $binDir/createHTMLreport.py $template $recognized_genes_counts $barcodes_counted $general_stats $recognized_barcodes_per_gene $decoded_stat_report $channels_called $recognized_barcodes_per_gene
+    // """                                                                                
 }
