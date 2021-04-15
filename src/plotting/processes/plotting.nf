@@ -23,7 +23,7 @@ process plot_decoded_spots {
     script:
 
     """
-    python $binDir/imageViewing.py $reference_image $decoded_genes $grid_size_x,$grid_size_y $tile_size_x $tile_size_y
+    python $binDir/plotDecodedGenes.py $reference_image $decoded_genes $grid_size_x,$grid_size_y $tile_size_x $tile_size_y
     pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
     """
 }

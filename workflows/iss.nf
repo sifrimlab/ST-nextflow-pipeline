@@ -75,6 +75,6 @@ workflow iss {
        decoded_out = get_decoded_stats(decoded_genes)
        create_html_report("$baseDir/assets/html_templates/decoding_report_template.html"  ,decoded_out)
     
-       //plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
+       plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
 
 }
