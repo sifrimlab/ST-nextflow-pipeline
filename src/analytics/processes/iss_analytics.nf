@@ -6,19 +6,20 @@ moduleName= "analytics"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process get_decoded_stats {
-    publishDir "$params.outDir/analytics", mode: 'copy'
+    publishDir "$params.outDir/analytics", mode: 'symlink'
     input:
     path decoded_genes
 
     output:
-    path recognized_genes_counts.svg
-    path barcodes_counted.svg
-    path general_stats.html
-    path recognized_barcodes_per_gene.html
-    path decoded_stat_report.html
-    path channels_called.html
-    path unique_barcodes_called_counted.html
+    path "recognized_genes_counts.svg"
+    path "barcodes_counted.svg"
+    path "general_stats.html"
+    path "recognized_barcodes_per_gene.html"
+    path "decoded_stat_report.html"
+    path "channels_called.html"
+    path "unique_barcodes_called_counted.html"
 
+    script:
     
     """
     python $binDir/extractStatsFromDecodedBarcodes.py $decoded_genes $params.codebook $params.nr_rounds $params.nr_channels

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import random
 import numpy as np
-from modules.decodedMetrics.py import countRecognizedBarcodeStats, countChannelsInBarcodeList
+from modules.decodedMetrics import countRecognizedBarcodeStats, countChannelsInBarcodeList, evaluateRandomCalling
 
 decoded_genes = sys.argv[1]
 codebook = sys.argv[2]

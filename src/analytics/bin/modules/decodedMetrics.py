@@ -65,7 +65,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         plt.ylabel("Number of times recognized")
         plt.savefig("barcodes_counted.svg")
 
-        possible_barcode_combinations = num_channels ** num_rounds
+        possible_barcode_combinations = int(num_channels) ** int(num_rounds)
         attribute_dict['# possible combination'] = possible_barcode_combinations
         n_unique_barcodes_called = len(unique_df)
         attribute_dict['# unique barcodes called'] = n_unique_barcodes_called
