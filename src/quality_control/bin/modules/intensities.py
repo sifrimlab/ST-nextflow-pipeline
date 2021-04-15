@@ -70,7 +70,6 @@ def getPeaks(hist):
     first_max_tuple = (first_max_pixel_value, first_max)    
     second_max_tuple = (second_max_pixel_value, second_max)   
 
-
     return first_max_pixel_value, first_max, second_max_pixel_value, second_max
 
 def getAverageIntensity(hist):
@@ -81,19 +80,26 @@ def getAverageIntensity(hist):
 
 # Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
 def getIntensityAnalytics(name: str, hist ):
+    attribute_dict = {}
     hist = hist.astype(int)
     image = cv2.imread(name,0 )
     n_pixels = np.sum(hist)
     # Get average intensity pixel value weighted by the number of times counted
     average = getAverageIntensity(hist)
     # Get peak information
-    first_max_pixel_value, first_max, second_max_pixel_value, second_max= getPeaks(hist)
-    n_pixels_lower_than_first_peak = np.sum(np.where(image <= first_max_pixel_value, 1,0))
-    median_of_pixel_values = (first_max_pixel_value+second_max_pixel_value)/2
+    first_max_pixel_value, first_max, second_max_pixel_value, second_max= getPeaks(hist) 
+    try:
+        n_pixels_lower_than_first_peak = np.sum(np.where(image <= first_max_pixel_value, 1,0))
+        median_of_pixel_values = (first_max_pixel_value+second_max_pixel_value)/2
 
-    n_pixels_lower_than_median_value = np.sum(np.where(image<= median_of_pixel_values, 1,0))
-    percentage_lower_than_first_peak = (n_pixels_lower_than_first_peak/n_pixels)*100
-    percentage_lower_than_medium = (n_pixels_lower_than_median_value/n_pixels)*100
+        n_pixels_lower_than_median_value = np.sum(np.where(image<= median_of_pixel_values, 1,0))
+        percentage_lower_than_first_peak = (n_pixels_lower_than_first_peak/n_pixels)*100
+        percentage_lower_than_medium = (n_pixels_lower_than_median_value/n_pixels)*100
+        attribute_dict['median_pixel_value']=median_of_pixel_values
+        attribute_dict['percentage_lower_than_first_peak']= percentage_lower_than_first_peak
+        attribute_dict['percentage_lower_than_medium']= percentage_lower_than_medium
+    except: 
+        pass
 
     # Get min and max pixel value by removing pixel values that didn't have a pixel counted
     hist_2D = np.insert(hist, 0,range(0,256), axis=1)
@@ -106,7 +112,6 @@ def getIntensityAnalytics(name: str, hist ):
 
 
     # Creating the dicst of attributes:
-    attribute_dict = {}
     attribute_dict['image_name']=name
     attribute_dict['minimum_pixel_value']=int(minimum_pixel_value)
     attribute_dict['maximum_pixel_value']=int(maximum_pixel_value)
@@ -114,9 +119,6 @@ def getIntensityAnalytics(name: str, hist ):
     attribute_dict['# pixels_in_first_peak']=int(first_max)
     attribute_dict['second_peak']=int(second_max_pixel_value)
     attribute_dict['# pixels_in_second_peak']=int(second_max)
-    attribute_dict['median_pixel_value']=median_of_pixel_values
-    attribute_dict['percentage_lower_than_first_peak']= percentage_lower_than_first_peak
-    attribute_dict['percentage_lower_than_medium']= percentage_lower_than_medium
     attribute_dict['average_intensity']=int(average)
     return attribute_dict
 
@@ -124,6 +126,9 @@ def collectIntensityAnalytics(rows_list):
     df = pd.DataFrame.from_dict(rows_list)  
     df = df.sort_values(by=['image_name'])
     return  df  
-test_image_path = "/media/tool/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c4.TIF"
 
-getIntensityAnalytics(test_image_path, getHistogram(test_image_path))
+if __name__ == '__main__':
+
+    test_image_path = "/home/nacho/Documents/Code/communISS/work/de/0df049e32f79898ffa74a487810fbb/Round2_c1_maxIP.tif"
+
+    getIntensityAnalytics(test_image_path, getHistogram(test_image_path))

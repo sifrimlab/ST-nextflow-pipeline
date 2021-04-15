@@ -98,6 +98,7 @@ log.info """\
          Data dir: ${params.dataDir}
          Output dir : ${params.outDir}
          BaseDir: ${baseDir}
+         workDir: ${params.workDir}
          -----------------------------
          """
          .stripIndent()
@@ -130,7 +131,7 @@ workflow quality_control{
         intensity_diagnosing
     } from "./src/quality_control/workflows/intensity_workflows.nf"
 
-    intensity_diagnosing("$params.dataDir/$params.round_prefix/*.$params.extension")
+    intensity_diagnosing("$params.dataDir/$params.round_prefix/${params.round_prefix}_${params.channel_prefix}.$params.extension")
 }
 
 workflow iss {
