@@ -164,7 +164,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
             ## Now we plot the dot
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
             ax2.add_patch(circ)
-    legendWithoutDuplicateLabels(ax2)
+    # legendWithoutDuplicateLabels(ax2)
     plt.savefig("decoded_genes_plotted.pdf")
 if __name__=='__main__':
     reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
