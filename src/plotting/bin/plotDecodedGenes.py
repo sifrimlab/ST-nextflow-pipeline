@@ -13,3 +13,4 @@ tile_grid_shape = make_tuple(sys.argv[3])
 tile_size_x = int(float(sys.argv[4]))
 tile_size_y = int(float(sys.argv[5]))
 plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+

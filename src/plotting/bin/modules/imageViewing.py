@@ -166,3 +166,11 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
             ax2.add_patch(circ)
     legendWithoutDuplicateLabels(ax2)
     plt.savefig("decoded_genes_plotted.pdf")
+if __name__=='__main__':
+    reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
+    decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results2/decoded/concat_decoded_genes.csv" 
+    tile_grid_shape =(8,6) 
+    tile_size_x = int(float(1875))
+    tile_size_y = int(float(2200))
+    plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+
