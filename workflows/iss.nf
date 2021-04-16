@@ -51,13 +51,13 @@ workflow iss {
             params.reference = create_reference_image(rounds.groupTuple(by:0).first()) //Create reference image by taking maxIP on the first round
         }
         // Create the channel of round images, reference is implicitely defined in the config file as params.reference
-       rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}/${params.round_prefix}_${params.channel_prefix}.${params.extension}")
+       rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}*/${params.round_prefix}*_${params.channel_prefix}*.${params.extension}")
 
        // // Normalize the round images
        // rounds = clip_and_rescale(rounds)
        // 
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
-       tiling("$params.dataDir/$params.round_prefix/${params.round_prefix}_${params.channel_prefix}.$params.extension", rounds, params.reference)
+       tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference)
 
        // perform white tophat filtering on both reference and round images
        filter_ref(tiling.out.reference)

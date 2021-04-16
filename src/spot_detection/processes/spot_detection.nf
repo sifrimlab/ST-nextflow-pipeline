@@ -22,13 +22,13 @@ process spot_detection_round {
     publishDir "$params.outDir/hybs", mode: 'symlink'
 
     input:
-    tuple val(tile_nr), val(round_nr), val(channel_nr), path(round_image) 
+    path round_image 
 
     output:
     path "${round_image.baseName}_hybs.csv"
 
     """
-    python ${params.spot_detection_path} ${round_image} ${tile_nr} ${params.min_sigma} ${params.max_sigma} ${round_nr} ${channel_nr}
+    python $binDir/spotDetection.py $round_image $params.min_sigma $params.max_sigma $params.round_prefix $params.channel_prefix
     """
 }
 

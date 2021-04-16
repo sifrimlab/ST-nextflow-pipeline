@@ -4,7 +4,7 @@ import glob
 import pathlib
 
 dataDir = sys.argv[1]
-roundDirName = sys.argv[2]
+roundDirName = f"{sys.argv[2]}*"
 
 round_dirs = glob.glob(os.path.join(dataDir, roundDirName))
 for round_dir in round_dirs:

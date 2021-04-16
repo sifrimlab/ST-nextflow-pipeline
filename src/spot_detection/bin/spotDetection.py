@@ -54,8 +54,8 @@ else:
     max_sigma=None
 
 try:
-    round_number = re.findall(r'Round\d+', sys.argv[4])[0]
-    channel_number = re.findall(r'c\d+', sys.argv[5])[0]
+    round_number = re.findall(r'Round\d+', prefix)[0]
+    channel_number = re.findall(r'c\d+', prefix)[0]
     round_bool = True
 except:
     round_bool = False
@@ -74,10 +74,3 @@ if not round_bool:
 else:
     np.savetxt(f"{prefix}_hybs.csv", array,delimiter=',',fmt='%i', header='Tile,Round,Channel,Y,X,Sigma',comments='')
 
-
-## This is a testblock from which i test spot detection resutls on 8-bit vs 16-bit 
-# img = io.imread("/media/tool/moved_from_m2/cartana_test_stitched/results/filtered_ref/REF_tiled_1_filtered.tif")
-# img = img.astype('uint8')
-# io.imsave("test.tif", img)
-# array = blob_log(img, min_sigma=1, max_sigma=10)
-# print(array)
