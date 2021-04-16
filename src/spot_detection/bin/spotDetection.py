@@ -52,12 +52,15 @@ if len(sys.argv)>2:
 else:
     min_sigma=None
     max_sigma=None
-
-try:
-    round_number = re.findall(r'Round\d+', prefix)[0]
-    channel_number = re.findall(r'c\d+', prefix)[0]
+if len(sys.argv)>4:
+    round_prefix =sys.argv[4] 
+    channel_prefix = sys.argv[5]
+    round_piece = re.findall(fr'{round_prefix}\d+', prefix)[0]
+    channel_piece = re.findall(fr'{channel_prefix}\d+', prefix)[0]
+    round_number = re.findall(r'\d+', round_piece)[0]
+    channel_number = re.findall(r'\d+', channel_piece)[0]
     round_bool = True
-except:
+else:
     round_bool = False
 
 
