@@ -15,5 +15,8 @@ starfish:
 **/
 
 # Actually used in pipeline so far:
+- Starfish iss test data
     - Reference: params.min_sigma = 1 params.max_sigma = 10
     - Rounds: params.min_sigma = 1 params.max_sigma = 10
+- 1442_OB
+   - params.min_sigma = 2 params.max_sigma = 20

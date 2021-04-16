@@ -11,9 +11,6 @@ def getHistogram(path_to_image):
     image = cv2.imread(path_to_image, 0)
     hist = cv2.calcHist([image], [0], None, [256], [0, 256])
     return hist
-   # plt.plot(hist)
-   # plt.xlim([0, 256])
-   # plt.show()
 
 def plotHistograms(hist_dict):
     # Extract names
