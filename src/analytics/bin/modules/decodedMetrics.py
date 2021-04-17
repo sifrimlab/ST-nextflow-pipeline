@@ -118,6 +118,14 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     general_df = pd.DataFrame(general_row_list)
     general_df.to_html("general_stats.html")
 
+    # Now we parse the tile dicts
+    tile_attribute_dict = {}
+    for tile_nr, temp_list in tile_dict.items():
+        tile_attribute_dict['Tile']= tile_nr
+        nr_recognized, nr_unrecognized_barcodes = temp_list
+        
+
+
     
 
     # parse the dict such that the value becomes gene name, count, and respective barcode. this makes it easier to convert to a df

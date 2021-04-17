@@ -2,9 +2,6 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import sys
 
-#template = "/home/david/Documents/communISS/assets/html_report_template.html"
-#intensities = "/home/david/Documents/communISS/results/quality_control/combined_intensity_analytics.html"
-#image = "/home/david/Documents/communISS/results/quality_control/Round1_c2_intensity_histogram.svg"
 template = sys.argv[1]
 intensities = sys.argv[2]
 image_list = [sys.argv[i] for i in range(3, len(sys.argv))]
