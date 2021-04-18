@@ -14,6 +14,8 @@ process get_decoded_stats {
     output:
     path "recognized_genes_counts.svg"
     path "barcodes_counted.svg"
+    path "tile_stats.html"
+    path "recognized_genes_per_tile.svg"
     path "general_stats.html"
     path "recognized_barcodes_per_gene.html"
     path "decoded_stat_report.html"
@@ -33,6 +35,8 @@ process create_html_report {
     path template
     path recognized_genes_counts
     path barcodes_counted
+    path tile_stats
+    path recognized_genes_per_tile
     path general_stats
     path recognized_barcodes_per_gene
     path decoded_stat_report

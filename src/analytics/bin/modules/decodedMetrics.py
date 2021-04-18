@@ -1,4 +1,5 @@
 import pandas as pd
+from icecream import ic
 import progressbar
 import os
 import matplotlib.pyplot as plt
@@ -92,8 +93,6 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     tile_dict = {}
     # general_attribute_dict: key=column name, value = column value
     general_attribute_dict = {}
-    # tile_attribute_dict: key=column name, value = column value
-    tile_attribute_dict = {}
     for row in df.itertuples():
         tile = row.Tile
         gene =str(row.Gene)
@@ -109,6 +108,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
         else:
             nr_unrecognized_barcodes += 1
             tile_dict[tile][1] += 1
+
     general_attribute_dict['# recognized barcodes']= nr_recognized_barcodes
     general_attribute_dict['# unrecognized barcodes']= nr_unrecognized_barcodes
     general_attribute_dict['Total # spots']= len(df)
@@ -119,11 +119,45 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     general_df.to_html("general_stats.html")
 
     # Now we parse the tile dicts
-    tile_attribute_dict = {}
-    for tile_nr, temp_list in tile_dict.items():
+    tile_row_list= []
+    for tile_nr, count_list in tile_dict.items():
+        # tile_attribute_dict: key=column name, value = column value
+        tile_attribute_dict = {}
         tile_attribute_dict['Tile']= tile_nr
-        nr_recognized, nr_unrecognized_barcodes = temp_list
-        
+        nr_recognized, nr_unrecognized_barcodes = count_list
+        tile_attribute_dict['# recognized barcodes']= nr_recognized
+        tile_attribute_dict['# unrecognized barcodes']= nr_unrecognized_barcodes
+        tile_row_list.append(tile_attribute_dict)
+
+    tile_df = pd.DataFrame(tile_row_list)
+    tile_df = tile_df.sort_values(by=['Tile'])
+    tile_df.to_html("tile_stats.html")
+
+    # Create a Barpot plotting recognized an unrecognized genes per tile, for quality control purposes
+
+    labels = tile_df['Tile']
+    recognized_column = tile_df['# recognized barcodes']
+    unrecognized_column = tile_df['# unrecognized barcodes']
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, recognized_column, width, label='recognized')
+    rects2 = ax.bar(x + width/2, unrecognized_column, width, label='unrecognized')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('# barcodes')
+    ax.set_xlabel('Tile number')
+    ax.set_title('# number of barcodes recognized by tile')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    ax.bar_label(rects1, padding=3)
+    ax.bar_label(rects2, padding=3)
+    fig.tight_layout()
+    plt.savefig("recognized_genes_per_tile.svg")
 
 
     
@@ -141,9 +175,9 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     plt.ylabel("Number of times recognized")
     plt.savefig("recognized_genes_counts.svg")
 
-# if __name__ == '__main__':
-#         decoded_genes = "/home/david/Documents/communISS/results/decoded/concat_decoded_genes.csv" 
-#         codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
-#         countRecognizedBarcodeStats(decoded_genes)
-#         evaluateRandomCalling(decoded_genes, codebook, 4,4)
-#         countChannelsInBarcodeList(decoded_genes)
+if __name__ == '__main__':
+        decoded_genes = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/concat_decoded_genes.csv" 
+        codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+        # countChannelsInBarcodeList(decoded_genes)
+        # evaluateRandomCalling(decoded_genes, codebook, 4,4)
+        countRecognizedBarcodeStats(decoded_genes)

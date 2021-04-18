@@ -127,6 +127,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             y_coordinate = row.Y + y_adder
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3)
             ax.add_patch(circ)
+        fig.tight_layout()
         plt.show()
 
 
@@ -165,6 +166,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
             ax2.add_patch(circ)
     # legendWithoutDuplicateLabels(ax2)
+    fig.tight_layout()
     plt.savefig("decoded_genes_plotted.pdf")
 if __name__=='__main__':
     reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
