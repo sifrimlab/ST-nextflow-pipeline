@@ -75,7 +75,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         rows_list=[]
         rows_list.append(attribute_dict)
         analytics_df = pd.DataFrame(rows_list)
-        analytics_df.to_html("decoded_stat_report.html")
+        analytics_df.to_html("decoded_stat.html")
 
     
 def countRecognizedBarcodeStats(path_to_decoded_genes: str):
@@ -171,7 +171,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     fig= plt.figure(figsize=(13,9))
     plt.plot(gene_df['Gene'], gene_df['Counts'], 'o')
     plt.title("Recognized genes counted")
-    plt.xlabel("Barcode combination")
+    plt.xlabel("Gene name")
     plt.ylabel("Number of times recognized")
     plt.savefig("recognized_genes_counts.svg")
 

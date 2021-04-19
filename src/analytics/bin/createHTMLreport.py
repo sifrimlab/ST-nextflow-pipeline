@@ -3,9 +3,10 @@ import pandas as pd
 import sys
 
 template = sys.argv[1]
-image_list = [sys.argv[i] for i in range(2,4) ]
-tile_list = [sys.argv[i] for i in range(4, 6)]
-table_list = [sys.argv[i] for i in range(6, len(sys.argv))]
+
+table_list = [sys.argv[i] for i in range(2,7) ]
+image_list = [sys.argv[i] for i in range(7, 9)]
+tile_list = [sys.argv[i] for i in range(9, 11)] # first = table, second = image
 with open(template, 'r') as template_file:
     contents = template_file.read()
     template_soup = BeautifulSoup(contents, features="html.parser")

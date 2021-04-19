@@ -6,21 +6,21 @@ moduleName= "analytics"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process get_decoded_stats {
-    publishDir "$params.outDir/analytics", mode: 'symlink'
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
 
     input:
     path decoded_genes
 
     output:
+    path "general_stats.html"
+    path "decoded_stat.html"
+    path "recognized_barcodes_per_gene.html"
+    path "unique_barcodes_called_counted.html"
+    path "channels_called.html"
     path "recognized_genes_counts.svg"
     path "barcodes_counted.svg"
     path "tile_stats.html"
     path "recognized_genes_per_tile.svg"
-    path "general_stats.html"
-    path "recognized_barcodes_per_gene.html"
-    path "decoded_stat_report.html"
-    path "channels_called.html"
-    path "unique_barcodes_called_counted.html"
 
     script:
 
@@ -30,24 +30,24 @@ process get_decoded_stats {
 }
 
 process create_html_report {
-    publishDir "$params.outDir/analytics", mode: "symlink"
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
     input:
     path template
+    path general_stats
+    path decoded_stat
+    path recognized_barcodes_per_gene
+    path unique_barcodes_called_counted
     path recognized_genes_counts
     path barcodes_counted
+    path channels_called
     path tile_stats
     path recognized_genes_per_tile
-    path general_stats
-    path recognized_barcodes_per_gene
-    path decoded_stat_report
-    path channels_called
-    path unique_barcodes_called_counted
 
     output: 
     path "decoding_report.html"
 
     script:
     """
-    python $binDir/createHTMLreport.py $template $recognized_genes_counts $barcodes_counted $general_stats $recognized_barcodes_per_gene $decoded_stat_report $channels_called $recognized_barcodes_per_gene
+    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $recognized_genes_counts $barcodes_counted $channels_called $tile_stats $recognized_genes_per_tile
     """
 }

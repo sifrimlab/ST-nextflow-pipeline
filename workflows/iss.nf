@@ -33,8 +33,8 @@ include {
 } from "../src/decoding/processes/decoding.nf"
 
 include {
-    get_decoded_stats; create_html_report
-} from "../src/analytics/processes/iss_analytics.nf"
+    iss_decoding_statistics
+} from "../src/analytics/workflows/decoded_statistics.nf"
 
 include {
     plot_decoded_spots ; plot_detected_spots
@@ -75,8 +75,7 @@ workflow iss {
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
 
-       decoded_out = get_decoded_stats(decoded_genes)
-       create_html_report("$baseDir/assets/html_templates/decoding_report_template.html",decoded_out)
+       iss_decoding_statistics(decoded_genes)
     
        plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 }
