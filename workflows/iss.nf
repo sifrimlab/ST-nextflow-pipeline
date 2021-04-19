@@ -54,8 +54,7 @@ workflow iss {
        rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}*/${params.round_prefix}*_${params.channel_prefix}*.${params.extension}")
 
        // // Normalize the round images
-       // rounds = clip_and_rescale(rounds)
-       // 
+       /* rounds = CLIP_AND_RESCALE(rounds) */
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
        tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference)
        // Output of this is used often, so we rename the global variables:
