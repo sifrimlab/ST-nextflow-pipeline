@@ -1,4 +1,5 @@
 import numpy as np
+from skimage import io
 import matplotlib.pyplot as plt
 from matplotlib.colors import colorConverter
 import pandas as pd
@@ -126,6 +127,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
 
 
 def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int):
+    image = io.imread(path_to_original_image)
     df = pd.read_csv(path_to_spotsCSV)
     genes_list = set(df['Gene'])
     # Making a colormap that picks a different color for each gene (and empty string)
