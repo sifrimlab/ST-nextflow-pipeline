@@ -1,4 +1,5 @@
 import numpy as np
+from skimage import io
 from PIL import Image
 from matplotlib import pyplot as plt
 import re
@@ -32,16 +33,19 @@ def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: 
     # Create range list of the tiles
     total_tiles_list = list(range(1,total_n_tiles+1))
     # Reshape the range list into the tile grid of the original image.
-    tile_grid_array = np.reshape(total_tiles_list, tile_grid_shape)
+    # We swap the elements of the grid because the rest of the pipeline sees x and y as horizontal vs vertical, but numpy sees it as an array, where x = vertical movement
+    swapped_grid = (tile_grid_shape[1],tile_grid_shape[0])
+    tile_grid_array = np.reshape(total_tiles_list, swapped_grid)
     # Creating an empty array the size of an original image
-    original_x = tile_grid_shape[0] * tile_size_x 
-    original_y = tile_grid_shape[1] * tile_size_y
+    original_x = tile_grid_array.shape[1] * tile_size_x 
+    original_y = tile_grid_array.shape[0] * tile_size_y
     return total_n_tiles, tile_grid_array, original_x, original_y
 
 def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_size_y: int ):
     #  Now we create a list of the original path images, but sorted by tile number:
     # By first creating a dict where the key is the tile number, and the value is the path
-    tile_image_dict = {re.findall(r"tiled_\d+", image_path)[0]: image_path for image_path in image_path_list}
+    # Tile number is extracted by re.findalling on "tiled_d" and then extracting the number from that, i cast it to int to make the sorting work like it should
+    tile_image_dict = {int(re.findall(f"\d+", re.findall(r"tiled_\d+", image_path)[0])[0]): image_path for image_path in image_path_list}
     sorted_tile_images = [value for (key, value) in sorted(tile_image_dict.items(), key=lambda x:x[0])]
 
     total_n_tiles, tile_grid_array, original_x, original_y = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)
@@ -58,9 +62,6 @@ def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_siz
     return numpy_image
 
 if __name__ == '__main__':
-    image_path_list = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_ref/REF_padded_tiled_{i}.tif" for i in range(1,5)]
-    stitched = stitchImageList(image_path_list, (2,2), 700,500)
-    plt.imshow(stitched)
-    plt.show()
-
-
+    image_path_list = [f"/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/tiled_ref/REF_padded_tiled_{i}.tif" for i in range(1,49)]
+    stitched = stitchImageList(image_path_list, (8,6), 1875,2200)
+    io.imsave("test.tif", stitched)

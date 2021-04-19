@@ -15,7 +15,7 @@ from ast import literal_eval as make_tuple
  |
  v
 '''
-def calculateTileGridStatistics(tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int):
+def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: int):
     """Calculates all necessary grid statistics based on tile shape and size
 
     Parameters
@@ -43,10 +43,12 @@ def calculateTileGridStatistics(tile_grid_shape: Tuple[int, int], tile_size_x: i
     # Create range list of the tiles
     total_tiles_list = list(range(1,total_n_tiles+1))
     # Reshape the range list into the tile grid of the original image.
-    tile_grid_array = np.reshape(total_tiles_list, tile_grid_shape)
+    # We swap the elements of the grid because the rest of the pipeline sees x and y as horizontal vs vertical, but numpy sees it as an array, where x = vertical movement
+    swapped_grid = (tile_grid_shape[1],tile_grid_shape[0])
+    tile_grid_array = np.reshape(total_tiles_list, swapped_grid)
     # Creating an empty array the size of an original image
-    original_x = tile_grid_shape[0] * tile_size_x 
-    original_y = tile_grid_shape[1] * tile_size_y
+    original_x = tile_grid_array.shape[1] * tile_size_x 
+    original_y = tile_grid_array.shape[0] * tile_size_y
     return total_n_tiles, tile_grid_array, original_x, original_y
 
 def legendWithoutDuplicateLabels(ax):
