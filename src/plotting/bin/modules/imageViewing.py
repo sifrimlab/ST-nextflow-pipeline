@@ -6,15 +6,6 @@ import cv2
 from typing import Tuple
 from ast import literal_eval as make_tuple
 
-''' cv2 coordinate system:
-0/0---X--->
- |
- |
- Y
- |
- |
- v
-'''
 def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: int):
     """Calculates all necessary grid statistics based on tile shape and size
 
@@ -127,10 +118,10 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             # Calculate the position in the original image
             x_coordinate = row.X + x_adder
             y_coordinate = row.Y + y_adder
-            circ = plt.Circle((x_coordinate, y_coordinate), radius=3)
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=2)
             ax.add_patch(circ)
         fig.tight_layout()
-        plt.show()
+        plt.savefig("detected_spots_plotted.pdf")
 
 
 

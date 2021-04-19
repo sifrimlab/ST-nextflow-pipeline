@@ -28,6 +28,7 @@ workflow register_wrt_maxIP {
         combined = maxIP_channel.combine(grouped_rounds, by:0)
 
         register_with_maxIP(reference, combined)
+
     emit:
         registered = register_with_maxIP.out.flatten()
     

@@ -3,24 +3,36 @@ nextflow.enable.dsl=2
 include {
     spot_detection_reference;spot_detection_round ; gather_intensities_in_rounds; get_max_intensities_over_channels
 } from "../processes/spot_detection.nf"
+include {
+    plot_detected_spots
+} from "$baseDir/src/plotting/processes/plotting.nf" 
 
 
 workflow spot_detection_iss {
     take:
+    // Data
     reference //Preferably filtered by a filtering method: spot detection will be performed on this
-
     round_images //the detected spot's intensity will be measured on these images
+
+    // Plotting parameter
+    grid_size_x
+    grid_size_y
+    tile_size_x
+    tile_size_y
 
     main:
     //detect spots on reference image
     spot_detection_reference(reference)
+
     // This is for spot detection quality control purposes
-    spot_detection_round(round_images)
-    spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
+    /* spot_detection_round(round_images) */
+    /* spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs} */
 
     // Collect all spots in a seperate file
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Call first to convert it into a value channel to allow for multiple iteration of a process with multiple inputs
+    plot_detected_spots(blobs,grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+
     
     //map round images into a tuple containing their round, channel and tile number, gather intensity code requires this information up front
     round_images.map() {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}

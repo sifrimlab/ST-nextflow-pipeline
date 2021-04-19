@@ -1,5 +1,6 @@
 nextflow.enable.dsl=2
 
+params.stitchDir = "tiled"
 
 include {
     calculate_biggest_resolution; calculate_tile_size ; pad_round; pad_reference; tile_ref; tile_round
@@ -11,7 +12,7 @@ include {
     register_wrt_maxIP
 } from "../../registration/workflows/registration_on_maxIP.nf"
 include {
-    stitch_tiles
+    stitch_tiles ; stitch_round_tiles
 } from "$baseDir/src/utils/processes/stitching.nf"
 
 
@@ -35,9 +36,14 @@ workflow standard_iss_tiling {
         register_wrt_maxIP(pad_reference.out, pad_round.out)
 
         tile_ref(pad_reference.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+
         // Stitch tiles back as a control
         stitch_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
-        tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+
+        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {grouped_rounds}
+        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+
     emit:
         reference = tile_ref.out.flatten()
         rounds = tile_round.out.flatten()

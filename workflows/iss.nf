@@ -8,8 +8,8 @@ include {
     iss_round_adder;
 } from '../src/utils/workflows/image_name_parser.nf'
 include {
-    clip_and_rescale
-} from '../src/normalization/processes/normalization.nf'
+    CLIP_AND_RESCALE
+} from '../src/normalization/workflows/normalization_workflow.nf'
 include {
     standard_iss_tiling as tiling;
 } from "../src/tiling/workflows/tiling_workflows.nf"
@@ -37,7 +37,7 @@ include {
 } from "../src/analytics/processes/iss_analytics.nf"
 
 include {
-    plot_decoded_spots
+    plot_decoded_spots ; plot_detected_spots
 } from "../src/plotting/processes/plotting.nf" 
 
 
@@ -66,13 +66,11 @@ workflow iss {
        
        //perform white tophat filtering on both reference and round images
        white_tophat_filter(tiling.out.reference,tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
-       /* filter_ref(tiling.out.reference) */
-       /* filter_round(tiling.out.rounds) */
 
        // Register tiles locally:
-       register(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round)
+       register(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-       spot_detection(white_tophat_filter.out.filtered_ref, register.out)
+       spot_detection(white_tophat_filter.out.filtered_ref, register.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
        decoding(spot_detection.out)
        // Pool decoded genes into one file for downstream analysis
@@ -81,6 +79,5 @@ workflow iss {
        decoded_out = get_decoded_stats(decoded_genes)
        create_html_report("$baseDir/assets/html_templates/decoding_report_template.html",decoded_out)
     
-       plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, tiling.out.tile_size_x, tiling.out.tile_size_y, tiling.out.grid_size_x, tiling.out.grid_size_y)
-
+       plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 }
