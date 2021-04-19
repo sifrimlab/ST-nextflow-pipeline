@@ -17,8 +17,8 @@ include {
     create_reference_image
 } from "../src/utils/workflows/projections.nf"
 include {
-    filter_ref; filter_round
-} from "../src/filtering/processes/filtering.nf"
+    white_tophat_filter
+} from "../src/filtering/workflows/filter_workflow.nf"
 
 include {
     local_registration_of_tiles as register 
@@ -58,15 +58,21 @@ workflow iss {
        // 
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
        tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference)
-
-       // perform white tophat filtering on both reference and round images
-       filter_ref(tiling.out.reference)
-       filter_round(tiling.out.rounds)
+       // Output of this is used often, so we rename the global variables:
+       tile_size_x = tiling.out.tile_size_x
+       tile_size_y = tiling.out.tile_size_y
+       grid_size_x = tiling.out.grid_size_x
+       grid_size_y = tiling.out.grid_size_y
+       
+       //perform white tophat filtering on both reference and round images
+       white_tophat_filter(tiling.out.reference,tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       /* filter_ref(tiling.out.reference) */
+       /* filter_round(tiling.out.rounds) */
 
        // Register tiles locally:
-       register(filter_ref.out, filter_round.out)
+       register(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round)
 
-       spot_detection(filter_ref.out, register.out)
+       spot_detection(white_tophat_filter.out.filtered_ref, register.out)
        
        decoding(spot_detection.out)
        // Pool decoded genes into one file for downstream analysis

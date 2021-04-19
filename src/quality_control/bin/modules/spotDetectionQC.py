@@ -2,9 +2,8 @@ import math
 import numpy as np
 import pandas as pd
 
-ref_spots_csv = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/blobs/REF_padded_tiled_3_filtered_blobs.csv"
-rounds_csv = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/hybs/Round2_c{i}_padded_registered_tiled_3_filtered_registered_hybs.csv" for i in range (2,6)]
-# print(rounds_csv)
+ref_spots_csv = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/blobs/concat_blobs.csv"
+rounds_csv = [f"/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/hybs/Round2_c{i}_maxIP_padded_registered_tiled_4_filtered_registered_hybs.csv" for i in range (1,5)]
 def filterSpotsBasedOnSigmas(spots_csv: str, num_stdev: int):
     original_array = np.genfromtxt(path_to_spots, delimiter=',', skip_header=1)
     original_array = original_array.astype(int)
@@ -68,8 +67,8 @@ def checkSpotsInRounds(ref_spots_csv: str, round_spots_csv_list, pixel_mismatch:
                 break
             else:
                 continue
-    print(nr_matches)
     nr_misses = len(ref_tuples) - nr_matches
+    print(f"nr_matches = {nr_matches} and nr_mismatches = {nr_misses}")
                 
 
 

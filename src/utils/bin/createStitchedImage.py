@@ -4,7 +4,6 @@ import sys
 from skimage import io
 from modules.stitch import stitchImageList
 
-
 tile_grid_size_x = int(sys.argv[1])
 tile_grid_size_y = int(sys.argv[2])
 tile_grid_size = (tile_grid_size_x,tile_grid_size_y)

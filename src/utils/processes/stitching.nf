@@ -19,6 +19,9 @@ process stitch_tiles {
     val tile_size_y
     path images
 
+    output:
+    path "*_stitched.tif"
+
     script:
     """
     python $binDir/createStitchedImage.py $tile_grid_size_x $tile_grid_size_y $tile_size_x $tile_size_y $images
