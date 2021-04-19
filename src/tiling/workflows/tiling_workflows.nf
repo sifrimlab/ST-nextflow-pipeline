@@ -10,6 +10,9 @@ include {
 include {
     register_wrt_maxIP
 } from "../../registration/workflows/registration_on_maxIP.nf"
+include {
+    stitch_tiles
+} from "$baseDir/src/utils/processes/stitching.nf"
 
 
 workflow standard_iss_tiling {
@@ -30,9 +33,10 @@ workflow standard_iss_tiling {
         pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
 
         register_wrt_maxIP(pad_reference.out, pad_round.out)
-        
 
         tile_ref(pad_reference.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        // Stitch tiles back as a control
+        stitch_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
         tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
     emit:
         reference = tile_ref.out.flatten()

@@ -16,7 +16,6 @@ workflow spot_detection_iss {
     spot_detection_reference(reference)
     // This is for spot detection quality control purposes
     spot_detection_round(round_images)
-    spot_detection_round.out.view()
     spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
 
     // Collect all spots in a seperate file
@@ -33,6 +32,8 @@ workflow spot_detection_iss {
     intensities_value_channel = intensities.first()
 
     get_max_intensities_over_channels(intensities_value_channel) 
+    
+
 
     emit:
         get_max_intensities_over_channels.out.flatten()

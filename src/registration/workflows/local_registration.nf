@@ -4,6 +4,10 @@ include {
     local_registration
 } from "../processes/rigid_registration.nf"
 
+/* include { */
+/*     stitch_tiles */
+/* } from "$baseDir/utils/processed/stitching.nf" */
+
 workflow local_registration_of_tiles {
     take:
         reference_tiles
