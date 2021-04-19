@@ -125,8 +125,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
 
 
 
-def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int):
-    image = cv2.imread(path_to_original_image)
+def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int):
     df = pd.read_csv(path_to_spotsCSV)
     genes_list = set(df['Gene'])
     # Making a colormap that picks a different color for each gene (and empty string)
@@ -136,12 +135,9 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
 
     ## Calculate image properties:
     total_n_tiles, tile_grid_array, original_x, original_y = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)    
-
-    fig, (ax1,ax2) = plt.subplots(1,2)
-    ax1.imshow(image, cmap='gray')
-    ax1.set_title("Original Reference Image")
-    ax2.imshow(image, cmap='gray')
-    ax2.set_title("Decoded spots")
+    fig, ax = plt.subplots(1,1)
+    ax.imshow(image, cmap='gray')
+    ax.set_title("Decoded genes")
     for row in df.itertuples():
         # extract X and Y coordinates of the respective tile the spot belongs to
         row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
@@ -154,13 +150,14 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: 
         x_coordinate = row.X + x_adder
         y_coordinate = row.Y + y_adder
         gene = row.Gene
-        if gene != "":
+        if str(gene) != "nan":
             ## Now we plot the dot
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
-            ax2.add_patch(circ)
-    # legendWithoutDuplicateLabels(ax2)
+            ax.add_patch(circ)
+    # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
     plt.savefig("decoded_genes_plotted.pdf")
+
 if __name__=='__main__':
     reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
     decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results2/decoded/concat_decoded_genes.csv" 

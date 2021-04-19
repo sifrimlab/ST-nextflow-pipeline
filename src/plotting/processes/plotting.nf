@@ -40,7 +40,7 @@ process plot_detected_spots {
 
     output:
     path "detected_spots_plotted.pdf"
-    path "detected_spots_plotted-1.pdf"
+    path "detected_spots_plotted-1.png"
     script:
 
     """
