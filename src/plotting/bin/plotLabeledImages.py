@@ -18,9 +18,11 @@ else:
     ref_image = ""
 colored_image_on_DAPI, colored_image_on_REF=plotLabeledImages(labeled_image, dapi_image, ref_image)
 
-for name, image in zip(("DAPI, ref"),(colored_image_on_DAPI, colored_image_on_REF)):
+for name, image in zip(("DAPI", "ref"),(colored_image_on_DAPI, colored_image_on_REF)):
+    print(name, image)
     if image is not None:
-        io.imsave(f"{prefix}_overlay_{name}.tif", image)
+        print(f"{prefix}_overlay_{name}.png")
+        io.imsave(f"{prefix}_overlay_{name}.png", image)
 
 
 

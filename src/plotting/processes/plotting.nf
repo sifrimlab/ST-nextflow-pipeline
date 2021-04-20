@@ -54,7 +54,7 @@ process plot_segmentation_labels {
     input:
     tuple val(tile_nr), path(labeled_image),path(original_image)
     output:
-    path "${labeled_image.baseName}_overlay_DAPI.tif"
+    path "${labeled_image.baseName}_overlay_DAPI.png"
 
     script:
 

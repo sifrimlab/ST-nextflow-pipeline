@@ -16,7 +16,7 @@ workflow local_registration_of_tiles {
         reference_tiles
         round_tiles
 
-        // Tile grid parameters
+        // Tile grid parameters for stitching
         tile_grid_size_x
         tile_grid_size_y
         tile_size_x

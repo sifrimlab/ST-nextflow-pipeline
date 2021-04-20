@@ -28,7 +28,6 @@ def otsuThresholding(path_to_image: str):
     pixels_to_um = 0.454 # 1 pixel = 454 nm (got this from the metadata of original image)
 
     ret1, thresh = cv2.threshold(cells, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    # cv2.imwrite("otsu_thresh.png",thresh)
 
     # Morphological operations to remove small noise - opening
     #To remove holes we can use closing
