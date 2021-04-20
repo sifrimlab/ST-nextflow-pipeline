@@ -39,7 +39,9 @@ include {
 include {
     plot_decoded_spots ; plot_detected_spots
 } from "../src/plotting/processes/plotting.nf" 
-
+include {
+    threshold_watershed_segmentation
+} from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 
 workflow iss {
@@ -56,7 +58,7 @@ workflow iss {
        // // Normalize the round images
        /* rounds = CLIP_AND_RESCALE(rounds) */
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
-       tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference)
+       tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference, params.DAPI)
        // Output of this is used often, so we rename the global variables:
        tile_size_x = tiling.out.tile_size_x
        tile_size_y = tiling.out.tile_size_y
@@ -74,6 +76,8 @@ workflow iss {
        decoding(spot_detection.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
+
+       threshold_watershed_segmentation(tiling.out.dapi, decoding.out)
 
        iss_decoding_statistics(decoded_genes)
     

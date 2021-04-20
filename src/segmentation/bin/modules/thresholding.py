@@ -6,9 +6,22 @@ from scipy import ndimage
 from skimage import measure, color, io
 from icecream import ic
 
+def collectProperties(property_csv_list: str):
+    """
+    The idea here is to concat all labels of different tiles, and give them a unique label number, because this will not be the case
+    """
+    df_list = [pd.read_csv(csv) for csv in property_csv_list]
+    total_df = pd.concat(df_list)
+    total_df = total_df.sort_values(by=['Tile'])
+    new_index = list(range(1,len(total_df)+1))
+    total_df['Label'] = new_index
+    return total_df
+
 def otsuThresholding(path_to_image: str):
     '''
-    returns a labeled image, where 0 = background and all other integers an object. also returns a csv that contains image properties of the given objects
+    returns a labeled image, where 0 = background and all other integers an object number. 
+    These numbers don't have any actual image value, so the image isn't really used as an image object, but more as an array
+    that stores which pixel belongs to which label. Also returns a csv that contains image properties of the given objects
     '''
     img = cv2.imread(path_to_image)
     cells = img[:,:,0]
@@ -79,6 +92,9 @@ def otsuThresholding(path_to_image: str):
     for region_props in regions:
         attribute_dict = {}
         attribute_dict['Label'] = region_props['Label'] 
+        center_y, center_x= region_props['centroid']
+        attribute_dict['center_x'] = int(center_x)
+        attribute_dict['center_y'] = int(center_y)
         for i,prop in enumerate(propList):
             if(prop == 'Area'): 
                 attribute_dict['area'] = region_props[prop]*pixels_to_um**2 
@@ -92,5 +108,18 @@ def otsuThresholding(path_to_image: str):
     attribute_df = pd.DataFrame(rows_list)
     return label_image, attribute_df
 
+def assignGenesToCells(labeled_image: str, decoded_genes: str):
+    image = io.imread(labeled_image) # slicing = [Y,X]
+    decoded_df = pd.read_csv(decoded_genes)
+    filtered_df = decoded_df[decoded_df['Gene'].isnull()!=True]
+    label_column = []
+    for row in filtered_df.itertuples():
+        label = image[row.Y, row.X]
+        label_column.append(label)
+    filtered_df['Label'] = label_column
+    return filtered_df
+
+
 if __name__=='__main__':
-    otsuThresholding("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/DAPI.TIF")
+    # otsuThresholding("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/DAPI.TIF")
+    assignGenesToCells("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_3_labeled.tif", "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tile3.csv" )
