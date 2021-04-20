@@ -41,8 +41,7 @@ process assign_genes_to_cells {
     publishDir "$params.outDir/assigned", mode: 'symlink'
 
     input:
-    path decoded_genes
-    path labeled_image
+    tuple val(tile_nr), path(decoded_genes),path(labeled_images)
     
     output:
     path "${decoded_genes.baseName}_assigned.csv"
