@@ -75,7 +75,7 @@ process pad_round {
 }
 
 process tile_ref {
-    publishDir "$params.outDir/tiled_ref/", mode: 'symlink'
+    publishDir "$params.outDir/tiled_DO/", mode: 'symlink'
     input:
     path image
     val tile_size_x

@@ -37,7 +37,7 @@ include {
 } from "../src/analytics/workflows/decoded_statistics.nf"
 
 include {
-    plot_decoded_spots ; plot_detected_spots
+    plot_decoded_spots ; plot_detected_spots 
 } from "../src/plotting/processes/plotting.nf" 
 include {
     threshold_watershed_segmentation as segmentation
@@ -78,9 +78,6 @@ workflow iss {
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
 
        segmentation(tiling.out.dapi, decoding.out)
-       segmentation.out.concat_assigned_genes.view()
-       segmentation.out.assigned_genes.view()
-       
 
        iss_decoding_statistics(decoded_genes)
     

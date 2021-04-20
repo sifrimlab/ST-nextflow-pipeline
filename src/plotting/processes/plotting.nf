@@ -48,3 +48,17 @@ process plot_detected_spots {
     pdftoppm -png -r 300 detected_spots_plotted.pdf detected_spots_plotted
     """
 }
+process plot_segmentation_labels {
+    publishDir "$params.outDir/plots/segmentation/", mode: 'copy'
+
+    input:
+    tuple val(tile_nr), path(labeled_image),path(original_image)
+    output:
+    path "${labeled_image.baseName}_overlay_DAPI.tif"
+
+    script:
+
+    """
+    python $binDir/plotLabeledImages.py $labeled_image $original_image 
+    """
+}
