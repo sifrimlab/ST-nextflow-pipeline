@@ -12,6 +12,24 @@ def getHistogram(path_to_image):
     hist = cv2.calcHist([image], [0], None, [256], [0, 256])
     return hist
 
+def plotCombinedHistograms(hist_dict, title = ""):
+    def getRandomColor():
+        r = random.random()
+        g = random.random()
+        b = random.random()
+        color = (r,g,b)
+        return color
+
+    fig, ax = plt.subplots(1,1)
+    ax.set_title(title)
+    ax.set_xlabel("pixel value")
+    ax.set_ylabel("# times encountered")
+
+    for name, hist in hist_dict.items():
+        ax.plot(hist, color=getRandomColor(), label=name)
+    ax.legend()
+    return plt
+
 def plotHistograms(hist_dict):
     # Extract names
     names=list(hist_dict.keys())
@@ -106,8 +124,6 @@ def getIntensityAnalytics(name: str, hist ):
     minimum_pixel_value = min(without_zero_values[:,0])
     maximum_pixel_value = max(without_zero_values[:,0])
     
-
-
     # Creating the dicst of attributes:
     attribute_dict['image_name']=name
     attribute_dict['minimum_pixel_value']=int(minimum_pixel_value)
@@ -126,6 +142,7 @@ def collectIntensityAnalytics(rows_list):
 
 if __name__ == '__main__':
 
-    test_image_path = "/home/nacho/Documents/Code/communISS/work/de/0df049e32f79898ffa74a487810fbb/Round2_c1_maxIP.tif"
+    img_list = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c{i}.TIF" for i in range(2,6)]
+    hist_dict = {i: getHistogram(img) for i,img in enumerate(img_list)}
 
-    getIntensityAnalytics(test_image_path, getHistogram(test_image_path))
+    plotCombinedHistograms(hist_dict)

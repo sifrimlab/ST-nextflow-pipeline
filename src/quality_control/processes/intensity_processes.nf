@@ -18,6 +18,19 @@ process plot_intensity_histogram {
     python $binDir/plotIntensityHistograms.py $image
     """
 }
+process plot_combined_histogram {
+    publishDir "$params.outDir/quality_control", mode: 'symlink'
+    input:
+    tuple val(prefix), path(images)
+
+    output:
+    path "${prefix}_intensity_histogram.svg"
+
+    script:
+    """
+    python $binDir/combineIntensityHistograms.py $prefix $images 
+    """
+}
 
 process get_intensity_analytics {
     input:
@@ -48,14 +61,18 @@ process create_html_report {
     publishDir "$params.outDir/quality_control", mode: "symlink"
 
     input: 
+    val round_nr
+    val channel_nr
     path template
     path combined_intensity_analytics
-    path images
+    path round_images
+    path channel_images
+    path all_images
 
     output:
     path 'quality_control_report.html'
     script:
     """
-    python $binDir/createHTMLreport.py $template $combined_intensity_analytics $images
+    python $binDir/createHTMLreport.py $round_nr $channel_nr $template $combined_intensity_analytics $round_images $channel_images $all_images
     """
 }
