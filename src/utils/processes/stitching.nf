@@ -9,7 +9,7 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 // stitchDir is supposed to be overwritten by the top-level workflow that includes it
 params.stitchDir = "stitched"
 
-process stitch_tiles {
+process stitch_ref_tiles {
     publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
 
     input: 

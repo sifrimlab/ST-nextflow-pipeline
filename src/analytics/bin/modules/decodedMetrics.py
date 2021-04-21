@@ -56,6 +56,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         # Create the counted column
         decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
         unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
+        unique_df = unique_df.sort_values(by=['Counted'])
         unique_df.to_html("unique_barcodes_called_counted.html")
 
         color_list = ['green' if barcode in list(codebook_df['Barcode']) else 'red' for barcode in decoded_df['Barcode']] 
@@ -127,6 +128,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
         nr_recognized, nr_unrecognized_barcodes = count_list
         tile_attribute_dict['# recognized barcodes']= nr_recognized
         tile_attribute_dict['# unrecognized barcodes']= nr_unrecognized_barcodes
+        tile_attribute_dict['Ratio']=round((nr_recognized_barcodes/(nr_unrecognized_barcodes + nr_recognized)),3)*100 
         tile_row_list.append(tile_attribute_dict)
 
     tile_df = pd.DataFrame(tile_row_list)

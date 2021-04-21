@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from skimage.morphology import white_tophat, disk
 import numpy as np
 
-img_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/tiled_ref/REF_padded_tiled_29.tif"
+img_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/tiled_ref/REF_padded_tiled_28.tif"
 image = io.imread(img_path)
 empty_image = np.zeros(image.shape)
 # empty_raw_image = np.zeros(image.shape)

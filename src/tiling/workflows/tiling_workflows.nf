@@ -12,7 +12,7 @@ include {
     register_wrt_maxIP
 } from "../../registration/workflows/registration_on_maxIP.nf"
 include {
-    stitch_tiles; stitch_tiles as stitch_dapi ; stitch_round_tiles
+    stitch_ref_tiles; stitch_ref_tiles as stitch_dapi ; stitch_round_tiles
 } from "$baseDir/src/utils/processes/stitching.nf"
 
 
@@ -43,7 +43,7 @@ workflow standard_iss_tiling {
         tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
 
         // Stitch tiles back as a control
-        stitch_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
+        stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
         stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
         tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {grouped_rounds}
