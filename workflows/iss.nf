@@ -37,7 +37,7 @@ include {
 } from "../src/analytics/workflows/decoded_statistics.nf"
 
 include {
-    plot_decoded_spots ; plot_detected_spots 
+    plot_decoded_spots as plot_decoded_spots_on_whole_image ;plot_decoded_genes_on_tile 
 } from "../src/plotting/processes/plotting.nf" 
 include {
     threshold_watershed_segmentation as segmentation
@@ -77,10 +77,18 @@ workflow iss {
        decoding(spot_detection.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
+       // To plot decoding, we will have to group decoding data and ref tiles together
+       tiling.out.reference.map{file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {reference_tiles_mapped}
+       decoding.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
+       reference_tiles_mapped.join(decoded_genes_mapped, by:0).set {tiled_decoded_grouped}
 
+       plot_decoded_genes_on_tile(tiled_decoded_grouped)
+       plot_decoded_spots_on_whole_image(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       
+       // Segmentation
        segmentation(tiling.out.dapi, decoding.out)
 
+       // Get analytics from decoding
        iss_decoding_statistics(decoded_genes)
     
-       plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 }

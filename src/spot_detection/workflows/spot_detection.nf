@@ -5,7 +5,7 @@ include {
 } from "../processes/spot_detection.nf"
 include {
     plot_detected_spots
-} from "$baseDir/src/plotting/processes/plotting.nf" 
+} from "$baseDir/src/plotting/workflows/detected_spots_workflow.nf" 
 
 
 workflow spot_detection_iss {
@@ -32,6 +32,13 @@ workflow spot_detection_iss {
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Call first to convert it into a value channel to allow for multiple iteration of a process with multiple inputs
     plot_detected_spots(blobs,grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+
+    // To plot detected spots on their respective tiles, we map them according to tile and combine them into it
+    reference.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {reference_tiles_mapped}
+    spot_detection_reference.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {spot_detection_reference_mapped}
+    reference_tiles_mapped.join(spot_detection_reference_mapped, by:0).set {tiled_spots_grouped}
+
+    plot_detected_spots_on_tile(tiled_spots_grouped)
 
     
     //map round images into a tuple containing their round, channel and tile number, gather intensity code requires this information up front

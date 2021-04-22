@@ -1,7 +1,6 @@
 nextflow.enable.dsl=2
 
 
-
 include{
         get_decoded_stats ; create_html_report
 } from "../processes/iss_analytics.nf"

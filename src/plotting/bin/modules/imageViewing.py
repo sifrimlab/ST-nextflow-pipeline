@@ -159,12 +159,56 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
     plt.savefig("decoded_genes_plotted.pdf")
+def plotSpotsOnTile(path_to_tile_image: str, path_to_spotsCSV: str, radius: int):
+    image = io.imread(path_to_tile_image)
+    df = pd.read_csv(path_to_spotsCSV)
+
+    fig, ax = plt.subplots(1,1)
+    ax.imshow(image, cmap='gray')
+    ax.set_title("Detected spots")
+    for row in df.itertuples():
+        ## Now we plot the dot
+        circ = plt.Circle((row.X, row.Y), radius=radius)
+        ax.add_patch(circ)
+    fig.tight_layout()
+    return plt
+
+def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, radius: int):
+    image = io.imread(path_to_tile_image)
+    df = pd.read_csv(path_to_decoded_spots)
+    genes_list = set(df['Gene'])
+    # Making a colormap that picks a different color for each gene (and empty string)
+    cmap=plt.get_cmap('gist_rainbow')
+    colors = cmap(np.linspace(0, 1, len(genes_list)))
+    color_dict = {gene:color for gene,color in zip(genes_list,colors)}
+
+    ## Calculate image properties:
+    fig, ax = plt.subplots(1,1)
+    ax.imshow(image, cmap='gray')
+    ax.set_title("Decoded genes")
+    for row in df.itertuples():
+        gene = row.Gene
+        if str(gene) != "nan":
+            # Now we plot the dot
+            circ = plt.Circle((row.X, row.Y), radius=3, color=color_dict[gene], label=gene)
+            ax.add_patch(circ)
+    legendWithoutDuplicateLabels(ax)
+    fig.tight_layout()
+    return plt
 
 if __name__=='__main__':
-    reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
-    decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results2/decoded/concat_decoded_genes.csv" 
-    tile_grid_shape =(8,6) 
-    tile_size_x = int(float(1875))
-    tile_size_y = int(float(2200))
-    plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+    # reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
+    # decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results2/decoded/concat_decoded_genes.csv" 
+    # tile_grid_shape =(8,6) 
+    # tile_size_x = int(float(1875))
+    # tile_size_y = int(float(2200))
+    # plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
 
+    # tile_image = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/REF_padded_tiled_3.tif"
+    # spotsCSV = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/blobs/REF_padded_tiled_3_filtered_blobs.csv"
+    # plotSpotsOnTile(tile_image, spotsCSV, 3)
+
+
+    tile_image = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/REF_padded_tiled_3.tif"
+    decoded_genes_csv = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tiled_3.csv"
+    plotDecodedGenesOnTile(tile_image, decoded_genes_csv, 3)
