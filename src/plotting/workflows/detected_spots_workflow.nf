@@ -4,11 +4,14 @@ include {
     plot_detected_spots; plot_detected_spots_on_tile
  }from "../processes/plotting.nf" 
  
-workflow plot_detected_spots {
+workflow plot_spots_whole_and_on_tiles {
     take:
-        reference_tiles
+        // Data
         detected_spots
+        reference_tiles
         blobs
+
+        // Tile grid size coordination
         grid_size_x 
         grid_size_y 
         tile_size_x 
