@@ -51,6 +51,35 @@ process plot_detected_spots {
     pdftoppm -png -r 300 detected_spots_plotted.pdf detected_spots_plotted
     """
 }
+
+process plot_detected_spots_on_tile {
+    publishDir "$params.outDir/plots/tiles", mode: 'copy'
+
+    input:
+    tuple val(tile_nr), path(tile_image),path(detected_spots)
+    
+    
+    output:
+    path "${detected_spots.baseName}_plotted.svg"
+    script:
+    """
+    python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 2
+    """
+}
+process plot_decoded_genes_on_tile {
+    publishDir "$params.outDir/plots/tiles", mode: 'copy'
+
+    input:
+    tuple val(tile_nr), path(tile_image), path(decoded_genes)
+    
+    output:
+    path "${decoded_genes.baseName}_plotted.svg"
+    script:
+    """
+    python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 2
+    """
+}
+
 process plot_segmentation_labels {
     publishDir "$params.outDir/plots/segmentation/", mode: 'copy'
 

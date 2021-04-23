@@ -21,7 +21,7 @@ include {
 } from "../src/filtering/workflows/filter_workflow.nf"
 
 include {
-    local_registration_of_tiles as register 
+    local_registration_of_tiles as registering 
 } from "../src/registration/workflows/local_registration.nf"
 
 include {
@@ -37,8 +37,8 @@ include {
 } from "../src/analytics/workflows/decoded_statistics.nf"
 
 include {
-    plot_decoded_spots ; plot_detected_spots 
-} from "../src/plotting/processes/plotting.nf" 
+    plot_decoded_genes 
+} from "../src/plotting/workflows/decoded_genes_workflow.nf" 
 include {
     threshold_watershed_segmentation as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
@@ -70,17 +70,20 @@ workflow iss {
        white_tophat_filter(CLIP_AND_RESCALE.out.normalized_ref,CLIP_AND_RESCALE.out.normalized_rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
        // Register tiles locally:
-       register(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       registering(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-       spot_detection(white_tophat_filter.out.filtered_ref, register.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       spot_detection(white_tophat_filter.out.filtered_ref, registering.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
        decoding(spot_detection.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
-
+       // Plot decoded genes
+       plot_decoded_genes(tiling.out.reference, decoding.out, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       
+       // Segmentation
        segmentation(tiling.out.dapi, decoding.out)
 
+       // Get analytics from decoding
        iss_decoding_statistics(decoded_genes)
     
-       plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 }

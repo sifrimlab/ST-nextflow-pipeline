@@ -3,9 +3,10 @@ nextflow.enable.dsl=2
 include {
     spot_detection_reference;spot_detection_round ; gather_intensities_in_rounds; get_max_intensities_over_channels
 } from "../processes/spot_detection.nf"
+
 include {
-    plot_detected_spots
-} from "$baseDir/src/plotting/processes/plotting.nf" 
+    plot_spots_whole_and_on_tiles
+} from "$baseDir/src/plotting/workflows/detected_spots_workflow.nf" 
 
 
 workflow spot_detection_iss {
@@ -31,11 +32,13 @@ workflow spot_detection_iss {
     // Collect all spots in a seperate file
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Call first to convert it into a value channel to allow for multiple iteration of a process with multiple inputs
-    plot_detected_spots(blobs,grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
+    // Plot all detected spots
+    spots = spot_detection_reference.out
+    plot_spots_whole_and_on_tiles(spots, reference,blobs, grid_size_x,grid_size_y, tile_size_x, tile_size_y)
     
     //map round images into a tuple containing their round, channel and tile number, gather intensity code requires this information up front
-    round_images.map() {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
+    round_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
 
     // Gather intesnity on each round image of every spot
     gather_intensities_in_rounds(blobs_value_channel, round_images_mapped)
