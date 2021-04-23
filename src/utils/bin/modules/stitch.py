@@ -41,7 +41,7 @@ def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: 
     original_y = tile_grid_array.shape[0] * tile_size_y
     return total_n_tiles, tile_grid_array, original_x, original_y
 
-def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_size_y: int ):
+def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_size_y: int , imtype= "tif" ):
     #  Now we create a list of the original path images, but sorted by tile number:
     # By first creating a dict where the key is the tile number, and the value is the path
     # Tile number is extracted by re.findalling on "tiled_d" and then extracting the number from that, i cast it to int to make the sorting work like it should
@@ -50,7 +50,11 @@ def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_siz
 
     total_n_tiles, tile_grid_array, original_x, original_y = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)
 
-    new_im = Image.new('I;16', (original_x, original_y ))
+    if imtype=="tif":
+        new_im = Image.new('I;16', (original_x, original_y ))
+    elif imtype=="RGB":
+        new_im = Image.new('RGB', (original_x, original_y ))
+
     for index, image_path in enumerate(sorted_tile_images, 1):
         im = Image.open(image_path)
         row_location, col_location = np.where(tile_grid_array==index) # this returns rows and columns, NOT X and Y, which is the opposite

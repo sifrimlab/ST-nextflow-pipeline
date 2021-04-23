@@ -61,7 +61,7 @@ process plot_detected_spots_on_tile {
     
     
     output:
-    path "${detected_spots.baseName}_plotted.svg"
+    path "${detected_spots.baseName}_plotted.tif"
     script:
     """
     python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 2
@@ -74,7 +74,7 @@ process plot_decoded_genes_on_tile {
     tuple val(tile_nr), path(tile_image), path(decoded_genes)
     
     output:
-    path "${decoded_genes.baseName}_plotted.svg"
+    path "${decoded_genes.baseName}_plotted.tif"
     script:
     """
     python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 2

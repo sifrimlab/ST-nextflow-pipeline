@@ -28,6 +28,25 @@ process stitch_ref_tiles {
     """
 
 }
+process stitch_rgb_tiles {
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+
+    input: 
+    val tile_grid_size_x
+    val tile_grid_size_y
+    val tile_size_x
+    val tile_size_y
+    path images
+
+    output:
+    path "*_stitched.tif"
+
+    script:
+    """
+    python $binDir/createStitchedRGBImage.py $tile_grid_size_x $tile_grid_size_y $tile_size_x $tile_size_y $images
+    """
+
+}
 process stitch_round_tiles {
     publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
 
