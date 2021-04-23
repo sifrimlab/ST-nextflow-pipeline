@@ -19,3 +19,17 @@ process clip_and_rescale {
     python $binDir/clipAndRescale.py $image $params.clip_percentile
     """
 }
+process equalize_histogram {
+    publishDir "$params.outDir/normalized", mode: 'copy'
+
+    input: 
+    path image
+
+    output:
+    path "${image.baseName}_equalized.tif"
+
+    script:
+    """
+    python $binDir/equalizeHistogram.py $image
+    """
+}
