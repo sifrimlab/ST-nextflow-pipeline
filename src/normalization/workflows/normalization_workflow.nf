@@ -11,8 +11,22 @@ include{
 } from "$baseDir/src/utils/processes/stitching.nf"
 
 
+workflow CLIP_AND_RESCALE_GLOBAL {
+    take: 
+        // Tile images
+        reference
+        rounds
 
-workflow CLIP_AND_RESCALE {
+    main: 
+        clip_and_rescale_ref(reference)
+        clip_and_rescale(rounds)
+        clip_and_rescale_ref.out.view()
+        clip_and_rescale.out.view()
+    emit:
+        normalized_ref = clip_and_rescale_ref.out
+        normalized_rounds = clip_and_rescale.out
+}
+workflow CLIP_AND_RESCALE_TILES {
     take: 
         // Tile images
         ref_tiles

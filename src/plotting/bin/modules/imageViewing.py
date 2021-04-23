@@ -216,7 +216,7 @@ def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, 
             # Now we plot the dot
             circ = plt.Circle((row.X, row.Y), radius=3, color=color_dict[gene], label=gene)
             ax.add_patch(circ)
-    legendWithoutDuplicateLabels(ax)
+    # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
     return plt
 

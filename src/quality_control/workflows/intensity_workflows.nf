@@ -26,8 +26,6 @@ workflow intensity_diagnosing{
   round_plots = plot_combined_histogram.out.collect()
   channel_plots = plot_combined_channel_histogram.out.collect()
 
-  round_plots.view()
-  channel_plots.view()
 
   get_intensity_analytics(images)
   intensities = get_intensity_analytics.out.collect()
