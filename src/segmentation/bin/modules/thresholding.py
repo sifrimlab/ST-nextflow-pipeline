@@ -120,5 +120,11 @@ def assignGenesToCells(labeled_image: str, decoded_genes: str):
 
 
 if __name__=='__main__':
-    # otsuThresholding("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/DAPI.TIF")
-    assignGenesToCells("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_3_labeled.tif", "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tile3.csv" )
+    image_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma2_maxsigma20/tiled_DO/DAPI_padded_tiled_28.tif"
+    original_image = io.imread(image_path)
+    label_image, attribute_df = otsuThresholding(image_path)
+    colored_image = color.label2rgb(label_image,original_image, bg_label=0) 
+    plt.imshow(colored_image)
+    plt.show()
+
+    # assignGenesToCells("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_3_labeled.tif", "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tile3.csv" )

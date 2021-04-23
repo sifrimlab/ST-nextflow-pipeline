@@ -18,6 +18,8 @@ process plot_decoded_spots {
     
 
     output:
+    path "all_decoded_spots_plotted.pdf"
+    path "all_decoded_spots_plotted-1.png"
     path "decoded_genes_plotted.pdf"
     path "decoded_genes_plotted-1.png"
     script:
@@ -25,6 +27,7 @@ process plot_decoded_spots {
     """
     python $binDir/plotDecodedGenes.py $reference_image $decoded_genes $grid_size_x,$grid_size_y $tile_size_x $tile_size_y
     pdftoppm -png -r 300 decoded_genes_plotted.pdf decoded_genes_plotted
+    pdftoppm -png -r 300 all_decoded_spots_plotted.pdf all_decoded_spots_plotted
     """
 }
 process plot_detected_spots {

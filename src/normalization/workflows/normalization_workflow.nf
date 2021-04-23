@@ -29,7 +29,7 @@ workflow CLIP_AND_RESCALE {
 
 
         // stitch the tiles for visualization 
-       stitch_ref_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,clip_and_rescale_ref.out)
+       stitch_ref_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,clip_and_rescale_ref.out.collect())
        
        clip_and_rescale.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} \
                             .groupTuple(by:[0,1]).set {grouped_rounds}
