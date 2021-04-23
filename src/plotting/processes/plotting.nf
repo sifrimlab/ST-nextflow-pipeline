@@ -11,6 +11,7 @@ process plot_decoded_spots {
     input:
     path decoded_genes
     path reference_image
+
     val grid_size_x
     val grid_size_y
     val tile_size_x

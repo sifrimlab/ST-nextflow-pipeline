@@ -25,7 +25,7 @@ include {
 } from "../src/registration/workflows/local_registration.nf"
 
 include {
-    spot_detection_iss as spot_detection;
+    spot_detection_iss;
 } from "../src/spot_detection/workflows/spot_detection.nf"
 
 include {
@@ -72,13 +72,13 @@ workflow iss {
        // Register tiles locally:
        registering(white_tophat_filter.out.filtered_ref, white_tophat_filter.out.filtered_round, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-       spot_detection(white_tophat_filter.out.filtered_ref, registering.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       spot_detection_iss(white_tophat_filter.out.filtered_ref, registering.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
-       decoding(spot_detection.out)
+       decoding(spot_detection_iss.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
        // Plot decoded genes
-       plot_decoded_genes(tiling.out.reference, decoding.out, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       plot_decoded_genes(tiling.out.reference, decoding.out,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
        // Segmentation
        segmentation(tiling.out.dapi, decoding.out)

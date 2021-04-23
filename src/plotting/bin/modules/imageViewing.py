@@ -159,6 +159,30 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
     plt.savefig("decoded_genes_plotted.pdf")
+
+    # Now the same with nonrecognized spots included
+    fig, ax = plt.subplots(1,1)
+    ax.imshow(image, cmap='gray')
+    ax.set_title("Decoded genes")
+    for row in df.itertuples():
+        # extract X and Y coordinates of the respective tile the spot belongs to
+        row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
+        # unpacking the array structure of the return tuple of np.where
+        y_tile_location, x_tile_location = row_location[0], col_location[0]
+        # Calculate how many pixels to add in order to plot the spot in the correct tile in the original image
+        x_adder = x_tile_location * tile_size_x 
+        y_adder = y_tile_location * tile_size_y
+        # Calculate the position in the original image
+        x_coordinate = row.X + x_adder
+        y_coordinate = row.Y + y_adder
+        gene = row.Gene
+        ## Now we plot the dot
+        circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=str(gene))
+        ax.add_patch(circ)
+    # legendWithoutDuplicateLabels(ax)
+    fig.tight_layout()
+    plt.savefig("all_decoded_spots_plotted.pdf")
+
 def plotSpotsOnTile(path_to_tile_image: str, path_to_spotsCSV: str, radius: int):
     image = io.imread(path_to_tile_image)
     df = pd.read_csv(path_to_spotsCSV)
