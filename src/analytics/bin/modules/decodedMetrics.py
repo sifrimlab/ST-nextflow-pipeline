@@ -125,10 +125,10 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
         # tile_attribute_dict: key=column name, value = column value
         tile_attribute_dict = {}
         tile_attribute_dict['Tile']= tile_nr
-        nr_recognized, nr_unrecognized_barcodes = count_list
-        tile_attribute_dict['# recognized barcodes']= nr_recognized
+        nr_recognized_barcodes, nr_unrecognized_barcodes = count_list
+        tile_attribute_dict['# recognized barcodes']= nr_recognized_barcodes
         tile_attribute_dict['# unrecognized barcodes']= nr_unrecognized_barcodes
-        tile_attribute_dict['Ratio']=round((nr_recognized_barcodes/(nr_unrecognized_barcodes + nr_recognized)),3)*100 
+        tile_attribute_dict['Ratio']=round((nr_recognized_barcodes/(nr_unrecognized_barcodes + nr_recognized_barcodes)),3)*100 
         tile_row_list.append(tile_attribute_dict)
 
     tile_df = pd.DataFrame(tile_row_list)
