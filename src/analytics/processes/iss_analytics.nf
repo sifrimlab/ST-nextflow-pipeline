@@ -5,6 +5,19 @@ import java.nio.file.Paths
 moduleName= "analytics"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
+process plotDecodingPotential {
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    input: 
+    path decoded_genes
+
+    output:
+    path "decoding_potential_plot.svg"
+
+    script:
+    """
+    python $binDir/plotDecodingPotential.py $decoded_genes $params.codebook 
+    """
+}
 process get_decoded_stats {
     publishDir "$params.outDir/analytics/", mode: 'symlink'
 
@@ -42,12 +55,14 @@ process create_html_report {
     path channels_called
     path tile_stats
     path recognized_genes_per_tile
+    //decoding potential process
+    path decoding_potential_plot
 
     output: 
     path "decoding_report.html"
 
     script:
     """
-    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $recognized_genes_counts $barcodes_counted $channels_called $tile_stats $recognized_genes_per_tile
+    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $recognized_genes_counts $barcodes_counted $channels_called $tile_stats $recognized_genes_per_tile $decoding_potential_plot
     """
 }

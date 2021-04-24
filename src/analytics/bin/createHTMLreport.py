@@ -7,6 +7,8 @@ template = sys.argv[1]
 table_list = [sys.argv[i] for i in range(2,7) ]
 image_list = [sys.argv[i] for i in range(7, 9)]
 tile_list = [sys.argv[i] for i in range(9, 11)] # first = table, second = image
+decoding_potential_plot = sys.argv[11] 
+
 with open(template, 'r') as template_file:
     contents = template_file.read()
     template_soup = BeautifulSoup(contents, features="html.parser")
@@ -46,6 +48,15 @@ image_tag['width']= 500
 image_tag['height']= 500
 h2_list[h2_index].insert_after(image_tag)
 h2_index+=1
+
+# Decoding potential image
+image_tag = template_soup.new_tag('img')
+image_tag['src']= decoding_potential_plot
+image_tag['width']= 500
+image_tag['height']= 500
+h2_list[h2_index].insert_after(image_tag)
+h2_index+=1
+
 
 with open('decoding_report.html', 'w') as result_file:
     result_file.write(str( template_soup ))

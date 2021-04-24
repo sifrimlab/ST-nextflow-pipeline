@@ -1,4 +1,5 @@
 import math
+from collections import Counter
 from skimage import io
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,28 +65,42 @@ def checkSpotsInRounds(ref_spots_csv: str, round_spots_csv_list, original_image,
     # y_sorted_round_tuples = sorted(round_tuples, key=lambda x: x[1])
 
     # this is not going to be optimized in any way, time will tell if it is necessary or not
-    closest_point_dict = {}
-    for ref_tuple in ref_tuples:
+    closest_ref_point_dict = {} # key = spot in round, value = spot in reference
+    closest_distance_dict = {}  # key = spot in round, value = distance to closest ref spot
+    for round_tuple in round_tuples:
         # min returns the original iterable, not the result of the key function
-        closest_point = min(round_tuples, key=lambda x: calculateEuclideanDistance2D(ref_tuple, x))
-        closest_point_dict[ref_tuple] = closest_point
+        closest_ref_point = min(ref_tuples, key=lambda x: calculateEuclideanDistance2D(round_tuple, x))
+        closest_ref_point_dict[round_tuple] = closest_ref_point
+        closest_distance_dict[round_tuple] = calculateEuclideanDistance2D(round_tuple, closest_ref_point)
 
-    fig, axs = plt.subplots(1,2)
-    axs[0].imshow(original_image, cmap='gray')
-    axs[0].set_title("Reference")
-    axs[1].imshow(original_image, cmap='gray')
-    axs[1].set_title("Round")
-    for key, value in closest_point_dict.items():
-        # key & value in format: (Y,X)
-        color=np.random.rand(1,3)
-        circ1 = plt.Circle((key[1],key[0]), 2, color=color)
-        circ2 = plt.Circle((value[1],value[0]), 2, color=color)
-        axs[0].add_patch(circ1)
-        axs[1].add_patch(circ2)
-    plt.show()
+    # fig, axs = plt.subplots(1,2)
+    # axs[0].imshow(original_image, cmap='gray')
+    # axs[0].set_title("Reference")
+    # axs[1].imshow(original_image, cmap='gray')
+    # axs[1].set_title("Round")
+    # for key, value in closest_ref_point_dict.items():
+    #     # key & value in format: (Y,X)
+    #     color=np.random.rand(1,3)
+    #     circ1 = plt.Circle((key[1],key[0]), 2, color=color)
+    #     circ2 = plt.Circle((value[1],value[0]), 2, color=color)
+    #     axs[0].add_patch(circ1)
+    #     axs[1].add_patch(circ2)
+    # plt.show()
 
-    # nr_misses = len(ref_tuples) - nr_matches
-    # print(f"nr_matches = {nr_matches} and nr_mismatches = {nr_misses}")
+    # Plot duplicate assignement counted
+    fig, axs = plt.subplots(1,1)
+    axs.set_title("Multiple assigned reference spots plotted by counts")
+    axs.set_xlabel("# round spots a reference spot is assigned to")
+    axs.set_ylabel("# times counted")
+    closest_ref_points = closest_ref_point_dict.values()
+    counted_dict = Counter(closest_ref_points)
+    duplicate_ref_point_dict ={k: v for k, v in counted_dict.items() if v > 1}
+    axs.hist(duplicate_ref_point_dict.values())
+    for rect in axs.patches:
+        height = rect.get_height()
+        axs.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height), 
+                    xytext=(0, 5), textcoords='offset points', ha='center', va='bottom') 
+
 if __name__=='__main__':
     checkSpotsInRounds(ref_spots_csv, rounds_csv, original_image, 2)
 
