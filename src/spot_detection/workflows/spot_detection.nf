@@ -26,8 +26,8 @@ workflow spot_detection_iss {
     spot_detection_reference(reference)
 
     // This is for spot detection quality control purposes
-    spot_detection_round(round_images)
-    spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
+    /* spot_detection_round(round_images) */
+    /* spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs} */
 
     // Collect all spots in a seperate file
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}

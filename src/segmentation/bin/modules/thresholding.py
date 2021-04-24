@@ -4,7 +4,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import ndimage
 from skimage import measure, color, io
+from skimage.util import img_as_ubyte 
 from icecream import ic
+
 
 def collectProperties(property_csv_list: str):
     """
@@ -120,11 +122,16 @@ def assignGenesToCells(labeled_image: str, decoded_genes: str):
 
 
 if __name__=='__main__':
-    image_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma2_maxsigma20/tiled_DO/DAPI_padded_tiled_28.tif"
+    image_path = "/media/david/Puzzles/gabriele_data/1442_OB/DO/DAPI.tif"
     original_image = io.imread(image_path)
-    label_image, attribute_df = otsuThresholding(image_path)
-    colored_image = color.label2rgb(label_image,original_image, bg_label=0) 
-    plt.imshow(colored_image)
+    cut_image = original_image[2500:3500, 2500:3500]
+    cut_image_8bit = img_as_ubyte(cut_image)
+    io.imsave("test.tif", cut_image_8bit)
+    label_image, attribute_df = otsuThresholding("test.tif")
+    colored_image = color.label2rgb(label_image, bg_label=0) 
+    fig, axs = plt.subplots(1,2)
+    axs[0].imshow(colored_image)
+    axs[1].imshow(cut_image_8bit)
     plt.show()
 
     # assignGenesToCells("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_3_labeled.tif", "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tile3.csv" )

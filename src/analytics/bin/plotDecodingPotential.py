@@ -1,7 +1,7 @@
 import os 
 import matplotlib.pyplot as plt
 import sys
-from modules.decodingPotential import plotDecodingPotential.py
+from modules.decodingPotential import plotDecodingPotential
 
 decoded_genes = sys.argv[1]
 codebook = sys.argv[2]
