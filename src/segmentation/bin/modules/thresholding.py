@@ -124,14 +124,13 @@ def assignGenesToCells(labeled_image: str, decoded_genes: str):
 if __name__=='__main__':
     image_path = "/media/david/Puzzles/gabriele_data/1442_OB/DO/DAPI.tif"
     original_image = io.imread(image_path)
-    cut_image = original_image[2500:3500, 2500:3500]
-    cut_image_8bit = img_as_ubyte(cut_image)
-    io.imsave("test.tif", cut_image_8bit)
+    cut_image = original_image[3000:5000, 2000:4000]
+    # cut_image_8bit = img_as_ubyte(cut_image)
+    io.imsave("test.tif", cut_image)
     label_image, attribute_df = otsuThresholding("test.tif")
     colored_image = color.label2rgb(label_image, bg_label=0) 
     fig, axs = plt.subplots(1,2)
     axs[0].imshow(colored_image)
-    axs[1].imshow(cut_image_8bit)
+    axs[1].imshow(cut_image)
     plt.show()
 
-    # assignGenesToCells("/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_3_labeled.tif", "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tile3.csv" )

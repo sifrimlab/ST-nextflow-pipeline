@@ -89,6 +89,6 @@ workflow iss {
        segmentation(tiling.out.dapi, decoding.out)
 
        // Get analytics from decoding
-       iss_decoding_statistics(decoded_genes)
+       iss_decoding_statistics(decoded_genes, decoding.out)
     
 }

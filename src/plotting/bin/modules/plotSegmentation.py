@@ -1,9 +1,22 @@
 import matplotlib.pyplot as plt
-from icecream import ic
 import numpy as np
 import pandas as pd
 from skimage import io, color
+import matplotlib.pyplot as plt
 
+# tile_image is supposed to be and image with the mask boundaries labeled
+def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str):
+    assigned_genes = pd.read_csv(path_to_assigned_genes)
+    tile_image = io.imread(path_to_tile_image)
+
+    fig, ax = plt.subplots(1,1)
+    ax.imshow(tile_image, cmap="gray")
+    for row in assigned_genes.itertuples():
+        clr = 'green' if str(row.Gene) != 'nan' else 'red'
+        circ = plt.Circle((row.X, row.Y), radius=2, color=clr)
+        ax.add_patch(circ)
+    return plt
+    # fig.savefig('myimage.svg', format='svg', dpi=1200)
 
 def plotLabeledImages(path_to_labeled_image: str, path_to_dapi_image = "", path_to_reference_image=""):
     labeled_image = io.imread(path_to_labeled_image)

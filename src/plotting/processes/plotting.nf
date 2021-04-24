@@ -5,6 +5,34 @@ import java.nio.file.Paths
 moduleName="plotting"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
+process plotDecodingPotential {
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    input: 
+    path decoded_genes
+
+    output:
+    path "decoding_potential_plot.svg"
+
+    script:
+    """
+    python $binDir/plotDecodingPotential.py $decoded_genes $params.codebook 
+    """
+}
+process  plotTileDecodingPotential {
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    input: 
+    path decoded_genes
+
+    output:
+    path "${decoded_genes.baseName}_decoding_potential_plot.svg"
+
+    script:
+    """
+    python $binDir/plotTileDecodingPotential.py $decoded_genes $params.codebook 
+    """
+
+}
+plot
 process plot_decoded_spots {
     publishDir "$params.outDir/plots", mode: 'copy'
 
