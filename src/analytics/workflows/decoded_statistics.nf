@@ -2,7 +2,7 @@ nextflow.enable.dsl=2
 
 
 include{
-        get_decoded_stats ; ; create_html_report
+        get_decoded_stats ; ; create_html_report ; plot_decoding_intensity_QC
 } from "../processes/iss_analytics.nf"
 include {
     plotDecodingPotential; plotTileDecodingPotential
@@ -13,11 +13,16 @@ workflow iss_decoding_statistics{
             decoded_genes
             decoded_genes_per_tile
         main:
-            plotTileDecodingPotential(decoded_genes_per_tile)
-
+            // General statistics
             get_decoded_stats(decoded_genes)
+
+            // Decoding potential throughout round progression
             plotDecodingPotential(decoded_genes)
+
+
+            // Decoding intensity based on thresholds
+            plot_decoding_intensity_QC(decoded_genes)
             
-            create_html_report("$baseDir/assets/html_templates/decoding_report_template.html",get_decoded_stats.out, plotDecodingPotential.out, plotTileDecodingPotential.out.collect())
+            create_html_report("$baseDir/assets/html_templates/decoding_report_template.html",get_decoded_stats.out, plotDecodingPotential.out, plot_decoding_intensity_QC.out)
 
 }

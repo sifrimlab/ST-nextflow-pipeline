@@ -29,6 +29,21 @@ process get_decoded_stats {
     """
 }
 
+process plot_decoding_intensity_QC {
+    publishDir "$params.outDir/analytics/", mode: 'symlink'
+
+    input:
+    path decoded_genes
+
+    output:
+    path "decoding_intensity_QC.svg"
+
+    script:
+    """
+    python $binDir/plotDecodedIntensityQC.py $decoded_genes
+    """
+}
+
 process create_html_report {
     publishDir "$params.outDir/analytics/", mode: 'symlink'
     input:
@@ -44,13 +59,14 @@ process create_html_report {
     path recognized_genes_per_tile
     //decoding potential process
     path decoding_potential_plot
-    path decoding_potentia_plot_per_tile
+    // Decoding intensity qc
+    path decoding_intensity_QC_plot
 
     output: 
     path "decoding_report.html"
 
     script:
     """
-    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $recognized_genes_counts $barcodes_counted $channels_called $tile_stats $recognized_genes_per_tile $decoding_potential_plot $decoding_potentia_plot_per_tile
+    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $recognized_genes_counts $barcodes_counted $channels_called $tile_stats $recognized_genes_per_tile $decoding_potential_plot $decoding_intensity_QC_plot
     """
 }
