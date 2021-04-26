@@ -104,7 +104,6 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             axs[1].add_patch(circ)
         for ax in axs:
             ax.set(xlabel='X-coordinates', ylabel='y-coordinates')
-        plt.show()
     else: 
         fig,ax = plt.subplots(1,1)
         ax.imshow(empty_image, cmap='gray')
@@ -152,13 +151,14 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
         x_coordinate = row.X + x_adder
         y_coordinate = row.Y + y_adder
         gene = row.Gene
-        if str(gene) != "nan":
+        if str(gene) == "nan":
             ## Now we plot the dot
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
             ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
     plt.savefig("decoded_genes_plotted.pdf")
+    # plt.show()
 
     # Now the same with nonrecognized spots included
     fig, ax = plt.subplots(1,1)
@@ -244,18 +244,19 @@ def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, 
     # plt.savefig("all_decoded_spots_plotted.pdf")
 
 if __name__=='__main__':
-    # reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
-    # decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results2/decoded/concat_decoded_genes.csv" 
-    # tile_grid_shape =(8,6) 
-    # tile_size_x = int(float(1875))
-    # tile_size_y = int(float(2200))
-    # plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
+    reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
+    decoded_genes= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma2_maxsigma20/decoded/concat_decoded_genes.csv" 
+    tile_grid_shape =(8,6) 
+    tile_size_x = int(float(1875))
+    tile_size_y = int(float(2200))
+    plotDecodedGenesOnWholeImage(reference_image, decoded_genes, tile_grid_shape, tile_size_x, tile_size_y)
 
     # tile_image = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/REF_padded_tiled_3.tif"
     # spotsCSV = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/blobs/REF_padded_tiled_3_filtered_blobs.csv"
     # plotSpotsOnTile(tile_image, spotsCSV, 3)
 
 
-    tile_image = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/REF_padded_tiled_3.tif"
-    decoded_genes_csv = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tiled_3.csv"
-    plotDecodedGenesOnTile(tile_image, decoded_genes_csv, 3)
+
+     # = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/REF_padded_tiled_3.tif"
+    # decoded_genes_csv = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/decoded_tiled_3.csv"
+    # plotDecodedGenesOnTile(tile_image, decoded_genes_csv, 3)

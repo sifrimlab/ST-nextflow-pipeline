@@ -5,6 +5,22 @@ import java.nio.file.Paths
 moduleName="segmentation"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
+process stardist_segmentation {
+    publishDir "$params.outDir/segmented", mode: 'symlink'
+
+    input:
+    path image
+    
+    output:
+    path "${image.baseName}_labeled.tif", emit: labeled_images
+    path "${image.baseName}_properties.csv", emit: properties
+
+    script:
+    """
+    python $binDir/stardistSegment.py $image $baseDir/src/$moduleName/stardist_model/
+    """
+    
+}
 process otsu_thresholding {
     publishDir "$params.outDir/segmented", mode: 'symlink'
 

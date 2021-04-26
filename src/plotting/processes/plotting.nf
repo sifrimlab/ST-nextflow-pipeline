@@ -32,7 +32,6 @@ process  plotTileDecodingPotential {
     """
 
 }
-plot
 process plot_decoded_spots {
     publishDir "$params.outDir/plots", mode: 'copy'
 
@@ -89,7 +88,7 @@ process plot_detected_spots_on_tile {
     
     
     output:
-    path "${detected_spots.baseName}_plotted.tif"
+    path "${detected_spots.baseName}_plotted.svg"
     script:
     """
     python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 2
@@ -102,14 +101,28 @@ process plot_decoded_genes_on_tile {
     tuple val(tile_nr), path(tile_image), path(decoded_genes)
     
     output:
-    path "${decoded_genes.baseName}_plotted.tif"
+    path "${decoded_genes.baseName}_plotted.svg"
     script:
     """
     python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 2
     """
 }
 
-process plot_segmentation_labels {
+process plot_segmentation_labels_on_ref {
+    publishDir "$params.outDir/plots/segmentation/", mode: 'copy'
+
+    input:
+    tuple val(tile_nr), path(labeled_image),path(original_image)
+    output:
+    path "${labeled_image.baseName}_overlay_REF.png"
+
+    script:
+
+    """
+    python $binDir/plotLabeledImages.py $labeled_image $original_image REF
+    """
+}
+process plot_segmentation_labels_on_dapi {
     publishDir "$params.outDir/plots/segmentation/", mode: 'copy'
 
     input:
@@ -120,6 +133,6 @@ process plot_segmentation_labels {
     script:
 
     """
-    python $binDir/plotLabeledImages.py $labeled_image $original_image 
+    python $binDir/plotLabeledImages.py $labeled_image $original_image DAPI 
     """
 }

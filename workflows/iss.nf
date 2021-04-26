@@ -40,7 +40,7 @@ include {
     plot_decoded_genes 
 } from "../src/plotting/workflows/decoded_genes_workflow.nf" 
 include {
-    threshold_watershed_segmentation as segmentation
+    stardist_segmentation_workflow as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 
@@ -55,12 +55,12 @@ workflow iss {
         // Create the channel of round images, reference is implicitely defined in the config file as params.reference
        rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}*/${params.round_prefix}*_${params.channel_prefix}*.${params.extension}")
        
-       CLIP_AND_RESCALE_GLOBAL(params.reference, rounds)
+       /* CLIP_AND_RESCALE_GLOBAL(params.reference, rounds) */
 
 
 
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
-       tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", CLIP_AND_RESCALE_GLOBAL.out.normalized_rounds, CLIP_AND_RESCALE_GLOBAL.out.normalized_ref, params.DAPI)
+       tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference, params.DAPI)
        // Output of this is used often, so we rename the global variables:
        tile_size_x = tiling.out.tile_size_x
        tile_size_y = tiling.out.tile_size_y
@@ -86,7 +86,7 @@ workflow iss {
        plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
        // Segmentation
-       segmentation(tiling.out.dapi, decoding.out)
+       segmentation(tiling.out.dapi, decoding.out, tiling.out.reference)
 
        // Get analytics from decoding
        iss_decoding_statistics(decoded_genes, decoding.out)

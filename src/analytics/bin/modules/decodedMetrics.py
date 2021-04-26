@@ -1,6 +1,5 @@
 import pandas as pd
 from icecream import ic
-import progressbar
 import os
 import matplotlib.pyplot as plt
 import random

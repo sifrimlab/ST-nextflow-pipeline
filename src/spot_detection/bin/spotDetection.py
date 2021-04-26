@@ -1,6 +1,7 @@
 from skimage import io
 from skimage.feature import blob_log
 from skimage import exposure
+from skimage.morphology import extrema
 import cv2
 import os
 import sys
@@ -36,6 +37,10 @@ def laplacianOfGaussianBlobDetector(image, min_sigma=None, max_sigma=None):
     else:
         blobs = blob_log(image, min_sigma=int(min_sigma), max_sigma=int(max_sigma))
     return blobs
+
+def localMaximaBlobDetection(image_path: str):
+    image = io.imread(image_path)
+    local_maxima = extrema.local_maxima(image)
 
 
 ## Argument parsing:

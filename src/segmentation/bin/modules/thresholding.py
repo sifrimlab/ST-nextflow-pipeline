@@ -109,16 +109,6 @@ def otsuThresholding(path_to_image: str):
     attribute_df = pd.DataFrame(rows_list)
     return label_image, attribute_df
 
-def assignGenesToCells(labeled_image: str, decoded_genes: str):
-    image = io.imread(labeled_image) # slicing = [Y,X]
-    decoded_df = pd.read_csv(decoded_genes)
-    filtered_df = decoded_df[decoded_df['Gene'].isnull()!=True]
-    label_column = []
-    for row in filtered_df.itertuples():
-        label = image[row.Y, row.X]
-        label_column.append(label)
-    filtered_df['Label'] = label_column
-    return filtered_df
 
 
 if __name__=='__main__':

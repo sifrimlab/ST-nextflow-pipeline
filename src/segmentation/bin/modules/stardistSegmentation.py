@@ -1,47 +1,41 @@
 from __future__ import print_function, unicode_literals, absolute_import, division
-from stardist.models import StarDist2D
 import numpy as np
-import matplotlib.pyplot as plt
 from glob import glob
-from tifffile import imread
+from skimage import io
+import pandas as pd
 from csbdeep.utils import Path, normalize
 from csbdeep.io import save_tiff_imagej_compatible
 from stardist import random_label_cmap, _draw_polygons, export_imagej_rois
 from stardist.models import StarDist2D
 
-np.random.seed(6)
-lbl_cmap = random_label_cmap()
+# np.random.seed(6)
+# lbl_cmap = random_label_cmap()
 
 # save_tiff_imagej_compatible('example_image.tif', img, axes='YX')
 # save_tiff_imagej_compatible('example_labels.tif', labels, axes='YX')
 # export_imagej_rois('example_rois.zip', details['coord'])
-X = sorted(glob('/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_DO/DAPI_*.tif'))
-X = list(map(imread,X))
 
-def segment(img, model, show_dist=True):
+def segment(img_path,model, show_dist=True):
+    img = io.imread(img_path)
     # extract number of channels in case the input image is an RGB image
-    n_channel = 1 if X[0].ndim == 2 else X[0].shape[-1]
+    n_channel = 1 if img.ndim == 2 else img.shape[-1]
     # depending on that, we want to normalize the channels independantly
     axis_norm = (0,1)   # normalize channels independently
     # axis_norm = (0,1,2) # normalize channels jointly
-    img = normalize(img, 1,99.8, axis=axis_norm)
-    plt.imshow(img)
-    plt.show()
-    labels, details = model.predict_instances(img)
 
-    plt.figure(figsize=(13,10))
-    img_show = img if img.ndim==2 else img[...,0]
+    img_normalized = normalize(img, 1,99.8, axis=axis_norm)
+    labels, details = model.predict_instances(img_normalized)
     coord, points, prob = details['coord'], details['points'], details['prob']
-    plt.subplot(121); plt.imshow(img_show, cmap='gray'); plt.axis('off')
-    a = plt.axis()
-    _draw_polygons(coord, points, prob, show_dist=show_dist)
-    plt.axis(a)
-    plt.subplot(122); plt.imshow(img_show, cmap='gray'); plt.axis('off')
-    plt.imshow(labels, cmap=lbl_cmap, alpha=0.5)
-    plt.tight_layout()
-    plt.show()
 
-# versatile model
-model_versatile = StarDist2D.from_pretrained('2D_versatile_fluo')
-example(model_versatile, 1, False)
+    attribute_df = pd.DataFrame()
+    attribute_df['Y'] = points[:,0]
+    attribute_df['X'] = points[:,1]
+    attribute_df['prob'] = prob
 
+    # print(points.shape, coord.shape,prob.shape )
+    return labels, attribute_df
+
+if __name__=='__main__':
+    image_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma2_maxsigma20/tiled_DO/DAPI_padded_tiled_29.tif"
+    model_versatile = StarDist2D.from_pretrained('2D_versatile_fluo')
+    segment(image_path, model_versatile)

@@ -8,21 +8,10 @@ import os
 
 labeled_image = sys.argv[1]
 prefix = os.path.splitext(labeled_image)[0]
-if len(sys.argv)>2:
-    dapi_image = sys.argv[2]
-else:
-    dapi_image = ""
-if len(sys.argv)>3:
-    ref_image = sys.argv[3]
-else:
-    ref_image = ""
-colored_image_on_DAPI, colored_image_on_REF=plotLabeledImages(labeled_image, dapi_image, ref_image)
-
-for name, image in zip(("DAPI", "ref"),(colored_image_on_DAPI, colored_image_on_REF)):
-    print(name, image)
-    if image is not None:
-        print(f"{prefix}_overlay_{name}.png")
-        io.imsave(f"{prefix}_overlay_{name}.png", image)
+original_image = sys.argv[2]
+overlay_prefix = sys.argv[3]
+colored_image_on_DAPI=plotLabeledImages(labeled_image, overlay_image=original_image)
+io.imsave(f"{prefix}_overlay_{overlay_prefix}.png", colored_image_on_DAPI)
 
 
 

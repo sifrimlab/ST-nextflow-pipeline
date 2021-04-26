@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from skimage import io
 import numpy as np
-from modules.thresholding import assignGenesToCells
+from modules.assignGenes import assignGenesToCells
 
 decoded_genes = sys.argv[1]
 labeled_image_path = sys.argv[2]
