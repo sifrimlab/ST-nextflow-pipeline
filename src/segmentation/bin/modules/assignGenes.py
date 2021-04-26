@@ -9,7 +9,7 @@ def assignGenesToCells(labeled_image: str, decoded_genes: str, filter_unrecogniz
     if filter_unrecognized:
         decoded_df = decoded_df[decoded_df['Gene'].isnull()!=True]
     label_column = []
-    for row in filtered_df.itertuples():
+    for row in decoded_df.itertuples():
         label = image[row.Y, row.X]
         label_column.append(label)
     decoded_df['Label'] = label_column

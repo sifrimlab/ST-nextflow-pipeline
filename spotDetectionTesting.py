@@ -1,13 +1,18 @@
 from skimage import io
+from skimage import color
+from skimage.measure import label
 import math
 from skimage.feature import blob_log
 import os
 import matplotlib.pyplot as plt
-from skimage.morphology import white_tophat, disk
+from skimage.morphology import white_tophat, disk, extrema
 import numpy as np
 
 img_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results/tiled_ref/REF_padded_tiled_29.tif"
 image = io.imread(img_path)
+image = image[:500, :500]
+plt.imshow(image)
+plt.show()
 empty_image = np.zeros(image.shape)
 # empty_raw_image = np.zeros(image.shape)
 
@@ -21,28 +26,44 @@ def detectSpots(image, min_sigma=1, max_sigma=10):
     image = image.astype('uint8')
     blobs = blob_log(image, min_sigma=int(min_sigma), max_sigma=int(max_sigma))
     return blobs.astype(int)
+def localMaximaDetectSpots(image):
+    local_maxima = extrema.local_maxima(image)
+    label_maxima = label(local_maxima)
+    overlay = color.label2rgb(label_maxima, image, alpha=0.7, bg_label=0,
+                              bg_color=None, colors=[(1, 0, 0)])
+    plt.imshow(overlay)
+    plt.show()
+
+def hMaximaDetectSpots(image):
+    h = 100
+    h_maxima = extrema.h_maxima(image, h)
+    print(h_maxima)
+    label_h_maxima = label(h_maxima)
+    overlay_h = color.label2rgb(label_h_maxima, image, alpha=0.7, bg_label=0,
+                                bg_color=None, colors=[(1, 0, 0)])
+
+    fig,axs = plt.subplots(1,2)
+    plt.imshow(overlay_h)
+    plt.show()
+
 
 filtered_image = whiteFilter(image, 3)
+# local maxima
+hMaximaDetectSpots(filtered_image)
 
 # raw_blobs = detectSpots(image, 1,10)
 # sigmas = raw_blobs[:,2]
 # smallest_blobs = detectSpots(filtered_image, 1,10)
 # smal_blobs = detectSpots(filtered_image, 1,20)
 # bigger_blobs = detectSpots(filtered_image, 2,10)
-biggest_blobs = detectSpots(filtered_image, 2,20)
-fig, axs = plt.subplots(1,2)
-axs[0].imshow(filtered_image, cmap='gray')
-axs[1].imshow(filtered_image, cmap='gray')
-for x in biggest_blobs:
-        circ = plt.Circle((x[1], x[0]), radius=1)
-        axs[1].add_patch(circ)
-# sigmas = blobs[:,2]
-# print(np.amax(sigmas))
-# average = np.mean(sigmas)
-# stdev = np.std(sigmas)
-# interval = (math.floor(average-stdev), math.ceil(average+stdev))
-# is_between_list = [interval[0] <= sigma <= interval[1] for sigma in sigmas]
-plt.show()
+# biggest_blobs = detectSpots(filtered_image, 2,20)
+# fig, axs = plt.subplots(1,2)
+# axs[0].imshow(filtered_image, cmap='gray')
+# axs[1].imshow(filtered_image, cmap='gray')
+# for x in biggest_blobs:
+#         circ = plt.Circle((x[1], x[0]), radius=1)
+#         axs[1].add_patch(circ)
+# plt.show()
 
 # fig, axs = plt.subplots(2,2)
 # axs[0,0].imshow(image, cmap='gray')
