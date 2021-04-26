@@ -33,23 +33,20 @@ def decodeSequentialMaxIntensity(path_to_max_intensity_csv: str, path_to_codeboo
     #Iterate over each grouped coordinate pair with: name = tuple of X-Ycoordinates, group is a dataframe of only that group's rows.
     for name, group in coordinate_grouped_df:
         barcode = ""
+        min_intensity_ratio=1
         # Sort based on rounds, from top to bottom the rows are sequential.
         for row in group.sort_values('Round').itertuples():
             barcode += str(row.Channel)
+            if row.Intensity_ratio < min_intensity_ratio:
+                min_intensity_ratio = row.Intensity_ratio
         try:
             gene_name = codebook_dict[barcode]
         except  KeyError:
             gene_name=""
-        temp_dict = {'Tile': tile_nr, 'X':name[0], 'Y':name[1], 'Barcode':barcode, 'Gene':gene_name}
+        temp_dict = {'Tile': tile_nr, 'X':name[0], 'Y':name[1], 'Barcode':barcode, 'Gene':gene_name, "Intensity_ratio": min_intensity_ratio}
         barcode_list.append(temp_dict)
 
     result_df = pd.DataFrame(barcode_list)
     return result_df
 
 
-# Input parsing:
-intensities = sys.argv[1]
-codebook = sys.argv[2]
-tile_nr = re.findall(r'\d+', sys.argv[1])[0]
-
-decodeSequentialMaxIntensity(intensities, codebook, tile_nr).to_csv(f"decoded_tiled_{tile_nr}.csv")

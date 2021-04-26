@@ -14,7 +14,7 @@ process spot_detection_reference {
     path "${ref_image.baseName}_blobs.csv"
 
     """
-    python $binDir/spotDetection.py $ref_image $params.min_sigma $params.max_sigma
+    python $binDir/blogDetect.py $ref_image $params.min_sigma $params.max_sigma
     """
 }
 
@@ -28,7 +28,7 @@ process spot_detection_round {
     path "${round_image.baseName}_hybs.csv"
 
     """
-    python $binDir/spotDetection.py $round_image $params.min_sigma $params.max_sigma $params.round_prefix $params.channel_prefix
+    python $binDir/blogDetect.py $round_image $params.min_sigma $params.max_sigma $params.round_prefix $params.channel_prefix
     """
 }
 

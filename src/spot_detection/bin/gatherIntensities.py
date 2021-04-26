@@ -15,7 +15,7 @@ prefix = os.path.splitext(sys.argv[2])[0]
 input_tile = int(re.findall(r'\d+', sys.argv[3])[0])
 input_round = int(re.findall(r'\d+', sys.argv[4])[0])
 input_channel= int(re.findall(r'\d+', sys.argv[5])[0])
-print(prefix)
+
 headers = ["Tile", "Round", "Channel", "Y", "X", "Intensity"]
 with open(f"{prefix}_intensities.csv", 'a+', newline='') as write_obj:
     csv_writer = writer(write_obj)

@@ -151,7 +151,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
         x_coordinate = row.X + x_adder
         y_coordinate = row.Y + y_adder
         gene = row.Gene
-        if str(gene) == "nan":
+        if str(gene) != "nan":
             ## Now we plot the dot
             circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
             ax.add_patch(circ)
