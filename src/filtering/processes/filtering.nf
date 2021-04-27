@@ -34,3 +34,17 @@ process filter_round{
     python $binDir/filtering.py ${image} ${params.filter_radius}
     """
 }
+process filter_gaussian{
+    publishDir "$params.outDir/filtered/", mode: 'symlink'
+    
+    input: 
+    path image 
+
+    output:
+    path "${image.baseName}_filtered.tif"
+
+    script:
+    """
+    python $binDir/filtering.py ${image} ${params.filter_sigma}
+    """
+}
