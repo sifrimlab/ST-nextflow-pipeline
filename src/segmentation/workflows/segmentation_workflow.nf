@@ -5,8 +5,20 @@ include {
 } from "../processes/segmentation.nf"
 
 include{
-    plot_segmentation_labels_on_ref; plot_segmentation_labels_on_dapi
+    plot_segmentation_labels ; plot_segmentation_labels_on_ref; plot_segmentation_labels_on_dapi ; plot_assigned_genes
 } from "$baseDir/src/plotting/processes/plotting.nf"
+
+workflow base_threshold_watershed_segmentation {
+    take:
+        dapi_images
+
+    main:
+        // Perform segmentation
+        otsu_thresholding(dapi_images)
+        collect_cell_properties(otsu_thresholding.out.properties.collect()) //Saves them into a concatenated file
+
+        plot_segmentation_labels(otsu_thresholding.out.labeled_images)
+}
 
 workflow threshold_watershed_segmentation {
     take:
@@ -33,6 +45,11 @@ workflow threshold_watershed_segmentation {
 
         assign_genes_to_cells(combined_decoded_genes)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+
+        assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped}
+        assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes}
+
+        plot_assigned_genes(combined_assigned_genes)
 
     emit: 
         assigned_genes = assign_genes_to_cells.out
@@ -64,6 +81,11 @@ workflow stardist_segmentation_workflow {
 
         assign_genes_to_cells(combined_decoded_genes)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+
+        assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped}
+        assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes}
+
+        plot_assigned_genes(combined_assigned_genes)
 
     emit: 
         assigned_genes = assign_genes_to_cells.out

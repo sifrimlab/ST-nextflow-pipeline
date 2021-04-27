@@ -43,6 +43,10 @@ include {
     stardist_segmentation_workflow as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
+include {
+    transform_tile_coordinate_system
+} from "../src/file_conversion/processes/coordinate_parsing.nf"
+
 
 workflow iss {
     main:
@@ -82,6 +86,7 @@ workflow iss {
        decoding(spot_detection_iss.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
+       transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        // Plot decoded genes
        plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        

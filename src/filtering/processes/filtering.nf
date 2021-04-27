@@ -45,6 +45,20 @@ process filter_gaussian{
 
     script:
     """
-    python $binDir/filtering.py ${image} ${params.filter_sigma}
+    python $binDir/convolving.py ${image} ${params.filter_sigma}
+    """
+}
+process deconvolve_PSF {
+    publishDir "$params.outDir/filtered/deconvolved/", mode: 'symlink'
+    
+    input: 
+    path image 
+
+    output:
+    path "${image.baseName}_deconvolved.tif"
+
+    script:
+    """
+    python $binDir/deconvolving.py ${image} $params.deconvolve_sigma $params.iterations 
     """
 }

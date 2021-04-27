@@ -114,6 +114,7 @@ process plot_segmentation_labels_on_ref {
     input:
     tuple val(tile_nr), path(labeled_image),path(original_image)
     output:
+
     path "${labeled_image.baseName}_overlay_REF.png"
 
     script:
@@ -134,5 +135,35 @@ process plot_segmentation_labels_on_dapi {
 
     """
     python $binDir/plotLabeledImages.py $labeled_image $original_image DAPI 
+    """
+}
+
+process plot_segmentation_labels {
+    publishDir "$params.outDir/plots/segmentation/", mode: 'copy'
+
+    input:
+    path labeled_image
+    output:
+    path "${labeled_image.baseName}_plotted.png"
+
+    script:
+
+    """
+    python $binDir/plotLabeledImages.py $labeled_image
+    """
+}
+
+process plot_assigned_genes {
+    publishDir "$params.outDir/plots/assigned_genes/", mode: 'copy'
+
+    input:
+    tuple val(tile_nr), path(assigned_genes), path(labeled_image)
+    
+    output:
+    path "${labeled_image.baseName}_plotted.svg"
+
+    script:
+    """
+    python $binDir/plotAssignedGenes.py $assigned_genes $labeled_image
     """
 }

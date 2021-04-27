@@ -59,3 +59,37 @@ workflow standard_iss_tiling {
         grid_size_y = calculate_tile_size.out.grid_size_y
         padded_whole_reference = pad_reference.out
 }       
+workflow standard_merfish_tiling {
+    // includes a global registration step before tiling
+    take:
+        //This is a string containing a glob pattern: it's used to calculate the highest resolution
+        glob_pattern
+        //The round images, represented as a channel of tuples, that maps the round number to image, as created by image_round_adder.nf
+        data
+        // Dapi image
+        DAPI
+    main:
+        calculate_biggest_resolution(glob_pattern)
+
+        calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+                
+        pad_dapi(DAPI,  calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+        pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+
+        tile_dapi(pad_dapi.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        tile_round(pad_round.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+
+        // Stitch tiles back as a control
+        stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
+
+        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {grouped_rounds}
+        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+
+    emit:
+        rounds = tile_round.out.flatten()
+        dapi = tile_dapi.out.flatten()
+        tile_size_x = calculate_tile_size.out.tile_size_x
+        tile_size_y = calculate_tile_size.out.tile_size_y
+        grid_size_x = calculate_tile_size.out.grid_size_x
+        grid_size_y = calculate_tile_size.out.grid_size_y
+}

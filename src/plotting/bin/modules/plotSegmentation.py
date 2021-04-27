@@ -31,6 +31,7 @@ def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
 
     return colored_image_on_DAPI
 
+
 if __name__ == '__main__':
     original = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/tiled_ref/DAPI_padded_tiled_4.tif"
     labeled= "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/segmented/DAPI_padded_tiled_4_labeled.tif" 

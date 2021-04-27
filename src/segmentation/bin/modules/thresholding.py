@@ -21,12 +21,27 @@ def collectProperties(property_csv_list: str):
 
 def otsuThresholding(path_to_image: str):
     '''
+        note to self: this code adapted from DigitalSreeni assumes that your input image is an 8-bit rgb, which makes it so that we have to do some image format transformation because:
+        - cv2.shreshold accepts only 8-bit grayscale
+        - cv2.watershed only accepts 8-bit rgb
+    '''
+    '''
     returns a labeled image, where 0 = background and all other integers an object number. 
     These numbers don't have any actual image value, so the image isn't really used as an image object, but more as an array
     that stores which pixel belongs to which label. Also returns a csv that contains image properties of the given objects
     '''
-    img = cv2.imread(path_to_image)
-    cells = img[:,:,0]
+    img =cv2.imread(path_to_image, -1) 
+    img_as_8 = img_as_ubyte(img)
+    shape = img_as_8.shape
+    empty = np.zeros(shape)
+    img_as_8bit_RGB = cv2.merge([img_as_8,img_as_8,img_as_8])
+
+    try:
+        cells = img[:,:,0]
+    except IndexError:
+        cells = img_as_8
+    
+
     pixels_to_um = 0.454 # 1 pixel = 454 nm (got this from the metadata of original image)
 
     ret1, thresh = cv2.threshold(cells, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -65,13 +80,13 @@ def otsuThresholding(path_to_image: str):
     markers[unknown==255] = 0
 
     #Now we are ready for watershed filling. 
-    markers = cv2.watershed(img,markers)
+    markers = cv2.watershed(img_as_8bit_RGB,markers)
     #The boundary region will be marked -1
     markers[markers==-1] = 10 # add the boundary images to the background
     label_image = measure.label(markers, background=10)
 
     ## Extract properties of detected cells
-    regions = measure.regionprops(label_image, intensity_image=cells)
+    regions = measure.regionprops(label_image, intensity_image=img)
 
     #Best way is to output all properties to a csv file
     #Let us pick which ones we want to export. 

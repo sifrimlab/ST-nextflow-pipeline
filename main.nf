@@ -143,7 +143,6 @@ workflow iss {
     iss_pipeline()
 }
 workflow merfish {
-
     include {
     merfish as merfish_pipeline
     } from "./workflows/merfish.nf"

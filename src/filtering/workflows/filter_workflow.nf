@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 params.stitchDir = "filtered"
 
 include{
-    filter_ref; filter_round; filter_gaussian
+    filter_ref; filter_round; filter_gaussian ; deconvolve_PSF
 } from "../processes/filtering.nf"
 
 include{
@@ -39,7 +39,7 @@ workflow white_tophat_filter {
         filtered_round = filter_round.out.flatten()
 }
 
-workflow gaussian_filter {
+workflow gaussian_filter_workflow {
     take: 
         // Tile images
         round_tiles
@@ -60,4 +60,27 @@ workflow gaussian_filter {
 
     emit:
         filtered_gaussian = filter_gaussian.out.flatten()
+}
+
+workflow deconvolve_PSF_workflow {
+    take: 
+        // Tile images
+        round_tiles
+
+        // Tile grid paramters
+        tile_grid_size_x
+        tile_grid_size_y
+        tile_size_x
+        tile_size_y
+    main: 
+       deconvolve_PSF(round_tiles)
+
+        // stitche the tiles for visualization 
+
+       deconvolve_PSF.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} \
+                            .groupTuple(by:[0,1]).set {grouped_rounds}
+       stitch_round_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+
+    emit:
+        deconvolved_PSF = deconvolve_PSF.out.flatten()
 }
