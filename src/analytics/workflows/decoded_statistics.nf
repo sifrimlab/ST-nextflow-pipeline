@@ -15,6 +15,7 @@ workflow iss_decoding_statistics{
         main:
             // General statistics
             get_decoded_stats(decoded_genes)
+            get_decoded_stats.out.most_prominent_unrecognized_barcode.view()
 
             // Decoding potential throughout round progression
             plotDecodingPotential(decoded_genes)

@@ -55,7 +55,11 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         # Create the counted column
         decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
         unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
-        unique_df = unique_df.sort_values(by=['Counted'])
+        unique_df = unique_df.sort_values(by=['Counted'], ascending=False)
+        non_recognized_barcodes = [barcode for barcode in list(unique_df['Barcode']) if barcode not in list(codebook_df['Barcode'])]
+        non_recognized_df= unique_df[unique_df.Barcode.isin(non_recognized_barcodes)]
+        print(non_recognized_df.iloc[0]['Barcode'])
+        
         unique_df.to_html("unique_barcodes_called_counted.html")
 
         color_list = ['green' if barcode in list(codebook_df['Barcode']) else 'red' for barcode in decoded_df['Barcode']] 
@@ -180,5 +184,5 @@ if __name__ == '__main__':
         decoded_genes = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/concat_decoded_genes.csv" 
         codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
         # countChannelsInBarcodeList(decoded_genes)
-        # evaluateRandomCalling(decoded_genes, codebook, 4,4)
-        countRecognizedBarcodeStats(decoded_genes)
+        evaluateRandomCalling(decoded_genes, codebook, 4,4)
+        # countRecognizedBarcodeStats(decoded_genes)
