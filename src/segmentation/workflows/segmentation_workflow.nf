@@ -100,10 +100,10 @@ workflow stardist_segmentation_workflow {
         transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
         // Plot assigned genes doesnt work yet, something with trying to plot float32 images (the labeled images)
-        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
-        /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
+        assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped}
+        assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes}
 
-        /* plot_assigned_genes(combined_assigned_genes) */
+        plot_assigned_genes(combined_assigned_genes)
 
     emit: 
         assigned_genes = assign_genes_to_cells.out

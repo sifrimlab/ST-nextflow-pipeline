@@ -160,10 +160,28 @@ process plot_assigned_genes {
     tuple val(tile_nr), path(assigned_genes), path(labeled_image)
     
     output:
-    path "${labeled_image.baseName}_plotted.svg"
+    path "${assigned_genes.baseName}_plotted.svg"
 
     script:
     """
     python $binDir/plotAssignedGenes.py $assigned_genes $labeled_image
+    """
+}
+
+process plot_specific_barcode {
+    publishDir "$params.outDir/plots/quality_control/", mode: 'copy'
+
+    input:
+    path image
+    path decoded_genes
+    val barcode
+    
+    
+    output:
+    path "${image.baseName}_{gene}_expression_plotted.svg"
+
+    script:
+    """
+    python $binDir/plotGeneExpression.py $image $decoded_genes $barcode
     """
 }
