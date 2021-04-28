@@ -7,7 +7,7 @@ moduleName="file_conversion"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process transform_tile_coordinate_system {
-    publishDir "$params.outDir/final/", mode='move'
+    publishDir "$params.outDir/final", mode: 'copy'
 
     input:
     path csv

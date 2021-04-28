@@ -46,6 +46,7 @@ workflow spot_detection_iss {
     intensities_value_channel = intensities.first()
 
     get_max_intensities_over_channels(intensities_value_channel) 
+    get_max_intensities_over_channels.out.view()
     
 
 

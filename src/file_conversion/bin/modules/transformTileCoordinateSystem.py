@@ -42,7 +42,7 @@ def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: 
 
 
 # This requires that the input csv had a column X and column Y
-def tranformTileCoordinateSystem(path_to_csv: str, tile_grid_shape, tile_size_x, tile_size_y):
+def transformTileCoordinateSystem(path_to_csv: str, tile_grid_shape, tile_size_x, tile_size_y):
     decoded_df = pd.read_csv(path_to_csv)
     original_x_column = []
     original_y_column = []

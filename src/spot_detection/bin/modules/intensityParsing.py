@@ -1,4 +1,5 @@
 import sys
+from icecream import ic
 import pandas as pd
 
 def getMaxIntensityPerRound(path_to_intensity_csv: str):
@@ -6,7 +7,10 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str):
     def calcQC(intensity_list):
         mx = max(intensity_list)
         sm = sum(intensity_list)
-        return float(mx/sm)
+        try:
+            return float(mx/sm)
+        except ZeroDivisionError:
+            return 0
 
     df_total = pd.read_csv(path_to_intensity_csv)
     # Calculate max tile nr.
@@ -24,7 +28,7 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str):
             df_filtered = df.sort_values('Intensity', ascending=False).drop_duplicates(['Round','Y','X'])
             # Print out into different csv's to fascilitate parallelizing in nextflow
             df_filtered.to_csv(f"tile{i}_max_intensities.csv")
-        except:
+        except KeyError:
             pass
 
 
@@ -32,5 +36,5 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str):
 
 
 if __name__=='__main__':
-    intensities = "fake_intensities.csv"
+    intensities = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_white_disk3_minsigma2_maxsigma20_second_attempts/intensities/concat_intensities.csv"
     getMaxIntensityPerRound(intensities)
