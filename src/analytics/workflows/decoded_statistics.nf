@@ -14,7 +14,6 @@ workflow iss_decoding_statistics{
             decoded_genes_per_tile
         main:
             // General statistics
-            decoded_genes.view()
             get_decoded_stats(decoded_genes)
 
             // Decoding potential throughout round progression

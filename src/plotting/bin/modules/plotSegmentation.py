@@ -4,12 +4,14 @@ from skimage.util import img_as_ubyte
 import numpy as np
 import pandas as pd
 from skimage import io, color
+from skimage.util import img_as_uint
 import matplotlib.pyplot as plt
 
 # tile_image is supposed to be and image with the mask boundaries labeled
 def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str):
     assigned_genes = pd.read_csv(path_to_assigned_genes)
     tile_image = io.imread(path_to_tile_image)
+    tile_image = img_as_uint(tile_image)
 
     fig, ax = plt.subplots(1,1)
     ax.imshow(tile_image, cmap="gray")
