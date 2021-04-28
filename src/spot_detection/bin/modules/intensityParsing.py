@@ -27,7 +27,7 @@ def getMaxIntensityPerRound(path_to_intensity_csv: str):
             df['Intensity_ratio']=df.groupby(['Round','Y','X'])['Intensity'].transform(calcQC)
             df_filtered = df.sort_values('Intensity', ascending=False).drop_duplicates(['Round','Y','X'])
             # Print out into different csv's to fascilitate parallelizing in nextflow
-            df_filtered.to_csv(f"tile{i}_max_intensities.csv")
+            df_filtered.to_csv(f"tile{i}_max_intensities.csv", index=False)
         except KeyError:
             pass
 

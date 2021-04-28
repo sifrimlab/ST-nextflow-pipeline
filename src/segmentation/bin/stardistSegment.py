@@ -25,5 +25,5 @@ attributes_df = getProperties(labeled_image, img)
 if 'tile_nr' in locals():
     attributes_df['Tile'] = tile_nr
 io.imsave(f"{prefix}_labeled.tif", labeled_image, check_contrast=False)
-attributes_df.to_csv(f"{prefix}_properties.csv")
+attributes_df.to_csv(f"{prefix}_properties.csv", index=False)
 

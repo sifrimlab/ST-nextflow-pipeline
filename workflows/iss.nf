@@ -91,7 +91,7 @@ workflow iss {
        plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
        
        // Segmentation
-       segmentation(tiling.out.dapi, decoding.out, tiling.out.reference)
+       segmentation(tiling.out.dapi, decoding.out, tiling.out.reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
        // Get analytics from decoding
        iss_decoding_statistics(decoded_genes, decoding.out)

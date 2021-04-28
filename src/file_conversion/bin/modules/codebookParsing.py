@@ -18,7 +18,7 @@ def convertLettersToNumbers(path_to_codebook: str, path_to_conversion_index: str
           element = element.replace(letter, number)
         parsed_list.append(element)
     new_dict = pd.DataFrame({ 'Barcode':parsed_list, 'Gene':gene_list })
-    new_dict.to_csv(outfile)
+    new_dict.to_csv(outfile, index=False)
 if __name__ == '__main__':
     codebook = "/media/tool/gabriele_data/1442_OB/taglist.csv"
     index = "/media/tool/gabriele_data/1442_OB/barcode_index_fixed.csv"

@@ -8,6 +8,9 @@ include{
     plot_segmentation_labels ; plot_segmentation_labels_on_ref; plot_segmentation_labels_on_dapi ; plot_assigned_genes
 } from "$baseDir/src/plotting/processes/plotting.nf"
 
+include {
+    transform_tile_coordinate_system
+} from "$baseDir/src/file_conversion/processes/coordinate_parsing.nf"
 workflow base_threshold_watershed_segmentation {
     take:
         dapi_images
@@ -25,6 +28,12 @@ workflow threshold_watershed_segmentation {
         dapi_images
         decoded_genes
         ref_images
+
+        // Tile grid parameters for stitching
+        grid_size_x
+        grid_size_y
+        tile_size_x
+        tile_size_y
     main:
         // Perform segmentation
         otsu_thresholding(dapi_images)
@@ -45,11 +54,12 @@ workflow threshold_watershed_segmentation {
 
         assign_genes_to_cells(combined_decoded_genes)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+        transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped}
-        assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes}
+        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
+        /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
 
-        plot_assigned_genes(combined_assigned_genes)
+        /* plot_assigned_genes(combined_assigned_genes) */
 
     emit: 
         assigned_genes = assign_genes_to_cells.out
@@ -61,6 +71,12 @@ workflow stardist_segmentation_workflow {
         dapi_images
         decoded_genes
         ref_images
+
+        // Tile grid parameters for stitching
+        grid_size_x
+        grid_size_y
+        tile_size_x
+        tile_size_y
     main:
         // Perform segmentation
         stardist_segmentation(dapi_images)
@@ -81,6 +97,7 @@ workflow stardist_segmentation_workflow {
 
         assign_genes_to_cells(combined_decoded_genes)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+        transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
         // Plot assigned genes doesnt work yet, something with trying to plot float32 images (the labeled images)
         /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
