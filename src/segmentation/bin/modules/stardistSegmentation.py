@@ -49,7 +49,7 @@ def getProperties(labeled_image, dapi_image):
     rows_list=[]
     for region_props in regions:
         attribute_dict = {}
-        attribute_dict['Label'] = region_props['Label'] 
+        attribute_dict['Cell_Label'] = region_props['Label'] 
         center_y, center_x= region_props['centroid']
         attribute_dict['center_x'] = int(center_x)
         attribute_dict['center_y'] = int(center_y)

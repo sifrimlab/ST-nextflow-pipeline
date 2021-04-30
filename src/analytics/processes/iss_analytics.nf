@@ -21,11 +21,12 @@ process get_decoded_stats {
     path "barcodes_counted.svg"
     path "tile_stats.html"
     path "recognized_genes_per_tile.svg"
+    /* env max_expressed_non_recognized_barcode, emit: most_prominent_unrecognized_barcode */
 
     script:
 
     """
-    python $binDir/extractStatsFromDecodedBarcodes.py $decoded_genes $params.codebook $params.nr_rounds $params.nr_channels
+    max_expressed_non_recognized_barcode=(`python $binDir/extractStatsFromDecodedBarcodes.py $decoded_genes $params.codebook $params.nr_rounds $params.nr_channels`)
     """
 }
 
