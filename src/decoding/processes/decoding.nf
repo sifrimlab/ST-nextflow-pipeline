@@ -20,3 +20,19 @@ process decode_sequential_max_intensity {
     """
 
 }
+process pixel_based_decoding {
+    publishDir "$params.outDir/decoded", mode: 'symlink'
+
+    input:
+    val x_dim
+    val y_dim
+    tuple val(tile_nr), path(tile_images)
+
+    output:
+    path "decoded_tiled_${tile_nr}.csv"
+
+    """
+    python $binDir/decodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $tile_images 
+    """
+
+}

@@ -67,3 +67,18 @@ process assign_genes_to_cells {
     python $binDir/assignGenesToCells.py $decoded_genes $labeled_images
     """
 }
+
+process create_count_matrix {
+    publishDir "$params.outDir/final", mode: 'copy'
+
+    input:
+    path assigned_genes
+    
+    output:
+    path "count_matrix.csv"
+
+    script:
+    """
+    python $binDir/createCountMatrix.py $assigned_genes
+    """
+}

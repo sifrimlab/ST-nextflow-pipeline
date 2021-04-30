@@ -12,7 +12,7 @@ include {
     register_wrt_maxIP
 } from "../../registration/workflows/registration_on_maxIP.nf"
 include {
-    stitch_ref_tiles; stitch_ref_tiles as stitch_dapi ; stitch_round_tiles
+    stitch_ref_tiles; stitch_ref_tiles as stitch_dapi ; stitch_round_tiles ; stitch_image_tiles
 } from "$baseDir/src/utils/processes/stitching.nf"
 
 
@@ -59,6 +59,7 @@ workflow standard_iss_tiling {
         grid_size_y = calculate_tile_size.out.grid_size_y
         padded_whole_reference = pad_reference.out
 }       
+
 workflow standard_merfish_tiling {
     // includes a global registration step before tiling
     take:
@@ -82,8 +83,12 @@ workflow standard_merfish_tiling {
         // Stitch tiles back as a control
         stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
-        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {grouped_rounds}
-        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+        // Group images by origin image, so that they can be stitched back
+        tile_round.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+                            | groupTuple(by:0) \
+                            | set {grouped_rounds}
+
+        stitch_image_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
 
     emit:
         rounds = tile_round.out.flatten()

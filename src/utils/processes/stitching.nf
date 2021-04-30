@@ -66,3 +66,23 @@ process stitch_round_tiles {
     """
 
 }
+
+process stitch_image_tiles {
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+
+    input: 
+    val tile_grid_size_x
+    val tile_grid_size_y
+    val tile_size_x
+    val tile_size_y
+    tuple val(image_nr), path(images)
+
+    output:
+    path "*_stitched.tif"
+
+    script:
+    """
+    python $binDir/createStitchedImage.py $tile_grid_size_x $tile_grid_size_y $tile_size_x $tile_size_y $images
+    """
+
+}

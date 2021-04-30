@@ -37,6 +37,8 @@ def parseBarcodes(codebook: str, bit_len: int):
 
 def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5176):
     df = parseBarcodes(codebook,bit_len)
+    # Very important thing here is to sort, because the iteration is important
+    img_path_list.sort()
     image_list =  [img_as_float(io.imread(img)) for img in img_path_list]
     rows_list = []
     for x in range(0,x_dim):
@@ -46,6 +48,9 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5
             attribute_dict['Y'] = y
             pixel_vector = createPixelVector(x,y,image_list)
             minimal_distance = np.inf
+            gene_label = ""
+            gene_name = ""
+            barcode = ""
             for row in df.itertuples():
                 distance = calculateEuclideanDistance(row.Vector, pixel_vector)
                 if distance < minimal_distance:
@@ -65,22 +70,32 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5
     return result_df
 
 # this code assumes that all pixel combinations are present in the decoded_pixels_df 
-def labelImage(x_dim, y_dim, decoded_pixels_df, original_image=""):
+def labelImage(x_dim, y_dim, decoded_pixels_df):
+    # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
         gene_labeled_image[row.Y, row.X] = row.Label
+    # aggregate the pixels with the same gene label using skimage.measure.label
     region_labeled_image, num_spots = label(gene_labeled_image, background=0, return_num=True)
+    # Convert the found "spot" regions into a dataframe
     regions_table = regionprops_table(region_labeled_image, properties=("label", "area", "centroid"))
     regions_df = pd.DataFrame(regions_table)
     regions_df['Y'] = [int(y) for y in list(regions_df['centroid-0'])]
     regions_df['X'] = [int(x) for x in list(regions_df['centroid-1'])]
     regions_df = regions_df.drop(columns=[ "centroid-0", "centroid-1" ])
     regions_df = regions_df.rename(columns={"label":"Spot_label"})
-    print(regions_df.columns)
-    print(decoded_pixels_df.columns)
-    merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
 
+    # combine with the decoded pixels dataframe to add gene name and barcode to the spots
+    merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
+    
     return merged_df
+
+# threshold based on a 1-bit error in euclidean distance
+def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5176):
+    decoded_pixels_df = decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold)
+    decoded_spots_df = labelImage(x_dim, y_dim, decoded_pixels_df)
+    return decoded_spots_df
+
 
 
 
