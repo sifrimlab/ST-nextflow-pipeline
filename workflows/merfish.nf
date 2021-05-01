@@ -9,10 +9,10 @@ include {
     standard_merfish_tiling as tiling
 } from "../src/tiling/workflows/tiling_workflows.nf"
 include {
-    gaussian_filter_workflow; deconvolve_PSF_workflow
+    gaussian_filter_workflow; deconvolve_PSF_workflow; white_tophat_filter_merfish
 } from "../src/filtering/workflows/filter_workflow.nf"
 include {
-    merfish_threshold_watershed_segmentation
+    merfish_threshold_watershed_segmentation as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
@@ -33,6 +33,12 @@ workflow merfish {
         tile_size_y = tiling.out.tile_size_y
         grid_size_x = tiling.out.grid_size_x
         grid_size_y = tiling.out.grid_size_y
+
+
+        // White tophat filter
+        white_tophat_filter_merfish(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+
+
         
         // Gaussian high pass filter 
         /* gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
@@ -41,7 +47,7 @@ workflow merfish {
 
 
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
-        tiling.out.rounds.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+        white_tophat_filter_merfish.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_rounds}
                                         

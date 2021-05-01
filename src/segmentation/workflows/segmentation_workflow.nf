@@ -41,7 +41,7 @@ workflow merfish_threshold_watershed_segmentation {
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
 
-        plot_segmentation_on_dapi(combined_dapi_labeled_images) 
+        plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
 
         assign_genes_to_cells(combined_decoded_genes)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}

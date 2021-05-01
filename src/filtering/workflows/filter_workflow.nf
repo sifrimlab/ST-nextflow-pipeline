@@ -39,6 +39,27 @@ workflow white_tophat_filter {
         filtered_round = filter_round.out.flatten()
 }
 
+workflow white_tophat_filter_merfish {
+    take: 
+        // Tile images
+        round_tiles
+
+        // Tile grid paramters
+        tile_grid_size_x
+        tile_grid_size_y
+        tile_size_x
+        tile_size_y
+    main: 
+       filter_round(round_tiles)
+
+        // stitche the tiles for visualization 
+       filter_round.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+                            .groupTuple(by:[0]).set {grouped_rounds}
+       stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+
+    emit:
+        filtered_round = filter_round.out.flatten()
+}
 workflow gaussian_filter_workflow {
     take: 
         // Tile images
