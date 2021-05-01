@@ -72,7 +72,7 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5
     return result_df
 
 # this code assumes that all pixel combinations are present in the decoded_pixels_df 
-def labelImage(x_dim, y_dim, decoded_pixels_df):
+def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, max_area=10000):
     # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
@@ -82,6 +82,8 @@ def labelImage(x_dim, y_dim, decoded_pixels_df):
     # Convert the found "spot" regions into a dataframe
     regions_table = regionprops_table(region_labeled_image, properties=("label", "area", "centroid"))
     regions_df = pd.DataFrame(regions_table)
+    # Remove spots that only have an area of min_area and max_area
+    regions_df[(regions_df['area'] >=min_area) & (regions_df['area'] <=max_area )]
     regions_df['Y'] = [int(y) for y in list(regions_df['centroid-0'])]
     regions_df['X'] = [int(x) for x in list(regions_df['centroid-1'])]
     regions_df = regions_df.drop(columns=[ "centroid-0", "centroid-1" ])
@@ -94,7 +96,7 @@ def labelImage(x_dim, y_dim, decoded_pixels_df):
 # threshold based on a 1-bit error in euclidean distance
 def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5176):
     decoded_pixels_df = decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold)
-    decoded_spots_df = labelImage(x_dim, y_dim, decoded_pixels_df)
+    decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df)
     return decoded_spots_df
 
 
