@@ -29,7 +29,7 @@ process pixel_based_decoding {
     tuple val(tile_nr), path(tile_images)
 
     output:
-    path "decoded_tiled_${tile_nr}.csv"
+    path "decoded_${tile_nr}.csv"
 
     """
     python $binDir/decodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $tile_images 

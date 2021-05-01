@@ -84,7 +84,7 @@ workflow standard_merfish_tiling {
         stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
         // Group images by origin image, so that they can be stitched back
-        tile_round.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+        tile_round.out.flatten().map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
                             | groupTuple(by:0) \
                             | set {grouped_rounds}
 

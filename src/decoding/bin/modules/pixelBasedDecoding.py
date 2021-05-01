@@ -13,7 +13,9 @@ def createPixelVector(x_coordinate: int,y_coordinate: int, image_list, norm="L2"
     for i, actual_image in enumerate(image_list):
         barcode_list[i] = actual_image[y_coordinate, x_coordinate]
     barcode_array = np.array(barcode_list)
-    if norm=="L2":
+
+    # only normalize if it's not a zero vector, otherwise you get timeout problems
+    if norm=="L2" and np.any(barcode_array):
         barcode_array = barcode_array/np.linalg.norm(barcode_array)
     return barcode_array
 

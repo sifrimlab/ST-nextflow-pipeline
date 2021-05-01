@@ -12,12 +12,16 @@ include {
     gaussian_filter_workflow; deconvolve_PSF_workflow
 } from "../src/filtering/workflows/filter_workflow.nf"
 include {
-    base_threshold_watershed_segmentation
+    merfish_threshold_watershed_segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
     pixel_based_decoding
 } from "../src/decoding/processes/decoding.nf"
+
+include {
+    transform_tile_coordinate_system
+} from "../src/file_conversion/processes/coordinate_parsing.nf"
 
 workflow merfish {
     main:
@@ -31,17 +35,18 @@ workflow merfish {
         grid_size_y = tiling.out.grid_size_y
         
         // Gaussian high pass filter 
-        gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        /* gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
 
         /* deconvolve_PSF_workflow(gaussian_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
 
-        base_threshold_watershed_segmentation(tiling.out.dapi)
 
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
-        gaussian_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+        tiling.out.rounds.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_rounds}
                                         
         pixel_based_decoding(tile_size_x, tile_size_y, grouped_rounds)
+
+        segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
 }

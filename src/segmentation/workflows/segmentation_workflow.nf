@@ -16,16 +16,39 @@ include {
     umap
 } from "$baseDir/src/dim_reduction/processes/dim_reduction.nf"
 
-workflow base_threshold_watershed_segmentation {
+workflow merfish_threshold_watershed_segmentation {
     take:
         dapi_images
+        decoded_genes
+
+        // Tile grid parameters for stitching
+        grid_size_x
+        grid_size_y
+        tile_size_x
+        tile_size_y
 
     main:
         // Perform segmentation
         otsu_thresholding(dapi_images)
         collect_cell_properties(otsu_thresholding.out.properties.collect()) //Saves them into a concatenated file
 
+        decoded_genes.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
+        otsu_thresholding.out.labeled_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {labeled_images_mapped}
+        dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
+
         plot_segmentation_labels(otsu_thresholding.out.labeled_images)
+
+        labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
+        decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
+
+        plot_segmentation_on_dapi(combined_dapi_labeled_images) 
+
+        assign_genes_to_cells(combined_decoded_genes)
+        assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+        transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set {assigned_genes}
+
+        create_count_matrix(assigned_genes)
+        umap(create_count_matrix.out)
 }
 
 workflow threshold_watershed_segmentation {

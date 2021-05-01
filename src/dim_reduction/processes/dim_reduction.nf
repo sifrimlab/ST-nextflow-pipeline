@@ -7,6 +7,8 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 
 process umap {
+    publishDir "$params.outDir/final/", mode: 'copy'
+
 
     input:
     path count_matrix
