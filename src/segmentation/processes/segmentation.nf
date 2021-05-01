@@ -57,14 +57,14 @@ process assign_genes_to_cells {
     publishDir "$params.outDir/assigned", mode: 'symlink'
 
     input:
-    tuple val(tile_nr), path(decoded_genes),path(labeled_images)
+    tuple val(tile_nr), path(decoded_genes),path(labeled_images), path(properties)
     
     output:
     path "${decoded_genes.baseName}_assigned.csv"
 
     script:
     """
-    python $binDir/assignGenesToCells.py $decoded_genes $labeled_images
+    python $binDir/assignGenesToCells.py $decoded_genes $labeled_images $properties
     """
 }
 

@@ -3,14 +3,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def assignGenesToCells(labeled_image: str, decoded_genes: str, filter_unrecognized = True):
+def assignGenesToCells(labeled_image: str, decoded_genes: str, cell_properties: str, filter_unrecognized = True):
     image = io.imread(labeled_image) # slicing = [Y,X]
     decoded_df = pd.read_csv(decoded_genes)
+    cell_properties_df = pd.read_csv(cell_properties)
     if filter_unrecognized:
         decoded_df = decoded_df[decoded_df['Gene'].isnull()!=True]
     label_column = []
     for row in decoded_df.itertuples():
         label = image[row.Y, row.X]
+        if label != 0:
+            label = cell_properties_df.loc[cell_properties_df['Image_Label']==label, 'Cell_Label'].iloc[0]
         label_column.append(label)
     decoded_df['Cell_Label'] = label_column
     return decoded_df

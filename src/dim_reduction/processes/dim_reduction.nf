@@ -2,7 +2,7 @@ nextflow.enable.dsl=2
 
 import java.nio.file.Paths
 
-moduleName="dim_reduction.nf"
+moduleName="dim_reduction"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 

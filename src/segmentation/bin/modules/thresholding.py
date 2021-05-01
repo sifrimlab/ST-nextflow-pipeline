@@ -107,10 +107,11 @@ def otsuThresholding(path_to_image: str):
     rows_list=[]
     for region_props in regions:
         attribute_dict = {}
-        attribute_dict['Cell_Label'] = region_props['Label'] 
         center_y, center_x= region_props['centroid']
-        attribute_dict['Center_x'] = int(center_x)
-        attribute_dict['Center_y'] = int(center_y)
+        attribute_dict['Image_Label'] =region_props['Label']
+        attribute_dict['Cell_Label'] = f"X{int(center_x)}_Y{int(center_y)}_{region_props['Label']}"
+        attribute_dict['Center_X'] = int(center_x)
+        attribute_dict['Center_Y'] = int(center_y)
         for i,prop in enumerate(propList):
             if(prop == 'Area'): 
                 attribute_dict['area'] = region_props[prop]*pixels_to_um**2 

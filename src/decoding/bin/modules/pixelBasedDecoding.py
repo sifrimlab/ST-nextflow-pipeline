@@ -66,7 +66,7 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5
             # If minimal distance not passing the threshold, it will be labeled as background
             if minimal_distance > threshold:
                 gene_label = 0
-            attribute_dict['Label'] = gene_label
+            attribute_dict['Gene_Label'] = gene_label
             rows_list.append(attribute_dict)
     result_df = pd.DataFrame(rows_list)
     return result_df
@@ -76,7 +76,7 @@ def labelImage(x_dim, y_dim, decoded_pixels_df):
     # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
-        gene_labeled_image[row.Y, row.X] = row.Label
+        gene_labeled_image[row.Y, row.X] = row.Gene_Label
     # aggregate the pixels with the same gene label using skimage.measure.label
     region_labeled_image, num_spots = label(gene_labeled_image, background=0, return_num=True)
     # Convert the found "spot" regions into a dataframe
@@ -89,7 +89,6 @@ def labelImage(x_dim, y_dim, decoded_pixels_df):
 
     # combine with the decoded pixels dataframe to add gene name and barcode to the spots
     merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
-    
     return merged_df
 
 # threshold based on a 1-bit error in euclidean distance
