@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
             shape=(self.kernel_size, self.kernel_size),
             sigma=sigma
 """
+def calculateKernelSize(sigma):
+    return int(2*np.ceil(2 * sigma)+1)
+
 def deconvolvePSF(image_path, psf, iterations):
     img = io.imread(image_path)
     img = img_as_float(img)
