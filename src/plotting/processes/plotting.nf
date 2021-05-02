@@ -91,7 +91,7 @@ process plot_detected_spots_on_tile {
     path "${detected_spots.baseName}_plotted.svg"
     script:
     """
-    python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 2
+    python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 1
     """
 }
 process plot_decoded_genes_on_tile {
@@ -104,7 +104,7 @@ process plot_decoded_genes_on_tile {
     path "${decoded_genes.baseName}_plotted.svg"
     script:
     """
-    python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 2
+    python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 1
     """
 }
 

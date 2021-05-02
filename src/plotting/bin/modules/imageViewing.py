@@ -100,7 +100,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             x_coordinate = row.X + x_adder
             y_coordinate = row.Y + y_adder
 
-            circ = plt.Circle((x_coordinate, y_coordinate), radius=3)
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=2)
             axs[1].add_patch(circ)
         for ax in axs:
             ax.set(xlabel='X-coordinates', ylabel='y-coordinates')
@@ -153,7 +153,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
         gene = row.Gene
         if str(gene) != "nan":
             ## Now we plot the dot
-            circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=gene)
+            circ = plt.Circle((x_coordinate, y_coordinate), radius=2, color=color_dict[gene], label=gene)
             ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
@@ -177,7 +177,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
         y_coordinate = row.Y + y_adder
         gene = row.Gene
         ## Now we plot the dot
-        circ = plt.Circle((x_coordinate, y_coordinate), radius=3, color=color_dict[gene], label=str(gene))
+        circ = plt.Circle((x_coordinate, y_coordinate), radius=2, color=color_dict[gene], label=str(gene))
         ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
@@ -214,7 +214,7 @@ def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, 
         gene = row.Gene
         if str(gene) != "nan":
             # Now we plot the dot
-            circ = plt.Circle((row.X, row.Y), radius=3, color=color_dict[gene], label=gene)
+            circ = plt.Circle((row.X, row.Y), radius=radius, color=color_dict[gene], label=gene)
             ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
