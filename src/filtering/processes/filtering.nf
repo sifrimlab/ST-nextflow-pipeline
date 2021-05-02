@@ -15,7 +15,7 @@ process filter_ref {
     path "${image.baseName}_filtered.tif" 
 
     """
-    python $binDir/filtering.py ${image} ${params.filter_radius}
+    python $binDir/whiteTophatFilter.py ${image} ${params.filter_radius}
     """
 }
 
@@ -31,7 +31,7 @@ process filter_round{
 
     script:
     """
-    python $binDir/filtering.py ${image} ${params.filter_radius}
+    python $binDir/whiteTophatFilter.py ${image} ${params.filter_radius}
     """
 }
 process filter_gaussian{
@@ -45,7 +45,7 @@ process filter_gaussian{
 
     script:
     """
-    python $binDir/convolving.py ${image} ${params.filter_sigma}
+    python $binDir/gaussianPass.py ${image} ${params.filter_sigma}
     """
 }
 process deconvolve_PSF {
@@ -59,6 +59,6 @@ process deconvolve_PSF {
 
     script:
     """
-    python $binDir/deconvolving.py ${image} $params.deconvolve_sigma $params.iterations 
+    python $binDir/restoreRichardsonLucy.py ${image} $params.deconvolve_sigma $params.iterations 
     """
 }
