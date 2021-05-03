@@ -9,8 +9,6 @@ def createCountMatrix(assigned_genes:str):
     original_df = original_df[original_df.Cell_Label != 0]
     df1 = pd.crosstab(original_df.Gene,original_df.Cell_Label,original_df.Cell_Label,aggfunc='count').fillna(0)
     df2 = original_df.groupby('Gene')['Cell_Label'].value_counts().unstack('Cell_Label', fill_value=0).reset_index()
-    df1.to_csv("test1.csv")
-    df2.to_csv("test2.csv")
     return df1
 
 
