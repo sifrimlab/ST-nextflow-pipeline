@@ -83,7 +83,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
 
     if path_to_original_img:
         fig, axs = plt.subplots(1,2)
-        image = cv2.imread(path_to_original_img)
+        image = io.imread(path_to_original_img)
         axs[0].imshow(image)
         axs[0].set_title('Original image')
         axs[1].imshow(empty_image)

@@ -5,6 +5,7 @@ import pandas as pd
 import cv2
 from typing import Tuple
 import sys
+from skimage import io
 from ast import literal_eval as make_tuple
 # reference = "/media/tool/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
 # blobs = "/home/nacho/Documents/Code/communISS/results/blobs/concat_blobs.csv"
@@ -70,7 +71,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
 
     if path_to_original_img:
         fig, axs = plt.subplots(1,2)
-        image = cv2.imread(path_to_original_img)
+        image = io.imread(path_to_original_img)
         axs[0].imshow(image)
         axs[0].set_title('Original image')
         axs[1].imshow(empty_image)
@@ -113,7 +114,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
 
 
 def plotDecodedGenesOnWholeImage(path_to_original_image: str ,path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int], tile_size_x: int, tile_size_y: int):
-    image = cv2.imread(path_to_original_image)
+    image = io.imread(path_to_original_image)
     df = pd.read_csv(path_to_spotsCSV)
     genes_list = set(df['Gene'])
     # Making a colormap that picks a different color for each gene (and empty string)

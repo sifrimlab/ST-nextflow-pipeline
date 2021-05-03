@@ -46,7 +46,9 @@ workflow standard_iss_tiling {
         stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
         stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
-        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {grouped_rounds}
+        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds}
+        mapped_rounds.groupTuple(by:[0,1]).set {grouped_rounds}
+
         stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
 
     emit:

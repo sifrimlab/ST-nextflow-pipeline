@@ -1,4 +1,5 @@
 import cv2
+from skimage import io
 import re
 import os
 import sys
@@ -39,7 +40,7 @@ def pad(filepath, target_width, target_height, expected_width=0, expected_height
     
     widthToAdd = math.floor((target_width - currentWidth)/2)
     heightToAdd = math.floor((target_height - currentHeight)/2)
-    img = cv2.cv2.imread(filepath, cv2.cv2.IMREAD_ANYDEPTH)
+    img = io.imread(filepath)
     #In case there is still a difference in pixels to add and the wanted resolution, add that difference to the right or top,
     # depending on whether the difference is in width or in height respectively
     differenceWidth = (target_width-currentWidth) - widthToAdd*2

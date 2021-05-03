@@ -1,5 +1,6 @@
 import cv2
 import math
+from skimage import io
 
 '''
     Tiling has so far been implemented such that an optimal divisor is sought that brings the tile resolution as close to a user defined resolution
@@ -35,7 +36,7 @@ def calculateOptimalTileSize(X: int, Y: int , target_X: int, target_Y: int):
 
 
 def writeTiles(img_path, tile_size_x, tile_size_y, output_file_prefix, offset_x=None, offset_y=None, discard_irregular=False):
-    img = cv2.imread(img_path, 1)
+    img = io.imread(img_path, 1)
     # Don't forget, cv2 works with shape = (y, x), meaning rows, columns
     img_shape=img.shape
     if offset_x == None or offset_y==None:

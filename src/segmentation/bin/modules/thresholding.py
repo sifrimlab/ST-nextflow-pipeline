@@ -30,7 +30,7 @@ def otsuThresholding(path_to_image: str):
     These numbers don't have any actual image value, so the image isn't really used as an image object, but more as an array
     that stores which pixel belongs to which label. Also returns a csv that contains image properties of the given objects
     '''
-    img =cv2.imread(path_to_image, -1) 
+    img =io.imread(path_to_image) 
     img_as_8 = img_as_ubyte(img)
     shape = img_as_8.shape
     empty = np.zeros(shape)

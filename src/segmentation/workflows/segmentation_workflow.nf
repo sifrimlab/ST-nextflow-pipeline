@@ -13,6 +13,9 @@ include {
 } from "$baseDir/src/file_conversion/processes/coordinate_parsing.nf"
 
 include {
+    stitch_rgb_tiles
+} from "$baseDir/src/utils/processes/stitching.nf"
+include {
     umap
 } from "$baseDir/src/dim_reduction/processes/dim_reduction.nf"
 
@@ -123,17 +126,18 @@ workflow stardist_segmentation_workflow {
         // Parse the outputs in a way that per tile, one decoded gene file and one labeled image is input into the pipeline
         decoded_genes.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
         stardist_segmentation.out.labeled_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {labeled_images_mapped}
-        otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
+        stardist_segmentation.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
         dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
-        ref_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {ref_images_mapped}
+        /* ref_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {ref_images_mapped} */
 
+        // Cobmine all segmentation results and decoded genes by tile, such that everything after this can happen correctly per Tile
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
-        labeled_images_mapped.join(ref_images_mapped, by:0).set{combined_ref_labeled_images}
+        /* labeled_images_mapped.join(ref_images_mapped, by:0).set{combined_ref_labeled_images} */
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
         combined_decoded_genes.join(cell_properties_mapped, by:0).set{combined_decoded_labeled_properties}
 
         plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
-        plot_segmentation_labels_on_ref(combined_ref_labeled_images) 
+        /* plot_segmentation_labels_on_ref(combined_ref_labeled_images) */ 
 
         assign_genes_to_cells(combined_decoded_labeled_properties)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}

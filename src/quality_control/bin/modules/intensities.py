@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import random # for random color plotting
+from skimage import io
+from skimage.util import img_as_ubyte
 from scipy.signal import find_peaks
 
 def getHistogram(path_to_image):
-    image = cv2.imread(path_to_image, 0)
+    image = io.imread(path_to_image)
+    image = img_as_ubyte(image)
     hist = cv2.calcHist([image], [0], None, [256], [0, 256])
     return hist
 
@@ -97,7 +100,8 @@ def getAverageIntensity(hist):
 def getIntensityAnalytics(name: str, hist ):
     attribute_dict = {}
     hist = hist.astype(int)
-    image = cv2.imread(name,0 )
+    image = io.imread(name)
+    image = img_as_ubyte(image)
     n_pixels = np.sum(hist)
     # Get average intensity pixel value weighted by the number of times counted
     average = getAverageIntensity(hist)
