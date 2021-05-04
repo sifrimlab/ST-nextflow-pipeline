@@ -11,6 +11,7 @@ def calculateTransform(fixed, moving):
     outTx = R.Execute(fixed, moving)
     return outTx
 
-def warpImage(image, transform):
+def warpImage(image, transform_file):
+    transform = sitk.ReadTransform(transform_file)
     resampled = sitk.Resample(image, transform, sitk.sitkLinear, 0.0, sitk.sitkUInt16)
     return resampled

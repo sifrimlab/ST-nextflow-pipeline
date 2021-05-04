@@ -23,6 +23,38 @@ process register{
 
 }
 
+process calculate_transformation_wrt_maxIP {
+
+    publishDir "$params.outDir/tranformations/", mode: 'symlink'
+
+    input:
+    path reference
+    tuple val(round_nr), path(maxIP_image)
+
+    output:
+    path "${round_nr}_transform.txt"
+
+    """
+    python $binDir/calculateTransformation.py $reference $round_nr $maxIP_image 
+    """
+
+}
+process apply_transformation {
+
+    publishDir "$params.outDir/registered/", mode: 'symlink'
+
+    input:
+    tuple val(round_nr), path(transform), path(image)
+
+    output:
+    path "*_registered.tif"
+
+    script:
+    """
+    python $binDir/applyTransform.py $transform $image 
+    """
+
+}
 // For this process, you need to map and combine your maxIP and round images to be transformed in the correct way
 process register_with_maxIP {
 
@@ -39,7 +71,6 @@ process register_with_maxIP {
     """
     python $binDir/rigidRegisterMaxIP.py $reference $round_nr $maxIP_image $round_images
     """
-
 }
 
 process local_registration {

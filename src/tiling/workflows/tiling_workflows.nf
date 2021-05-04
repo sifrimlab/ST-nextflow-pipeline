@@ -9,7 +9,7 @@ include {
     register as register
 } from "../../registration/processes/rigid_registration.nf"
 include {
-    register_wrt_maxIP
+    register_wrt_maxIP ; register_wrt_maxIP_memory_friendly
 } from "../../registration/workflows/registration_on_maxIP.nf"
 include {
     stitch_ref_tiles; stitch_ref_tiles as stitch_dapi ; stitch_round_tiles ; stitch_image_tiles
@@ -36,20 +36,19 @@ workflow standard_iss_tiling {
         pad_dapi(DAPI,  calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
         pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
 
-        register_wrt_maxIP(pad_reference.out, pad_round.out)
+        register_wrt_maxIP_memory_friendly(pad_reference.out, pad_round.out)
 
         tile_ref(pad_reference.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
         tile_dapi(pad_dapi.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
-        tile_round(register_wrt_maxIP.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        tile_round(register_wrt_maxIP_memory_friendly.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
 
         // Stitch tiles back as a control
         stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
         stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
         tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds}
-        mapped_rounds.groupTuple(by:[0,1]).set {grouped_rounds}
 
-        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, mapped_rounds)
 
     emit:
         reference = tile_ref.out.flatten()

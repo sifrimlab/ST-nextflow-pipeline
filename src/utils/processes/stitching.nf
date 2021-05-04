@@ -10,7 +10,7 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 params.stitchDir = "stitched"
 
 process stitch_ref_tiles {
-    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'move'
 
     input: 
     val tile_grid_size_x
@@ -29,7 +29,7 @@ process stitch_ref_tiles {
 
 }
 process stitch_rgb_tiles {
-    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'move'
 
     input: 
     val tile_grid_size_x
@@ -48,7 +48,7 @@ process stitch_rgb_tiles {
 
 }
 process stitch_round_tiles {
-    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'move'
 
     input: 
     val tile_grid_size_x
@@ -68,7 +68,7 @@ process stitch_round_tiles {
 }
 
 process stitch_image_tiles {
-    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'symlink'
+    publishDir "$params.outDir/stitched/$params.stitchDir/", mode: 'move'
 
     input: 
     val tile_grid_size_x
