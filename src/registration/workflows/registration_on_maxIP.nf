@@ -22,6 +22,7 @@ workflow register_wrt_maxIP {
                             | map {file -> tuple((file.baseName=~ /Round\d+/)[0], file)}
 
 
+
         // Also map your round to the same tuple
         grouped_rounds = round_data.map {file -> tuple((file.baseName=~ /Round\d+/)[0], file)} \
                     | groupTuple()
@@ -48,7 +49,6 @@ workflow register_wrt_maxIP_memory_friendly {
 
         // Calculate transformations of maxIP wrt reference
         calculate_transformation_wrt_maxIP(reference, maxIP_per_round_channel)
-        calculate_transformation_wrt_maxIP.out.view()
 
 // map your rounds to the corresponding rounds and transform to the correct round nr 
         // Also map your round to the same tuple
@@ -56,6 +56,7 @@ workflow register_wrt_maxIP_memory_friendly {
         mapped_transforms = calculate_transformation_wrt_maxIP.out.map {file -> tuple((file.baseName=~ /Round\d+/)[0], file)}
         // combine the two transforms with the image
         combined = mapped_transforms.combine(mapped_rounds, by:0)
+        combined.view()
 
         apply_transformation(combined)
 
