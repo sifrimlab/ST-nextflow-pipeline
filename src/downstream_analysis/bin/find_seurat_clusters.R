@@ -5,14 +5,17 @@ library(dplyr)
 # Argparsing
 arg_list <- commandArgs(trailingOnly = TRUE)
 count_matrix_file = arg_list[1]
-prefix = strsplit("name1.csv", "\\.")[[1]]
+prefix = strsplit(count_matrix_file, "\\.")[[1]]
 resolution = arg_list[2]
+options(digits=3)
+resolution = as.double(resolution)
+
 
 # Data table parsing
 count_matrix = read.table(count_matrix_file, sep=",", header=TRUE)
 rownames(count_matrix) =count_matrix[,"Gene"]
 # then remove the gene and the first column, since it's teh one containing the unassigned genes
-count_matrix = subset(count_matrix, select = -c(Gene,X0) )
+count_matrix = subset(count_matrix, select = -c(Gene,0) )
 
 seurat_object <- CreateSeuratObject(count_matrix ,project = "seurat",assay = "RNA",names.field = 1, names.delim="#") # delimiter set to something that won't have any impact
 

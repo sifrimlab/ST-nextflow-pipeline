@@ -20,6 +20,6 @@ def convertLettersToNumbers(path_to_codebook: str, path_to_conversion_index: str
     new_dict = pd.DataFrame({ 'Barcode':parsed_list, 'Gene':gene_list })
     new_dict.to_csv(outfile, index=False)
 if __name__ == '__main__':
-    codebook = "/media/tool/gabriele_data/161230_161220_3_1/taglist.csv"
+    codebook = "/media/tool/gabriele_data/170315_161220_hippo_4_1/taglist.csv"
     index = "/media/tool/gabriele_data/161230_161220_3_1/barcode_index_fixed.csv"
-    convertLettersToNumbers(codebook, index, outfile = "/media/tool/gabriele_data/161230_161220_3_1/maxIP-seperate-channels/codebook_fixed.csv")
+    convertLettersToNumbers(codebook, index, outfile = "/media/tool/gabriele_data/170315_161220_hippo_4_1/maxIP_seperate_channels/codebook_fixed.csv")

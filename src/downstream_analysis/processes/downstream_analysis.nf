@@ -34,6 +34,6 @@ process find_seurat_clusters {
 
     script:
     """
-    Rscript $binDir/find_seurat_clusters.R count_matrix_umap $params.find_clusters_resolution
+    Rscript $binDir/find_seurat_clusters.R $count_matrix $params.find_clusters_resolution
     """
 }
