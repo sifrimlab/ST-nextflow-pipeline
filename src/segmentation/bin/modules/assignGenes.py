@@ -56,6 +56,9 @@ def assignAllGenesToCells(labeled_image: str, decoded_genes: str, cell_propertie
     decoded_df['Cell_Label'] = label_column
     return decoded_df
 
+
+# def assignGenesToPatches(decoded_df, 
+
 if __name__=='__main__':
     # labeled_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma1_max_sigma15_stardist_segmentation_no_normalization/segmented/DAPI_padded_tiled_10_labeled.tif"
     # labeled_image = io.imread(labeled_image)

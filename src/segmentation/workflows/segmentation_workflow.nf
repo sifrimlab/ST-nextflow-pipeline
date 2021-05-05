@@ -52,8 +52,8 @@ workflow merfish_threshold_watershed_segmentation {
         transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set {assigned_genes}
 
         create_count_matrix(assigned_genes)
-        umap(create_count_matrix.out)
-        find_seurat_clusters(create_count_matrix.out)
+        /* umap(create_count_matrix.out) */
+        /* find_seurat_clusters(create_count_matrix.out) */
 }
 
 workflow threshold_watershed_segmentation {
@@ -92,8 +92,8 @@ workflow threshold_watershed_segmentation {
         transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set {assigned_genes}
 
         create_count_matrix(assigned_genes)
-        umap(create_count_matrix.out)
-        find_seurat_clusters(create_count_matrix.out)
+        /* umap(create_count_matrix.out) */
+        /* find_seurat_clusters(create_count_matrix.out) */
 
         /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
         /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
@@ -143,8 +143,8 @@ workflow stardist_segmentation_workflow {
         transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set {assigned_genes}
 
         create_count_matrix(assigned_genes)
-        umap(create_count_matrix.out)
-        find_seurat_clusters(create_count_matrix.out)
+        /* umap(create_count_matrix.out) */
+        /* find_seurat_clusters(create_count_matrix.out) */
 
 
         // Plot assigned genes doesnt work yet, something with running out of memory problem 
