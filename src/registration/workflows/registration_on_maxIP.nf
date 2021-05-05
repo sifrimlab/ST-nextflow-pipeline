@@ -56,7 +56,6 @@ workflow register_wrt_maxIP_memory_friendly {
         mapped_transforms = calculate_transformation_wrt_maxIP.out.map {file -> tuple((file.baseName=~ /Round\d+/)[0], file)}
         // combine the two transforms with the image
         combined = mapped_transforms.combine(mapped_rounds, by:0)
-        combined.view()
 
         apply_transformation(combined)
 
