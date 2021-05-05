@@ -1,3 +1,4 @@
+import json
 from skimage import io
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,7 +58,6 @@ def assignAllGenesToCells(labeled_image: str, decoded_genes: str, cell_propertie
     return decoded_df
 
 
-# def assignGenesToPatches(decoded_df, 
 
 if __name__=='__main__':
     # labeled_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma1_max_sigma15_stardist_segmentation_no_normalization/segmented/DAPI_padded_tiled_10_labeled.tif"
