@@ -68,6 +68,21 @@ process assign_genes_to_cells {
     """
 }
 
+process assign_genes_to_cells_voronoi {
+    publishDir "$params.outDir/assigned", mode: 'symlink'
+
+    input:
+    tuple val(tile_nr), path(decoded_genes),path(labeled_images), path(properties)
+    
+    output:
+    path "${decoded_genes.baseName}_assigned.csv"
+
+    script:
+    """
+    python $binDir/assignGenesToCellsVoronoi.py $decoded_genes $labeled_images $properties
+    """
+}
+
 process create_count_matrix {
     publishDir "$params.outDir/final", mode: 'copy'
 
