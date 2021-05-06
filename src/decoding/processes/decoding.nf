@@ -32,7 +32,7 @@ process pixel_based_decoding {
     path "decoded_${tile_nr}.csv"
 
     """
-    python $binDir/decodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $tile_images 
+    python $binDir/decodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $params.image_prefix $tile_images 
     """
 
 }
