@@ -1,4 +1,5 @@
 import cv2
+import re
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -31,7 +32,14 @@ def otsuThresholding(path_to_image: str):
     that stores which pixel belongs to which label. Also returns a csv that contains image properties of the given objects
     '''
     img =io.imread(path_to_image) 
+    # Extract tile number for umi's later on
+    try:
+        tile_nr = re.findall(r"tiled_\d+", re.findall(r"\d+", path_to_image)[0])[0]
+    except:
+        tile_nr = ""
+    # Create an 8bit version of the image
     img_as_8 = img_as_ubyte(img)
+    # Creat an RGB version that only has signal in the blue channel
     shape = img_as_8.shape
     empty = np.zeros(shape)
     img_as_8bit_RGB = cv2.merge([img_as_8,img_as_8,img_as_8])
@@ -109,7 +117,7 @@ def otsuThresholding(path_to_image: str):
         attribute_dict = {}
         center_y, center_x= region_props['centroid']
         attribute_dict['Image_Label'] =region_props['Label']
-        attribute_dict['Cell_Label'] = f"X{int(center_x)}_Y{int(center_y)}_{region_props['Label']}"
+        attribute_dict['Cell_Label'] = f"T{tile_nr}_X{int(center_x)}_Y{int(center_y)}_{region_props['Label']}"
         attribute_dict['Center_X'] = int(center_x)
         attribute_dict['Center_Y'] = int(center_y)
         for i,prop in enumerate(propList):

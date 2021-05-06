@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals, absolute_import, division
 import numpy as np
 from glob import glob
+import re
 from skimage import io
 from skimage import measure
 import pandas as pd
@@ -9,8 +10,6 @@ from csbdeep.io import save_tiff_imagej_compatible
 from stardist import random_label_cmap, _draw_polygons, export_imagej_rois
 from stardist.models import StarDist2D
 
-# np.random.seed(6)
-# lbl_cmap = random_label_cmap()
 
 # save_tiff_imagej_compatible('example_image.tif', img, axes='YX')
 # save_tiff_imagej_compatible('example_labels.tif', labels, axes='YX')
@@ -34,6 +33,11 @@ def segment(img,model, show_dist=True):
     return labeled_image #, attribute_df
 
 def getProperties(labeled_image, dapi_image):
+    # Extract tile number for umi's later on
+    try:
+        tile_nr = re.findall(r"tiled_\d+", re.findall(r"\d+", dapi_image)[0])[0]
+    except:
+        tile_nr = ""
     regions = measure.regionprops(labeled_image, intensity_image=dapi_image)
     pixels_to_um = 0.454 # 1 pixel = 454 nm (got this from the metadata of original image)
     propList = ['Area',
@@ -51,7 +55,7 @@ def getProperties(labeled_image, dapi_image):
         attribute_dict = {}
         attribute_dict['Image_Label'] =region_props['Label']
         center_y, center_x= region_props['centroid']
-        attribute_dict['Cell_Label'] = f"X{int(center_x)}_Y{int(center_y)}_{region_props['Label']}"
+        attribute_dict['Cell_Label'] = f"T{tile_nr}_X{int(center_x)}_Y{int(center_y)}_{region_props['Label']}"
         attribute_dict['Center_X'] = int(center_x)
         attribute_dict['Center_Y'] = int(center_y)
         for i,prop in enumerate(propList):
@@ -74,6 +78,4 @@ if __name__=='__main__':
     labeled_image, attribute_df1 = segment(image_path, model_versatile)
     dapi_image = io.imread(image_path)
     attibute_df2 = getProperties(labeled_image, dapi_image)
-    attribute_df1.to_csv("1.csv")
-    attibute_df2.to_csv("2.csv")
 
