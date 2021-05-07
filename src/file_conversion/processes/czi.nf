@@ -14,7 +14,7 @@ process SPLIT_CZI_IN_CHANNELS {
     path image
 
     output:
-    path "${image.baseName}_c*.tif"
+    path "${image.baseName}_${params.channel_prefix}*.tif"
 
     script:
     """

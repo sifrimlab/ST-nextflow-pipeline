@@ -5,14 +5,20 @@ library(dplyr)
 # Argparsing
 arg_list <- commandArgs(trailingOnly = TRUE)
 count_matrix_file = arg_list[1]
-prefix = strsplit("name1.csv", "\\.")[[1]]
+# prefix = strsplit(count_matrix_file, "\\.")[[1]]
 resolution = arg_list[2]
 
-# Data table parsing
+options(digits=3)
+resolution = as.double(resolution)
+
+# Data table parsing, since the seu.run function below needs the count matrix to have genes in rows, and cells as columns
 count_matrix = read.table(count_matrix_file, sep=",", header=TRUE)
 rownames(count_matrix) =count_matrix[,"Gene"]
 # then remove the gene and the first column, since it's teh one containing the unassigned genes
 count_matrix = subset(count_matrix, select = -c(Gene,X0) )
+
+print(rownames(count_matrix))
+print(colnames(count_matrix))
 
 seurat_object <- CreateSeuratObject(count_matrix ,project = "seurat",assay = "RNA",names.field = 1, names.delim="#") # delimiter set to something that won't have any impact
 
@@ -29,7 +35,7 @@ seu.run <- function(inputdata, resolution, output_file_prefix){
         seu_fun <- RunUMAP(seu_fun, reduction = "pca", dims= 1:20,verbose = FALSE)
         seu.markers <- FindAllMarkers(object = seu_fun, only.pos = TRUE, min.pct = 0.25, thresh.use = 0)
         print(head(seu.markers))
-        top10 <- seu.markers %>% group_by(cluster) %>% top_n(10, avg_logFC)
+        top10 <- seu.markers %>% group_by(cluster) %>% top_n(10, avg_log2FC)
         png("clustering_plots.png", width = 1000,height = 600)
         options(repr.plot.width=50, repr.plot.height=12)
         p1<- DimPlot(seu_fun, reduction = "pca",label = TRUE, group.by="seurat_clusters")
