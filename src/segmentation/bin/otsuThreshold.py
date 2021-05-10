@@ -12,8 +12,8 @@ try:
     # Check if there's a tile number in the image
     tile_nr = re.findall(r"\d+", re.findall(r"tiled_\d+", prefix)[0])[0]
 except:
-    pass
-labeled_image, attributes_df = otsuThresholding(image_path)
+    tile_nr=""
+labeled_image, attributes_df = otsuThresholding(image_path, tile_nr)
 # labeled_image is not yet viewable, it's just an int64 image with values 0-#objects, it has no pixel meaning.
 # For that you need to call skimage.label2rgb
 if 'tile_nr' in locals():

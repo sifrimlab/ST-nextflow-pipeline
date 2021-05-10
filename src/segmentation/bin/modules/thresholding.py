@@ -20,7 +20,7 @@ def collectProperties(property_csv_list: str):
     total_df['Label'] = new_index
     return total_df
 
-def otsuThresholding(path_to_image: str):
+def otsuThresholding(path_to_image: str, tile_nr=""):
     '''
         note to self: this code adapted from DigitalSreeni assumes that your input image is an 8-bit rgb, which makes it so that we have to do some image format transformation because:
         - cv2.shreshold accepts only 8-bit grayscale
@@ -33,10 +33,6 @@ def otsuThresholding(path_to_image: str):
     '''
     img =io.imread(path_to_image) 
     # Extract tile number for umi's later on
-    try:
-        tile_nr = re.findall(r"tiled_\d+", re.findall(r"\d+", path_to_image)[0])[0]
-    except:
-        tile_nr = ""
     # Create an 8bit version of the image
     img_as_8 = img_as_ubyte(img)
     # Creat an RGB version that only has signal in the blue channel

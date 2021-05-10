@@ -32,12 +32,7 @@ def segment(img,model, show_dist=True):
     # attribute_df['prob'] = prob
     return labeled_image #, attribute_df
 
-def getProperties(labeled_image, dapi_image):
-    # Extract tile number for umi's later on
-    try:
-        tile_nr = re.findall(r"tiled_\d+", re.findall(r"\d+", dapi_image)[0])[0]
-    except:
-        tile_nr = ""
+def getProperties(labeled_image, dapi_image, tile_nr=""):
     regions = measure.regionprops(labeled_image, intensity_image=dapi_image)
     pixels_to_um = 0.454 # 1 pixel = 454 nm (got this from the metadata of original image)
     propList = ['Area',
