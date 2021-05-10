@@ -50,6 +50,7 @@ def createPatchCountMatrix(decoded_df_csv, patch_labeled_image_path, neighbour_d
 
     gene_expression_df = pd.DataFrame(rows_list) #rows are patches
     gene_expression_df = gene_expression_df.transpose() # rows are genes
+    gene_expression_df.to_csv("patches_gene_expression_matrix.csv")
 
     return gene_expression_df
 

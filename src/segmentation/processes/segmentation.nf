@@ -69,7 +69,7 @@ process assign_genes_to_cells {
 }
 
 process assign_genes_to_cells_voronoi {
-    publishDir "$params.outDir/assigned", mode: 'symlink'
+    publishDir "$params.outDir/assigned_voronoi", mode: 'symlink'
 
     input:
     tuple val(tile_nr), path(decoded_genes),path(labeled_images), path(properties)

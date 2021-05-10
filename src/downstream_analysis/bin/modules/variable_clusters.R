@@ -15,7 +15,7 @@ resolution = as.double(resolution)
 count_matrix = read.table(count_matrix_file, sep=",", header=TRUE)
 rownames(count_matrix) =count_matrix[,"Gene"]
 # then remove the gene and the first column, since it's teh one containing the unassigned genes
-count_matrix = subset(count_matrix, select = -c(Gene,X0) )
+count_matrix = subset(count_matrix, select = -c(Gene,0) )
 
 print(rownames(count_matrix))
 print(colnames(count_matrix))

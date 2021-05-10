@@ -1,7 +1,7 @@
 nextflow.enable.dsl=2
 
 include {
-    otsu_thresholding ; collect_cell_properties ; assign_genes_to_cells; stardist_segmentation; create_count_matrix 
+    otsu_thresholding ; collect_cell_properties ; assign_genes_to_cells; assign_genes_to_cells_voronoi; stardist_segmentation; create_count_matrix 
 } from "../processes/segmentation.nf"
 
 include{
@@ -138,8 +138,8 @@ workflow stardist_segmentation_workflow {
         plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
         /* plot_segmentation_labels_on_ref(combined_ref_labeled_images) */ 
 
-        assign_genes_to_cells(combined_decoded_labeled_properties)
-        assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
+        assign_genes_to_cells_voronoi(combined_decoded_labeled_properties)
+        assign_genes_to_cells_voronoi.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
         transform_tile_coordinate_system(assigned, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set {assigned_genes}
 
         create_count_matrix(assigned_genes)
@@ -154,7 +154,7 @@ workflow stardist_segmentation_workflow {
         /* plot_assigned_genes(combined_assigned_genes) */
 
     emit: 
-        assigned_genes = assign_genes_to_cells.out
+        assigned_genes = assign_genes_to_cells_voronoi.out
         concat_assigned_genes = assigned
         count_matrix = create_count_matrix.out
 }

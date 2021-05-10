@@ -84,9 +84,8 @@ def createNeighbourDict(patches_array):
 
 
 if __name__ == "__main__":
-    # dapi_tile_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation/tiled_DO/DAPI_padded_tiled_13.tif"
-    # createPatchesLabeledImage(dapi_tile_path)
-    createNeighbourDict("test")
+    dapi_tile_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/DAPI.tif"
+    createPatchesLabeledImage(dapi_tile_path)
 
 
 
