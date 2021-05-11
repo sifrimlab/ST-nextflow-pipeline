@@ -97,10 +97,10 @@ def getAverageIntensity(hist):
     return average
 
 # Return a dict with key = image name, value is a dict with key=attribute, value= value of that attribute
-def getIntensityAnalytics(name: str, hist ):
+def getIntensityAnalytics(name: str, image_path: str, hist ):
     attribute_dict = {}
     hist = hist.astype(int)
-    image = io.imread(name)
+    image = io.imread(image_path)
     image = img_as_ubyte(image)
     n_pixels = np.sum(hist)
     # Get average intensity pixel value weighted by the number of times counted
