@@ -47,27 +47,45 @@ def hMaximaDetectSpots(image):
     plt.show()
 
 
-filtered_image = whiteFilter(image, 10)
-# io.imsave("test.tif", filtered_image)
+# Filter image
+filtered_image = whiteFilter(image, 3)
+io.imsave("test.tif", filtered_image)
 # plt.imshow(filtered_image)
 # plt.show()
 
+# Actual spotdetection
+
 # # local maxima
-hMaximaDetectSpots(filtered_image)
+# hMaximaDetectSpots(filtered_image)
 
 # raw_blobs = detectSpots(image, 1,10)
 # smallest_blobs = detectSpots(filtered_image, 1,10)
 # smal_blobs = detectSpots(filtered_image, 1,20)
 # bigger_blobs = detectSpots(filtered_image, 2,10)
-# biggest_blobs = detectSpots(filtered_image, 2,20)
+biggest_blobs = detectSpots(filtered_image, 3,5)
+print(len(biggest_blobs))
 
+#side-by-side visualization
 # fig, axs = plt.subplots(1,2)
+
 # axs[0].imshow(filtered_image, cmap='gray')
 # axs[1].imshow(filtered_image, cmap='gray')
 # for x in biggest_blobs:
-#         circ = plt.Circle((x[1], x[0]), radius=1)
+#         circ = plt.Circle((x[1], x[0]), radius=x[2])
 #         axs[1].add_patch(circ)
 # plt.show()
+
+# one vizualisation
+fig, axs = plt.subplots(1,1)
+axs.imshow(filtered_image, cmap='gray')
+for x in biggest_blobs:
+    circ = plt.Circle((x[1], x[0]), radius=x[2])
+    axs.add_patch(circ)
+plt.show()
+
+
+
+# All visualization
 
 # fig, axs = plt.subplots(2,2)
 # axs[0,0].imshow(filtered_image, cmap='gray')

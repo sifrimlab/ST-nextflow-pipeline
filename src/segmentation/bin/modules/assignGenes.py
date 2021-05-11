@@ -23,6 +23,11 @@ def assignGenesToCellsVoronoi(labeled_image: str, decoded_genes: str, cell_prope
     image = io.imread(labeled_image) # slicing = [Y,X]
     decoded_df = pd.read_csv(decoded_genes)
     cell_properties_df = pd.read_csv(cell_properties)
+
+    # If there are no cells inside the cell_properties, that means that no cells were found in this tile, so we return an empty dataframe based on the columns of decoded_df
+    if cell_properties_df.empty:
+        decoded_columns = list(decoded_df.columns)
+        return  pd.DataFrame(columns=decoded_columns)
     if filter_unrecognized:
         decoded_df = decoded_df[decoded_df['Gene'].isnull()!=True]
 
@@ -56,6 +61,7 @@ def assignGenesToCellsVoronoi(labeled_image: str, decoded_genes: str, cell_prope
         label = cell_properties_df.loc[cell_properties_df['Image_Label']==label, 'Cell_Label'].iloc[0]
         label_column.append(label)
     decoded_df['Cell_Label'] = label_column
+    # return decoded_df that has the added cell lables in it
     return decoded_df
 
 
