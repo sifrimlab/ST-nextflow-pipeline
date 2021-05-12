@@ -41,20 +41,24 @@ workflow merfish {
         grid_size_y = tiling.out.grid_size_y
         
         // White tophat filter
-        white_tophat_filter_merfish(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        /* white_tophat_filter_merfish(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
 
 
         
         // Gaussian high pass filter 
-        /* gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
+        gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        /* deconvolve_PSF_workflow(gaussian_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
+        deconvolve_PSF_workflow(gaussian_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+
+        deconvolve_PSF_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+                                        | groupTuple()
+                                        | set {grouped_rounds}
 
 
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
-        white_tophat_filter_merfish.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
-                                        | groupTuple()
-                                        | set {grouped_rounds}
+        /* white_tophat_filter_merfish.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \ */
+        /*                                 | groupTuple() */
+        /*                                 | set {grouped_rounds} */
                                         
         pixel_based_decoding(tile_size_x, tile_size_y, grouped_rounds)
         pixel_based_decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}

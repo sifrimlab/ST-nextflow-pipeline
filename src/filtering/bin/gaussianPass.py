@@ -2,7 +2,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from skimage import io
-from skimage.utils import img_as_uint
+from skimage.util import img_as_uint
 from modules.convolving import gaussianPass
 
 # input parsing

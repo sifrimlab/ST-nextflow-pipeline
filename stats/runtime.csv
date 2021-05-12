@@ -5,3 +5,4 @@ Time, Stopping_Point, Dataset
 17.4, quality_control, hippo_3
 2.16, quality_control, 1442_OB
 0.31, count_matrix, starfish_iss
+19.40, plot_decoded_spots, merfish_starfish(white_tophat)
