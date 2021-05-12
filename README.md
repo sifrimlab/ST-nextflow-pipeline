@@ -13,6 +13,11 @@ Currently it supports both ISS data and MERFISH data.
 - 	```bash
 	nextflow pull WoutDavid/communISS ; cd communISS
 	```
+- Create a conda environment containing all the dependencies of the current pipeline, and activate it
+- 	```bash
+	conda env create --file=communiss.yml --prefix ./communiss_env/
+	conda activate ./communiss_env/
+	```
 - Create a personal config file containing all the parameters you'll need for the functionality you want:
 - ```bash
 	nextflow config -profile conda,iss >> standard_iss_experiment.config
@@ -36,4 +41,6 @@ For an explanation on all possible parameters you might encounter in the generat
 	- Every directory in the src/ directory will follow the same structure, which allows any contributor or user to add processes and workflows as he wishes, while maintaining a structured pipeline:
 	- ***bin/***: This directory contains the binaries to whatever codebase the feature is implemented in.
 	- ***processes/***: This directory contains .nf files that represent the lowest level of nextflow processes, these processes call whatever binaries are stored in bin/.
-	- ***workflows/***: This directory contains a higher level of nextflow process management
+	- ***workflows/***: This directory contains a higher level of nextflow process management. If the processes being ran require more complicated in and output management than "one file in, one file out", this is the level where that is regulated, by means of channel manipulation using the Nextflow language.
+- ***configs/***: This directory contains all possible config files for the different experiments. They are included by the main nextflow.config file, and are called upon by mean of the ```nextflow config -profile X``` command, where X is the profile to be loaded, as defined in nextflow.config.
+- ***assets/***: This directory contains auxillary files that the pipeline uses. For now it just contains html templates that the pipeline uses to write tables and graphs into for a decent looking end report. 

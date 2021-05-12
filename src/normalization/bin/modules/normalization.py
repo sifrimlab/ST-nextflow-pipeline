@@ -30,3 +30,10 @@ def clipAndNormalize(path_to_image: str, percent_to_clip: int, prefix=""):
     return cut_image
     io.imsave(f"{prefix}_normalized.tif", cut_image)
 
+
+def basicNormalizeOverMultipleImages(img_path_list):
+    img_list = [io.imread(image) in img_path_list]
+    minima = [np.amin(img) for img in img_list]
+    maxima = [np.amax(img) for img in img_list]
+
+
