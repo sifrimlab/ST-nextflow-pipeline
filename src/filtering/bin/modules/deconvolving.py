@@ -18,6 +18,7 @@ def calculateKernelSize(sigma):
 def deconvolvePSF(image_path, psf, iterations):
     img = io.imread(image_path)
     img = img_as_float(img)
+    img += np.amax(img)* 1E-5
     # Restore Image using Richardson-Lucy algorithm
     deconvolved_RL = restoration.richardson_lucy(img, psf, iterations)
     deconvolved_RL = img_as_int(deconvolved_RL)
