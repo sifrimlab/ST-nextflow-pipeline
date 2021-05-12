@@ -84,8 +84,8 @@ workflow threshold_watershed_segmentation {
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
         combined_decoded_genes.join(cell_properties_mapped, by:0).set{combined_decoded_labeled_properties}
 
-        plot_segmentation_on_dapi(combined_dapi_labeled_images) 
-        plot_segmentation_on_ref(combined_ref_labeled_images) 
+        plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
+        /* plot_segmentation_on_ref(combined_ref_labeled_images) */ 
 
         assign_genes_to_cells(combined_decoded_labeled_properties)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}

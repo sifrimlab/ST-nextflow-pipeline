@@ -40,7 +40,7 @@ include {
     plot_decoded_genes 
 } from "../src/plotting/workflows/decoded_genes_workflow.nf" 
 include {
-    stardist_segmentation_workflow as segmentation
+    stardist_segmentation_workflow as segmentation 
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
@@ -51,6 +51,7 @@ include {
 workflow iss {
 
     main:
+        // Pipeline most definitely needs params.reference to exists, so create one out of the first round if it does not exist yet
         if (!params.containsKey("reference")){
             log.info "No Reference image found, one will be created by taking the maximum intensity projection of the first round."
             //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
@@ -60,8 +61,6 @@ workflow iss {
         // Create the channel of round images, reference is implicitely defined in the config file as params.reference
        rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}*/${params.round_prefix}*_${params.channel_prefix}*.${params.extension}")
        
-
-
 
        // Perform the complete tiling workflow, including calculating the highest resolution, padded all images to a resolution that would tile all images in equal sizes, registering globally
        tiling("$params.dataDir/$params.round_prefix*/${params.round_prefix}*_${params.channel_prefix}*.$params.extension", rounds, params.reference, params.DAPI)
@@ -86,7 +85,7 @@ workflow iss {
        decoding(spot_detection_iss.out)
        // Pool decoded genes into one file for downstream analysis
        decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
-       transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y) // Add original X and Y coordinates for later downstream analysis
 
        // Plot decoded genes
        plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
