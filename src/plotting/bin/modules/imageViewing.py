@@ -121,6 +121,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             circ = plt.Circle((x_coordinate, y_coordinate), radius=2)
             ax.add_patch(circ)
         fig.tight_layout()
+        plt.axis('off')
         plt.savefig("detected_spots_plotted.pdf")
 
 
@@ -157,6 +158,8 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
             ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
+
+    plt.axis('off')
     plt.savefig("decoded_genes_plotted.pdf")
     # plt.show()
 
@@ -195,6 +198,7 @@ def plotSpotsOnTile(path_to_tile_image: str, path_to_spotsCSV: str, radius: int)
         circ = plt.Circle((row.X, row.Y), radius=radius)
         ax.add_patch(circ)
     fig.tight_layout()
+    plt.axis('off')
     return plt
 
 def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, radius: int):
@@ -218,6 +222,7 @@ def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, 
             ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
+    plt.axis('off')
     return plt
 
     # # Now the same with nonrecognized spots included

@@ -18,6 +18,7 @@ def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str, outf
         clr = 'green' if str(row.Label) != '0' else 'red'
         circ = plt.Circle((row.X, row.Y), radius=2, color=clr)
         ax.add_patch(circ)
+    plt.axis('off')
     plt.savefig(f"{outfile_prefix}_plotted.svg", format="svg", dpi=1200)
 
 def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
