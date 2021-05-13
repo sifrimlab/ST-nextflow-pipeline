@@ -4,10 +4,10 @@ from bs4 import BeautifulSoup
 template = sys.argv[1]
 
 table_list = [sys.argv[i] for i in range(2,7) ]
-image_list = [sys.argv[i] for i in range(7, 9)]
-tile_list = [sys.argv[i] for i in range(9, 11)] # first = table, second = image
-decoding_potential_plot = sys.argv[11]
-decoding_intensity_QC_plot = sys.argv[12]
+image_list = [sys.argv[i] for i in range(7, 8)]
+tile_list = [sys.argv[i] for i in range(8, 10)] # first = table, second = image
+decoding_potential_plot = sys.argv[10]
+decoding_intensity_QC_plot = sys.argv[11]
 
 with open(template, 'r') as template_file:
     contents = template_file.read()
