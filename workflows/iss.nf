@@ -35,17 +35,21 @@ include {
 include {
     iss_decoding_statistics
 } from "../src/analytics/workflows/decoded_statistics.nf"
+include {
+    assignment_statistics_workflow
+} from "../src/analytics/workflows/assigned_statistics.nf"
 
 include {
     plot_decoded_genes 
 } from "../src/plotting/workflows/decoded_genes_workflow.nf" 
 include {
-    stardist_segmentation_workflow as segmentation 
+    stardist_segmentation_workflow as segmentation //threshold_watershed_segmentation as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
     transform_tile_coordinate_system
 } from "../src/file_conversion/processes/coordinate_parsing.nf"
+
 
 
 workflow iss {
@@ -95,5 +99,7 @@ workflow iss {
 
        // Get analytics from decoding
        iss_decoding_statistics(decoded_genes, decoding.out)
+
+       assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
     
 }
