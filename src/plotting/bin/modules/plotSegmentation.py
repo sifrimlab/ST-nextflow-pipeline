@@ -16,7 +16,7 @@ def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str, outf
     ax.imshow(tile_image, cmap="gray")
     for row in assigned_genes.itertuples():
         clr = 'green' if str(row.Cell_Label) != '0' else 'red'
-        circ = plt.Circle((row.X, row.Y), radius=1, color=clr)
+        circ = plt.Circle((row.X, row.Y), radius=2, color=clr)
         ax.add_patch(circ)
     plt.axis('off')
     plt.savefig(f"{outfile_prefix}_plotted.svg", format="svg", dpi=1200)
@@ -48,8 +48,15 @@ def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
 
 
 if __name__ == '__main__':
+    # Starfish
+    assigned_genes = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_voronoiAssigned/final/concat_assigned_genes_transformed.csv"
+    labeled = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/REF.TIF"
+    # properties = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_voronoiAssigned/segmented/DAPI_padded_tiled_2_properties.csv"
+    # plotAssignedGenesWRTCell(assigned_genes, labeled, properties, "")
+    plotAssignedGenes(assigned_genes,labeled, "starfish_normal_assigned_genes")
 
-    assigned_genes = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/assigned_voronoi/decoded_tiled_29_assigned.csv"
-    labeled= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/segmented/DAPI_padded_tiled_29_labeled.tif" 
-    properties = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/segmented/DAPI_padded_tiled_29_properties.csv"
-    plotAssignedGenesWRTCell(assigned_genes, labeled, properties, "/media/nacho/Puzzles/results_figures/tile_29_normalAssignment")
+
+    # assigned_genes = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/assigned_voronoi/decoded_tiled_29_assigned.csv"
+    # labeled= "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/segmented/DAPI_padded_tiled_29_labeled.tif" 
+    # properties = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/segmented/DAPI_padded_tiled_29_properties.csv"
+    # plotAssignedGenesWRTCell(assigned_genes, labeled, properties, "/media/nacho/Puzzles/results_figures/tile_29_normalAssignment")
