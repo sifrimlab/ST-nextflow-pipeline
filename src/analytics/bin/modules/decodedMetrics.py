@@ -1,5 +1,4 @@
 import pandas as pd
-from icecream import ic
 import os
 import matplotlib.pyplot as plt
 import random
@@ -73,7 +72,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         possible_barcode_combinations = int(num_channels) ** int(num_rounds)
         n_unique_barcodes_called = len(unique_df)
         n_random_calls_expected_per_barcode = n_spots/possible_barcode_combinations
-        ratio_recognized_barcodes_random_calling_would_create = round((n_random_calls_expected_per_barcode * n_genes_to_find) / n_spots), 3) *100
+        ratio_recognized_barcodes_random_calling_would_create = round(((n_random_calls_expected_per_barcode * n_genes_to_find) / n_spots), 3) *100
 
         
         # Add to the row entry
