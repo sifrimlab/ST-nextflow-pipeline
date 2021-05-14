@@ -6,7 +6,7 @@ moduleName="plotting"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process plotDecodingPotential {
-    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/decoded_stats/assets", mode: 'copy'
     input: 
     path decoded_genes
 
@@ -19,7 +19,7 @@ process plotDecodingPotential {
     """
 }
 process  plotTileDecodingPotential {
-    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/decoded_stats/assets", mode: 'copy'
     input: 
     path decoded_genes
 
