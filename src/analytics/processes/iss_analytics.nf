@@ -6,7 +6,7 @@ moduleName= "analytics"
 binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 
 process get_decoded_stats {
-    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/decoded_stats/assets/", mode: 'copy'
 
     input:
     path decoded_genes
@@ -30,7 +30,7 @@ process get_decoded_stats {
 }
 
 process plot_decoding_intensity_QC {
-    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/decoded_stats/assets/", mode: 'copy'
 
     input:
     path decoded_genes
@@ -45,7 +45,7 @@ process plot_decoding_intensity_QC {
 }
 
 process create_html_report {
-    publishDir "$params.outDir/analytics/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/decoded_stats/", mode: 'copy'
     input:
     path template
     path general_stats

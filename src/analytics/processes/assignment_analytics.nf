@@ -24,7 +24,7 @@ process get_assigned_stats {
 }
 
 process create_html_report {
-    publishDir "$params.outDir/analytics/assigned/", mode: 'symlink'
+    publishDir "$params.outDir/analytics/assigned/", mode: 'copy'
     input:
     path template
     path general_assignment_information

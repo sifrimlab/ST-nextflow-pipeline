@@ -28,8 +28,8 @@ for element in table_list:
 
 for element in image_list:
         image_tag = template_soup.new_tag('img')
-        image_tag['src']= element
-        image_tag['width']= 500
+        image_tag['src']= f"assets/{element}"
+        image_tag['width']= 800
         image_tag['height']= 500
         h2_list[h2_index].insert_after(image_tag)
         h2_index+=1
@@ -43,7 +43,7 @@ with open(tile_list[0], 'r') as html_file:
 
 # Tile image
 image_tag = template_soup.new_tag('img')
-image_tag['src']= tile_list[1]
+image_tag['src']= f"assets/{tile_list[1]}"
 image_tag['width']= 500
 image_tag['height']= 500
 h2_list[h2_index].insert_after(image_tag)
@@ -51,15 +51,15 @@ h2_index+=1
 
 # Decoding potential image
 image_tag = template_soup.new_tag('img')
-image_tag['src']= decoding_potential_plot
-image_tag['width']= 500
+image_tag['src']= f"assets/{decoding_potential_plot}"
+image_tag['width']= 800
 image_tag['height']= 500
 h2_list[h2_index].insert_after(image_tag)
 h2_index+=1
 
 # Decoding intensity QC
 image_tag = template_soup.new_tag('img')
-image_tag['src']= decoding_intensity_QC_plot
+image_tag['src']= f"assets/{decoding_intensity_QC_plot}"
 image_tag['width']= 800
 image_tag['height']= 500
 h2_list[h2_index].insert_after(image_tag)
