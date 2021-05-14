@@ -53,12 +53,11 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
 
 
         # Create the counted column
-        decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size')
+        decoded_df['Counted'] = decoded_df.groupby('Barcode')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
         unique_df = decoded_df[['Barcode', 'Counted']].drop_duplicates()
         unique_df = unique_df.sort_values(by=['Counted'], ascending=False)
         non_recognized_barcodes = [barcode for barcode in list(unique_df['Barcode']) if barcode not in list(codebook_df['Barcode'])]
         non_recognized_df= unique_df[unique_df.Barcode.isin(non_recognized_barcodes)]
-        print(non_recognized_df.iloc[0]['Barcode'])
         
         unique_df.to_html("unique_barcodes_called_counted.html")
 
@@ -70,12 +69,18 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         plt.ylabel("Number of times recognized")
         plt.savefig("barcodes_counted.svg")
 
+        # Evaluate randomness
         possible_barcode_combinations = int(num_channels) ** int(num_rounds)
-        attribute_dict['# possible combination'] = possible_barcode_combinations
         n_unique_barcodes_called = len(unique_df)
+        n_random_calls_expected_per_barcode = n_spots/possible_barcode_combinations
+        ratio_recognized_barcodes_random_calling_would_create = ((n_random_calls_expected_per_barcode * n_genes_to_find) / n_spots)
+
+        
+        # Add to the row entry
+        attribute_dict['# possible combination'] = possible_barcode_combinations
         attribute_dict['# unique barcodes called'] = n_unique_barcodes_called
-        n_random_calls_expected_per_gene = n_spots/possible_barcode_combinations
-        attribute_dict['# calls expected if random calling'] = n_random_calls_expected_per_gene
+        attribute_dict['# calls per barcode combination expected if random calling'] = n_random_calls_expected_per_barcode
+        attribute_dict['Random recognized ratio'] = ratio_recognized_barcodes_random_calling_would_create
         rows_list=[]
         rows_list.append(attribute_dict)
         analytics_df = pd.DataFrame(rows_list)

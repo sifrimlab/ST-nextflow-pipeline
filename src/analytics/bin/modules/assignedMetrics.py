@@ -9,16 +9,20 @@ def countGeneralAssignedStats(assigned_genes_csv: str, merfish = False):
     df['n_genes_in_cell'] = df.groupby('Cell_Label')['Cell_Label'].transform('count')
     df['n_times_gene_counted'] = df.groupby('Gene')['Gene'].transform('count')
     # columns = 'Spot_label', 'area', 'Y', 'X', 'Barcode', 'Distance', 'Gene','Gene_Label', 'Tile', 'Cell_Label
-    df_only_assigned = df[df['Cell_Label']!="0"]
+    df_only_assigned = df[df['Cell_Label']!="0"] # For extracting most assigned cells
 
     # General stats
-    nr_not_assigned  = df.loc[ df['Cell_Label']=="0"]['n_genes_in_cell'][0]
+    try:
+        nr_not_assigned  = df.loc[ df['Cell_Label']=="0"]['n_genes_in_cell'][0]
+    # It might be with voronoi asisgnment that there is actually not a single unassigned gene, i nthis case this just needs to be zero
+    except KeyError:
+        nr_not_assigned = 0
     nr_assigned = len(df) - nr_not_assigned
     ratio_assigned = round(nr_assigned/len(df), 3)*100
 
     general_attributes = {}
     general_attributes["# Assigned to cells"] = nr_assigned
-    general_attributes["# unassigned to cells"] = nr_not_assigned
+    general_attributes["# Unassigned to cells"] = nr_not_assigned
     general_attributes["Ratio"] = ratio_assigned
     rows_list =  []
     rows_list.append(general_attributes)

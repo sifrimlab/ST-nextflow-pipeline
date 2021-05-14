@@ -19,7 +19,7 @@ process get_assigned_stats {
 
     script:
     """
-    python $binDir/extractStatsFromAssignedGenes.py assigned_genes
+    python $binDir/extractStatsFromAssignedGenes.py $assigned_genes
     """
 }
 
@@ -36,6 +36,6 @@ process create_html_report {
 
     script:
     """
-    python $binDir/createHTMLreport.py $template $general_assignment_information $top10_assigned_cells $top10_assigned_genes
+    python $binDir/createAssignedHTMLreport.py $template $general_assignment_information $top10_assigned_cells $top10_assigned_genes
     """
 }
