@@ -1,4 +1,6 @@
 dataset, runtime, missing_process, decoding ratio
 1442_OB,25.19, global_registration,15.8
-1442_OB, 18,1, white_tophat_filter, 4.2
+1442_OB,25.18, white_tophat_filter, 4.2
+1442_OB,24.20, local_registration, 48.9
+
 

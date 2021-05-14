@@ -13,7 +13,7 @@ def countGeneralAssignedStats(assigned_genes_csv: str, merfish = False):
 
     # General stats
     try:
-        nr_not_assigned  = df.loc[ df['Cell_Label']=="0"]['n_genes_in_cell'][0]
+        nr_not_assigned  = len(df.loc[ df['Cell_Label']=="0"])
     # It might be with voronoi asisgnment that there is actually not a single unassigned gene, i nthis case this just needs to be zero
     except KeyError:
         nr_not_assigned = 0
