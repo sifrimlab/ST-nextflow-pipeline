@@ -79,11 +79,11 @@ def testChangeOfRounds(decoded_genes: str, codebook: str, permutation):
     decoded_genes = pd.read_csv(decoded_genes)
     codebook = pd.read_csv(codebook)
     # store codebook barcodes as strings
-    codebook_barcodes = [str(entry) for entry in list(codebook['Barcode'])]
+    codebook_barcodes = [CharList(str(entry)) for entry in list(codebook['Barcode'])]
     # store called barcodees as mutable strings, since changing rounds changes the called barcodes
-    called_barcodes = [CharList(str(entry)) for entry in list(decoded_genes['Barcode'])]
+    called_barcodes = [str(entry) for entry in list(decoded_genes['Barcode'])]
 
-    for barcode in called_barcodes:
+    for barcode in codebook_barcodes:
         # First we store the original values
         original_values = {}
         for i, entry in enumerate(barcode):
@@ -95,8 +95,10 @@ def testChangeOfRounds(decoded_genes: str, codebook: str, permutation):
 
     nr_matched = 0
     nr_unmatched = 0
+    # cast barcodes back to actual strings, not charlists
+    codebook_barcodes_strings = [barcode.string for barcode in codebook_barcodes]
     for barcode in called_barcodes:
-        if barcode.string in codebook_barcodes:
+        if barcode in codebook_barcodes_strings:
             nr_matched +=1
         else:
             nr_unmatched +=1
@@ -149,6 +151,8 @@ if __name__=="__main__":
     # print(testChangeOfChannels(decoded_genes, codebook, (2,3)))
     # testChangeOfAllChannels(decoded_genes, codebook, nr_channels)
     print(testChangeOfAllRounds(decoded_genes, codebook, nr_rounds))
+
+
 
 
     # init_string = "5543"
