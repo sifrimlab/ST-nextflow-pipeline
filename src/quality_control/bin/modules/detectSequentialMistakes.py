@@ -40,20 +40,24 @@ class CharList(list):
         return "{}(\'{}\')".format(cls, self.string)
 
 
-def testChangeOfChannels(decoded_genes: str, codebook: str, tuple_channel_indexes_to_change):
+def testChangeOfChannels(decoded_genes: str, codebook: str, permutation):
     decoded_genes = pd.read_csv(decoded_genes)
     codebook = pd.read_csv(codebook)
     # Cast the barcodes of the codeebook do charlists, they will be mutated
     barcodes = [CharList(str(entry)) for entry in list(codebook['Barcode'])]
+    # store called barcodees as mutable strings, since changing rounds changes the called barcodes
     called_barcodes = [str(entry) for entry in list(decoded_genes['Barcode'])]
-    first_index, second_index = tuple_channel_indexes_to_change
 
     # mutate the barcodes from the codebook to refrect the input change of channels
     for barcode in barcodes:
-        first_index_value = barcode[first_index]
-        second_index_value = barcode[second_index]
-        barcode[first_index] = second_index_value
-        barcode[second_index] = first_index_value
+        # First we store the original values
+        original_values = {}
+        for i, entry in enumerate(barcode):
+            original_values[i] = barcode[i]
+        # Then we iterate over each entry of the permutation, and mutate the barcode's value to the new index of the original barcode
+        for original_i, new_index in enumerate(permutation, 0):
+            new_index_value = original_values[new_index]
+            barcode[original_i] = str(new_index_value)
 
     # cast barcodes back to actual strings, not charlists
     barcodes_strings = [barcode.string for barcode in barcodes]
@@ -71,24 +75,28 @@ def testChangeOfChannels(decoded_genes: str, codebook: str, tuple_channel_indexe
     return nr_matched, nr_unmatched, ratio_matched
 
 
-def testChangeOfRounds(decoded_genes: str, codebook: str, tuple_round_indexes_to_change):
+def testChangeOfRounds(decoded_genes: str, codebook: str, permutation):
     decoded_genes = pd.read_csv(decoded_genes)
     codebook = pd.read_csv(codebook)
-    barcodes = [str(entry) for entry in list(codebook['Barcode'])]
+    # store codebook barcodes as strings
+    codebook_barcodes = [str(entry) for entry in list(codebook['Barcode'])]
+    # store called barcodees as mutable strings, since changing rounds changes the called barcodes
     called_barcodes = [CharList(str(entry)) for entry in list(decoded_genes['Barcode'])]
-    first_index, second_index = tuple_round_indexes_to_change
-
 
     for barcode in called_barcodes:
-        first_index_value = barcode[first_index]
-        second_index_value = barcode[second_index]
-        barcode[first_index] = second_index_value
-        barcode[second_index] = first_index_value
+        # First we store the original values
+        original_values = {}
+        for i, entry in enumerate(barcode):
+            original_values[i] = barcode[i]
+        # Then we iterate over each entry of the permutation, and mutate the barcode's value to the new index of the original barcode
+        for original_i, new_index in enumerate(permutation, 0):
+            new_index_value = original_values[new_index]
+            barcode[original_i] = str(new_index_value)
 
     nr_matched = 0
     nr_unmatched = 0
     for barcode in called_barcodes:
-        if barcode.string in barcodes:
+        if barcode.string in codebook_barcodes:
             nr_matched +=1
         else:
             nr_unmatched +=1
@@ -97,7 +105,8 @@ def testChangeOfRounds(decoded_genes: str, codebook: str, tuple_round_indexes_to
     return nr_matched, nr_unmatched, ratio_matched
 
 def testChangeOfAllChannels(decoded_genes, codebook, nr_channels):
-    permutations = list(itertools.permutations(range(nr_channels), 2))
+    permutations = list(itertools.permutations(range(nr_channels), nr_channels))
+    print(permutations)
     ratio_dict = {}
     for permutation in permutations:
         nr_matched, nr_unmatched, ratio_matched = testChangeOfChannels(decoded_genes, codebook, permutation)
@@ -109,31 +118,37 @@ def testChangeOfAllChannels(decoded_genes, codebook, nr_channels):
     return max_permutation, max_ratio#, ratio_dict
 
 def testChangeOfAllRounds(decoded_genes, codebook, nr_rounds):
-    permutations = list(itertools.combinations(range(nr_rounds), 2))
+    permutations = list(itertools.permutations(range(nr_rounds), nr_rounds))
+
     ratio_dict = {}
     for permutation in permutations:
         nr_matched, nr_unmatched, ratio_matched = testChangeOfRounds(decoded_genes, codebook, permutation)
-        ratio_dict[permutation] = ratio_matched
-        print(permutation,ratio_matched)
+        # if its the original permuation, add it to a variable indpeendent of the dict
+        if list(permutation) == list(range(0,nr_rounds)):
+            original_ratio = ratio_matched
+        else:
+            ratio_dict[permutation] = ratio_matched
 
     max_permutation = max(ratio_dict, key=ratio_dict.get)
-    max_ratio = ratio_dict[max_permutation]
-    return max_permutation, max_ratio#, ratio_dict
+    max_permutation_ratio = ratio_dict[max_permutation]
+    return max_permutation, max_permutation_ratio, original_ratio#, ratio_dict
 
 
 
 
 if __name__=="__main__":
-    decoded_genes= "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results2/decoded/concat_decoded_genes.csv" 
-    # decoded_genes= "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned/decoded/concat_decoded_genes.csv" 
-    codebook = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+    # decoded_genes= "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results2/decoded/concat_decoded_genes.csv"
+    decoded_genes= "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/decoded/concat_decoded_genes.csv"
+    # decoded_genes= "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/decoded/concat_decoded_genes.csv"
+    # codebook = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+    codebook = "/media/Puzzles/gabriele_data/hippo_3/codebook_fixed.csv"
     # codebook = "/media/Puzzles/gabriele_data/1442_OB/codebook_fixed.csv"
-    nr_rounds = 4
+    nr_rounds = 5
     nr_channels = 4
-    # testChangeOfRounds(decoded_genes, codebook, (0,1))
+    # print(testChangeOfRounds(decoded_genes, codebook, [(2,3)]))
     # print(testChangeOfChannels(decoded_genes, codebook, (2,3)))
     # testChangeOfAllChannels(decoded_genes, codebook, nr_channels)
-    testChangeOfAllRounds(decoded_genes, codebook, nr_rounds)
+    print(testChangeOfAllRounds(decoded_genes, codebook, nr_rounds))
 
 
     # init_string = "5543"
