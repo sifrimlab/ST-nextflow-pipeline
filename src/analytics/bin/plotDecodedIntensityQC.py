@@ -21,13 +21,21 @@ def plotSpotsLeftAfterIntensityThresholding(path_to_decoded_genes: str):
     ax.set_ylabel("# of genes that pasthe threshold")
 
     x = np.linspace(0.25, 1, 100)
-    y= [calculateGenesLeftAfterIntensityThresholding(recognized_df, threshold) for threshold in x]
-    ax.plot(x, y, 'g-', label="recognized spots")
+    y_recognized= [calculateGenesLeftAfterIntensityThresholding(recognized_df, threshold) for threshold in x]
+    ax.plot(x, y_recognized, 'g-', label="recognized spots")
 
     x = np.linspace(0.25, 1, 100)
-    y= [calculateGenesLeftAfterIntensityThresholding(unrecognized_df, threshold) for threshold in x]
-    ax.plot(x, y, 'r-', label = "non-recognized spots")
+    y_nonrecognized= [calculateGenesLeftAfterIntensityThresholding(unrecognized_df, threshold) for threshold in x]
+
+    # find biggest difference between x and y
+    differences = {index:recog - nonrecog for index, recog,nonrecog in enumerate(zip(y_recognized,y_nonrecognized))}
+    max_index = max(differences, key=differences.get)
+    max_difference = differences[max_index]
+
+    ax.plot(x, y_nonrecognized, 'r-', label = "non-recognized spots")
+    ax.plot(max_index, max_difference, 'b-', label="maximum difference threshold")
     fig.tight_layout()
+
     plt.legend()
     plt.savefig("decoding_intensity_QC.svg", format="svg", dpi=1200)
 
