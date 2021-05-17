@@ -27,13 +27,14 @@ def clipAndNormalize(path_to_image: str, percent_to_clip: int, prefix=""):
         raise Exception(f"Inputted percentage {percent_to_clip} is not between 0 and 100")
     image = io.imread(path_to_image)
     cut_image = cutOffPercentile(image, percent=percent_to_clip)
-    return cut_image
-    io.imsave(f"{prefix}_normalized.tif", cut_image)
+    norm_image = basicNormalize(cut_image)
+    return norm_image
 
 
 def basicNormalizeOverMultipleImages(img_path_list):
-    img_list = [io.imread(image) in img_path_list]
+    img_list = [io.imread(img) for img in img_path_list]
     minima = [np.amin(img) for img in img_list]
+    minimum = min(minima)
     maxima = [np.amax(img) for img in img_list]
-
-
+    maximum = max(maxima)
+    normalized_imgs = [(image - minimum) * (1.0 / (maximum - minimum)) for image in img_list]

@@ -6,7 +6,6 @@ from modules.normalization import clipAndNormalize
 
 
 if __name__ == "__main__":
-
     image_path = sys.argv[1]
     percentile = int(sys.argv[2])
     prefix = os.path.splitext(image_path)[0]

@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 from skimage.morphology import white_tophat, disk, extrema
 import numpy as np
 
-img_path = "/media/tool/gabriele_data/161230_161220_3_1/maxIP-seperate-channels/results/tiled_DO/REF_padded_tiled_29.tif"
+# img_path = "/media/tool/gabriele_data/161230_161220_3_1/maxIP-seperate-channels/results/tiled_DO/REF_padded_tiled_29.tif"
+img_path = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation/tiled_DO/REF_padded_tiled_29.tif"
 image = io.imread(img_path)
 # plt.imshow(image)
 # plt.show()
@@ -49,7 +50,7 @@ def hMaximaDetectSpots(image):
 
 # Filter image
 filtered_image = whiteFilter(image, 3)
-io.imsave("test.tif", filtered_image)
+# io.imsave("test.tif", filtered_image)
 # plt.imshow(filtered_image)
 # plt.show()
 
@@ -59,29 +60,41 @@ io.imsave("test.tif", filtered_image)
 # hMaximaDetectSpots(filtered_image)
 
 # raw_blobs = detectSpots(image, 1,10)
-# smallest_blobs = detectSpots(filtered_image, 1,10)
+# smallest_blobs = detectSpots(filtered_image, 1,2)
 # smal_blobs = detectSpots(filtered_image, 1,20)
-# bigger_blobs = detectSpots(filtered_image, 2,10)
-biggest_blobs = detectSpots(filtered_image, 3,5)
-print(len(biggest_blobs))
+blobs = detectSpots(filtered_image, 2,10)
+# biggest_blobs = detectSpots(filtered_image, 3,5)
+# print(len(bigger_blobs))
+
+# QC
+# average_sigma = np.mean(blobs[:,2])
+# stdev_sigma = np.std(blobs[:,2])
+# upper_bound =math.ceil(average_sigma +(2*stdev_sigma))
+# lower_bound =math.floor(average_sigma -(2*stdev_sigma))
+# mask = np.where(np.logical_or(blobs[:,2] > upper_bound, blobs[:,2] < lower_bound),  False, True)
+# blobs = blobs[mask]
+
+# blobs[blobs[:,2] > 2, :]
 
 #side-by-side visualization
 # fig, axs = plt.subplots(1,2)
 
 # axs[0].imshow(filtered_image, cmap='gray')
 # axs[1].imshow(filtered_image, cmap='gray')
-# for x in biggest_blobs:
+# for x in smallest_blobs:
 #         circ = plt.Circle((x[1], x[0]), radius=x[2])
 #         axs[1].add_patch(circ)
 # plt.show()
 
 # one vizualisation
-fig, axs = plt.subplots(1,1)
-axs.imshow(filtered_image, cmap='gray')
-for x in biggest_blobs:
-    circ = plt.Circle((x[1], x[0]), radius=x[2])
-    axs.add_patch(circ)
-plt.show()
+# fig, axs = plt.subplots(1,1)
+# axs.imshow(filtered_image, cmap='gray')
+# for x in bigger_blobs:
+#     circ = plt.Circle((x[1], x[0]), radius=x[2], color='w')
+#     axs.add_patch(circ)
+# plt.axis('off')
+# plt.show()
+
 
 
 
