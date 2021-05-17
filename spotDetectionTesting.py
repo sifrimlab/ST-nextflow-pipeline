@@ -1,6 +1,7 @@
 from skimage import io
 from skimage import color
 from skimage.measure import label
+from skimage import draw
 import math
 from skimage.feature import blob_log
 import os
@@ -62,7 +63,7 @@ filtered_image = whiteFilter(image, 3)
 # raw_blobs = detectSpots(image, 1,10)
 # smallest_blobs = detectSpots(filtered_image, 1,2)
 # smal_blobs = detectSpots(filtered_image, 1,20)
-blobs = detectSpots(filtered_image, 2,10)
+bigger_blobs = detectSpots(filtered_image, 2,10)
 # biggest_blobs = detectSpots(filtered_image, 3,5)
 # print(len(bigger_blobs))
 
@@ -73,8 +74,6 @@ blobs = detectSpots(filtered_image, 2,10)
 # lower_bound =math.floor(average_sigma -(2*stdev_sigma))
 # mask = np.where(np.logical_or(blobs[:,2] > upper_bound, blobs[:,2] < lower_bound),  False, True)
 # blobs = blobs[mask]
-
-# blobs[blobs[:,2] > 2, :]
 
 #side-by-side visualization
 # fig, axs = plt.subplots(1,2)
@@ -87,13 +86,20 @@ blobs = detectSpots(filtered_image, 2,10)
 # plt.show()
 
 # one vizualisation
-# fig, axs = plt.subplots(1,1)
-# axs.imshow(filtered_image, cmap='gray')
-# for x in bigger_blobs:
-#     circ = plt.Circle((x[1], x[0]), radius=x[2], color='w')
-#     axs.add_patch(circ)
+fig, axs = plt.subplots(1,1)
+axs.imshow(filtered_image, cmap='gray')
+for x in bigger_blobs:
+    try:
+        circ = draw.disk((x[0],x[1] ), radius=x[2]) 
+        filtered_image[circ]=255
+    except:
+        pass
+
+    # circ = plt.Circle((x[1], x[0]), radius=x[2], color='w')
+    # axs.add_patch(circ)
 # plt.axis('off')
 # plt.show()
+io.imsave("test.tif", filtered_image)
 
 
 
