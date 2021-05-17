@@ -30,6 +30,42 @@ def clipAndNormalize(path_to_image: str, percent_to_clip: int, prefix=""):
     norm_image = basicNormalize(cut_image)
     return norm_image
 
+# not finished yet!
+def csbDeepNormalization():
+    def normalize(x, pmin=3, pmax=99.8, axis=None, clip=False, eps=1e-20, dtype=np.float32):
+        mi = np.percentile(x,pmin,axis=axis,keepdims=True)
+        ma = np.percentile(x,pmax,axis=axis,keepdims=True)
+        return normalize_mi_ma(x, mi, ma, clip=clip, eps=eps, dtype=dtype)
+
+
+    def normalize_mi_ma(x, mi, ma, clip=False, eps=1e-20, dtype=np.float32):
+        if dtype is not None:
+            x   = x.astype(dtype,copy=False)
+            mi  = dtype(mi) if np.isscalar(mi) else mi.astype(dtype,copy=False)
+            ma  = dtype(ma) if np.isscalar(ma) else ma.astype(dtype,copy=False)
+            eps = dtype(eps)
+
+        try:
+            import numexpr
+            x = numexpr.evaluate("(x - mi) / ( ma - mi + eps )")
+        except ImportError:
+            x =                   (x - mi) / ( ma - mi + eps )
+
+        if clip:
+            x = np.clip(x,0,1)
+
+        return x
+
+
+    def normalize_minmse(x, target):
+        """Affine rescaling of x, such that the mean squared error to target is minimal."""
+        cov = np.cov(x.flatten(),target.flatten())
+        alpha = cov[0,1] / (cov[0,0]+1e-10)
+        beta = target.mean() - alpha*x.mean()
+        return alpha*x + beta
+
+
+
 
 def basicNormalizeOverMultipleImages(img_path_list):
     img_list = [io.imread(img) for img in img_path_list]
