@@ -56,8 +56,6 @@ def getProperties(labeled_image, dapi_image, tile_nr=""):
         for i,prop in enumerate(propList):
             if(prop == 'Area'): 
                 attribute_dict['area'] = region_props[prop]*pixels_to_um**2 
-            elif(prop == 'orientation'): 
-                attribute_dict['orientation'] = region_props[prop]*57.2958
             elif(prop.find('Intensity') < 0):          # Any prop without Intensity in its name
                 attribute_dict[prop] = region_props[prop]*pixels_to_um
             else: 
