@@ -45,7 +45,7 @@ process filter_gaussian{
 
     script:
     """
-    python $binDir/gaussianPass.py ${image} ${params.filter_sigma}
+    python $binDir/gaussianHighPass.py ${image} ${params.filter_sigma}
     """
 }
 process deconvolve_PSF {

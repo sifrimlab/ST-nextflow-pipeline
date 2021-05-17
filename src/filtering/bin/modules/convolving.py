@@ -6,7 +6,13 @@ from skimage import io
 from skimage.util import img_as_uint
 
 
-def gaussianPass(image_path: str, sigma):
+def gaussianHighPass(image_path: str, sigma):
     image = io.imread(image_path)
-    filtered_image = gaussian(image, sigma=sigma)
+    blurred_image = gaussian(image, sigma=sigma, preserve_range=True)
+    filtered_image = image - blurred_image
     return filtered_image
+
+def gaussianLowPass(image_path: str, sigma):
+    image = io.imread(image_path)
+    blurred_image = gaussian(image, sigma=sigma, preserve_range=True)
+    return blurred_image
