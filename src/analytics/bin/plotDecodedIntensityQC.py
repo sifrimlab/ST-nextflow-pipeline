@@ -33,7 +33,7 @@ def plotSpotsLeftAfterIntensityThresholding(path_to_decoded_genes: str):
     max_difference = differences[max_index]
 
     ax.plot(x, y_nonrecognized, 'r-', label = "non-recognized spots")
-    ax.plot(max_index, max_difference, 'b-', label="maximum difference threshold")
+    ax.axvline(max_index, color='k')
     fig.tight_layout()
 
     plt.legend()

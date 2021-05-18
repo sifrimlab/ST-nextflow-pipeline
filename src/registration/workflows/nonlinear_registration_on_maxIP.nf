@@ -6,7 +6,7 @@ include {
 } from "../../utils/workflows/projections.nf"
 
 include {
-    calculate_transformation_wrt_maxIP ; apply_transformation ;register_with_maxIP
+    calculate_transformation_wrt_maxIP ; apply_transformation 
 } from "../processes/nonlinear_registration.nf"
 
 

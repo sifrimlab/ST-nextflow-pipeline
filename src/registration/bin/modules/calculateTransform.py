@@ -27,8 +27,6 @@ def calculateBsplineTransform(fixed, moving):
     R.SetInitialTransform(tx, True)
     R.SetInterpolator(sitk.sitkLinear)
 
-    R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
-
     outTx = R.Execute(fixed, moving)
 
     return outTx

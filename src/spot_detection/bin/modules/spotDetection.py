@@ -39,12 +39,16 @@ def laplacianOfGaussianBlobDetector(image, min_sigma=None, max_sigma=None):
         blobs = blob_log(image, min_sigma=int(min_sigma), max_sigma=int(max_sigma))
 
     # QC based on sigma values
-    average_sigma = np.mean(blobs[:,2])
-    stdev_sigma = np.std(blobs[:,2])
-    upper_bound =math.ceil(average_sigma +(2*stdev_sigma))
-    lower_bound =math.floor(average_sigma -(2*stdev_sigma))
-    mask = np.where(np.logical_or(blobs[:,2] > upper_bound, blobs[:,2] < lower_bound),  False, True)
-    blobs = blobs[mask]
+    try:
+        average_sigma = np.mean(blobs[:,2])
+        stdev_sigma = np.std(blobs[:,2])
+        upper_bound =math.ceil(average_sigma +(2*stdev_sigma))
+        lower_bound =math.floor(average_sigma -(2*stdev_sigma))
+        mask = np.where(np.logical_or(blobs[:,2] > upper_bound, blobs[:,2] < lower_bound),  False, True)
+        blobs = blobs[mask]
+    # put this in a try except block, since it might be the case that no blobs are found, and in that case this throws an error
+    except ValueError: 
+        pass
     return blobs
 
 def localMaximaBlobDetection(image_path: str):

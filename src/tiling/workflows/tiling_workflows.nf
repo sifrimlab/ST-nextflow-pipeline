@@ -5,12 +5,11 @@ params.stitchDir = "tiled"
 include {
     calculate_biggest_resolution; calculate_tile_size ; pad_round; pad_reference ; pad_reference as pad_dapi; tile_ref;tile_ref as tile_dapi; tile_round
 } from "../processes/tiling.nf"
-include {
-    register as register
-} from "../../registration/processes/rigid_registration.nf"
+
 include {
     register_wrt_maxIP ; register_wrt_maxIP_memory_friendly
 } from "../../registration/workflows/registration_on_maxIP.nf"
+
 include {
     stitch_ref_tiles; stitch_ref_tiles as stitch_dapi ; stitch_round_tiles ; stitch_image_tiles
 } from "$baseDir/src/utils/processes/stitching.nf"
