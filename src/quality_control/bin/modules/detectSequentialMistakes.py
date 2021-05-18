@@ -55,16 +55,15 @@ def testChangeOfChannels(decoded_genes: str, codebook: str, permutation, origina
     decoded_genes = pd.read_csv(decoded_genes)
     codebook = pd.read_csv(codebook)
     # Cast the barcodes of the codebook to charlists, they will be mutated
-    codebook_barcodes = [str(entry) for entry in list(codebook['Barcode'])]
+    codebook_barcodes = [CharList(str(entry)) for entry in list(codebook['Barcode'])]
     # store called barcodees as mutable strings, since changing rounds changes the called barcodes
-    called_barcodes = [CharList(str(entry)) for entry in list(decoded_genes['Barcode'])]
+    called_barcodes = [str(entry) for entry in list(decoded_genes['Barcode'])]
 
     # Convert both permutations to strings for the replace function later
     original_permutation = [str(entry) for entry in original_permutation]
     permutation = [str(entry) for entry in permutation]
     # Create conversion dict that represents which channel needs to be changed into a different channel: key= original value, value = change to which channel
-    conversion_dict = {key: value for key,value in zip(original_permutation, permutation)}
-
+    conversion_dict = dict(zip(original_permutation, permutation))
 
     # Define helper function to replace the entries based on the permutation, because just doing str.replace will re-replace everything 
     def find_replace(barcode: CharList, conversion_dict):
@@ -77,20 +76,16 @@ def testChangeOfChannels(decoded_genes: str, codebook: str, permutation, origina
         # The CharList is mutable so no need to return anything
 
     # Mutate the barcodes from the codebook to refrect the input change of channels
-    print(f"permutation = {permutation}")
-    for barcode in called_barcodes:
-        print(f"Barcode before conversion: {barcode}")
+    for barcode in codebook_barcodes:
         find_replace(barcode, conversion_dict)
-        print(f"Barcode after conversion: {barcode}")
 
-    # # cast barcodes back to actual strings, not charlists
-    # barcodes_strings = [barcode.string for barcode in barcodes]
-
+    # cast back to strings instead of charlists for easy use of the "in" keyword
+    codebook_barcodes_strings = [barcode.string for barcode in codebook_barcodes]
     # Check if it did anything
     nr_matched = 0
     nr_unmatched = 0
     for barcode in called_barcodes:
-        if barcode.string in codebook_barcodes:
+        if barcode in codebook_barcodes_strings:
             nr_matched +=1
         else:
             nr_unmatched +=1
@@ -133,18 +128,20 @@ def testChangeOfRounds(decoded_genes: str, codebook: str, permutation):
 def testChangeOfAllChannels(decoded_genes, codebook, nr_channels):
     # Create permutations that represent switches of channels, so will be the length of the number of channels, not the length of the barcodes
     # This implementation of perumation makes sure that each channel is only converted to once, so what this does not check is if a channel is duplicated or overwritten, it only checks interchanges
-    original_permutation = list(range(1,nr_channels+1))
+    original_permutation = range(1,nr_channels+1)
     permutations = list(itertools.permutations(original_permutation, nr_channels))
     ratio_dict = {}
-    for i,permutation in enumerate(permutations):
-        print(i)
+    for permutation in permutations:
         nr_matched, nr_unmatched, ratio_matched = testChangeOfChannels(decoded_genes, codebook, permutation, original_permutation)
         # if its the original permuation, add it to a variable indpeendent of the dict
-        ratio_dict[permutation] = ratio_matched
+        if list(permutation) == list(original_permutation):
+            original_ratio = ratio_matched
+        else:
+            ratio_dict[permutation] = ratio_matched
 
     max_permutation = max(ratio_dict, key=ratio_dict.get)
     max_ratio = ratio_dict[max_permutation]
-    return max_permutation, max_ratio#, ratio_dict
+    return max_permutation, max_ratio, original_ratio#, ratio_dict
 
 def testChangeOfAllRounds(decoded_genes, codebook, nr_rounds):
     permutations = list(itertools.permutations(range(nr_rounds), nr_rounds))
@@ -165,17 +162,17 @@ def testChangeOfAllRounds(decoded_genes, codebook, nr_rounds):
 
 
 if __name__=="__main__":
-    decoded_genes= "/media/nacho/Puzzles/starfish_test_data/ExampleInSituSequencing/results2/decoded/concat_decoded_genes.csv"
+    # decoded_genes= "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results2/decoded/concat_decoded_genes.csv"
     # decoded_genes= "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/decoded/concat_decoded_genes.csv"
-    # decoded_genes= "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/decoded/concat_decoded_genes.csv"
-    codebook = "/media/nacho/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+    decoded_genes= "/media/Puzzles/gabriele_data/hippo_4/results_minsigma3_maxsigma5_1028tiles/decoded/concat_decoded_genes.csv"
+    # codebook = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
     # codebook = "/media/Puzzles/gabriele_data/hippo_3/codebook_fixed.csv"
-    # codebook = "/media/Puzzles/gabriele_data/1442_OB/codebook_fixed.csv"
-    nr_rounds = 4
+    codebook = "/media/Puzzles/gabriele_data/hippo_4/codebook_fixed.csv"
+    nr_rounds = 5
     nr_channels = 4
     # print(testChangeOfRounds(decoded_genes, codebook, [(2,3)]))
     # print(testChangeOfChannels(decoded_genes, codebook, (2,3)))
-    print(testChangeOfAllChannels(decoded_genes, codebook, nr_channels))
+    # print(testChangeOfAllChannels(decoded_genes, codebook, nr_channels))
     # print(testChangeOfAllRounds(decoded_genes, codebook, nr_rounds))
 
 
