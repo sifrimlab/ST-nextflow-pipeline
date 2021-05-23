@@ -28,12 +28,12 @@ def plotSpotsLeftAfterIntensityThresholding(path_to_decoded_genes: str):
     y_nonrecognized= [calculateGenesLeftAfterIntensityThresholding(unrecognized_df, threshold) for threshold in x]
 
     # find biggest difference between x and y
-    differences = {index:recog - nonrecog for index, recog,nonrecog in enumerate(zip(y_recognized,y_nonrecognized))}
+    differences = {threshold:recog - nonrecog for threshold, recog, nonrecog in zip(x, y_recognized,y_nonrecognized)}
     max_index = max(differences, key=differences.get)
     max_difference = differences[max_index]
 
     ax.plot(x, y_nonrecognized, 'r-', label = "non-recognized spots")
-    ax.axvline(max_index, color='k')
+    ax.axvline(max_index, color='k', label="optimal threshold")
     fig.tight_layout()
 
     plt.legend()
