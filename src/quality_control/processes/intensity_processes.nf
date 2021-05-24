@@ -73,6 +73,6 @@ process create_html_report {
     path 'quality_control_report.html'
     script:
     """
-    python $binDir/createHTMLreport.py $round_nr $channel_nr $template $combined_intensity_analytics $round_images $channel_images $all_images
+    python $binDir/createIntensityHTMLreport.py $round_nr $channel_nr $template $combined_intensity_analytics $round_images $channel_images $all_images
     """
 }

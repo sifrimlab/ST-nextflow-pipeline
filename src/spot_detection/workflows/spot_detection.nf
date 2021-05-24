@@ -5,6 +5,13 @@ include {
 } from "../processes/spot_detection.nf"
 
 include {
+    calculate_iss_precision_and_recall 
+} from "$baseDir/src/quality_control/workflows/spot_detection_qc_workflows.nf"
+
+include {
+    transform_tile_coordinate_system
+} from "$baseDir/src/file_conversion/processes/coordinate_parsing.nf"
+include {
     plot_spots_whole_and_on_tiles
 } from "$baseDir/src/plotting/workflows/detected_spots_workflow.nf" 
 
@@ -15,7 +22,7 @@ workflow spot_detection_iss {
     reference //Preferably filtered by a filtering method: spot detection will be performed on this
     round_images //the detected spot's intensity will be measured on these images
 
-    // Plotting parameter
+    // Tile grid parameter
     grid_size_x
     grid_size_y
     tile_size_x
@@ -25,9 +32,22 @@ workflow spot_detection_iss {
     //detect spots on reference image
     spot_detection_reference(reference)
 
-    // This is for spot detection quality control purposes
+    ////////////////////////////////////////////////////////
+    //This is for spot detection quality control purposes //
+    ////////////////////////////////////////////////////////
+    transform_tile_coordinate_system(spot_detection_reference.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set{transformed_ref_spots}
+    transform_tile_coordinate_system.out.collectFile(name: "$params.outDir/blobs/transformed_concat_blobs.csv", sort:true, keepHeader:true).set {transformed_blobs}
+
     spot_detection_round(round_images)
     spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
+
+    transform_tile_coordinate_system(spot_detection_round.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) .set {transformed_round_spots}
+
+    calculate_iss_precision_and_recall(transformed_blobs, transformed_round_spots) 
+
+
+    ///////////// end spot detection QC ///////////////////
+
 
     // Collect all spots in a seperate file
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
