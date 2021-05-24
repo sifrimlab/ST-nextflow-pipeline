@@ -29,7 +29,8 @@ process calculate_recall {
     path closest_ref_point_dicts
 
     output:
-    path "$recall_stats.json"
+    path "recall_stats.json"
+    path "recall_per_round.svg"
 
     script:
     """
@@ -43,12 +44,13 @@ process create_html_report {
     input: 
     path template
     path recall_json
+    path recall_plot
     path precision_jsons
 
     output:
     path 'spot_detection_qc_report.html'
     script:
     """
-    python $binDir/createSpotDetectionQCHTMLreport.py $template $recall_json $precision_jsons
+    python $binDir/createSpotDetectionQCHTMLreport.py $template $recall_json $recall_plot $precision_jsons
     """
 }

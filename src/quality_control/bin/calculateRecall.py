@@ -14,10 +14,12 @@ for json_path in closest_ref_point_dicts_list:
         data = json.load(json_file)
         dict_of_closest_ref_point_dicts[round_nr] = data
 
-attribute_dict = calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts)
+attribute_dict, plot = calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts)
 
-with open(f"recall_stats.json", "a+") as jsonfile:
+with open("recall_stats.json", "a+") as jsonfile:
     json.dump(attribute_dict, jsonfile)
+
+plot.savefig("recall_per_round.svg", format="svg", dpi=1200)
 
 
 

@@ -122,17 +122,21 @@ def checkSpotsInRoundPrecision(ref_spots_csv: str, round_spots_csv_list, round_n
         for rect in axs.patches:
             height = rect.get_height()
             axs.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),
-                        xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
+                         xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
         # plt.show()
     return closest_ref_point_dict, attribute_dict
 
-def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts):
-    # unpack the csv to get a list all spot tuples
-    ref_array = np.genfromtxt(ref_spots_csv, delimiter=',', skip_header=1)
+def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts, x_column_name="X", y_column_name="Y"):
+    ref_spots_df = pd.read_csv(ref_spots_csv)
+    #Extract only relevant columns X and Y
+    ref_spots_df = ref_spots_df[[x_column_name, y_column_name]]
+    # From now on consistency is important: everything in this function will assume that X is the first column of the np array, and Y is the second
+    ref_array = ref_spots_df.to_numpy()
+    # cast to int for insurance, shouldn't be necessary though
     ref_array = ref_array.astype(int)
 
-    array_of_tuples = map(tuple, ref_array[:,(1,2)])
-    ref_tuples = list(array_of_tuples) # this elements in this list represent spots found on the ref image
+    array_of_tuples = map(tuple, ref_array) # convert array to tuples
+    ref_tuples = list(array_of_tuples)
 
     #dict_of_closest_ref_point_dicts is supposed to contain key=int(round_number), value = closest_ref_point_dicts created by checkSpotsInRoundPrecision
     #Make a list of the keys (= round numbers) and sort them, such that searching in the dict is targeted and not iterated, to ensure correct order.
@@ -157,14 +161,44 @@ def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts):
     nr_complete = len(complete_barcodes)
     nr_total = len(ref_tuples)
     nr_incomplete = nr_total - nr_complete
-    ratio_complete = round(nr_complete / nr_incomplete, 3)*100
+    ratio_complete = round(nr_complete / nr_total, 3)*100
 
-    attribute_dict = {} # dict that will become a row in the dataframe
+    attribute_dict = {}
     attribute_dict["spots on ref"] = nr_total
     attribute_dict["Complete barcodes"] = nr_complete
     attribute_dict["incomplete barcodes"] = nr_incomplete
     attribute_dict["Ratio Complete Barcodes"] = ratio_complete
-    return attribute_dict
+
+
+    # Now we make a plot out of at which round  the complete barcode stops
+    lists = sorted(round_not_found.items()) # sorted by key, return a list of tuples
+    #unzip the list of tuples into x and y
+    lists = [[ i for i, j in lists ],
+          [ j for i, j in lists ]]
+    x = lists[0]
+    x_labels = [f"Round {int(i)}" for i in x]
+
+    y = lists[1]
+
+    # parse y into being a a negatice cumcount, not just absolute values
+    spots_left = nr_total
+    for i, y_el in enumerate(y):
+        spots_left = spots_left - y_el
+        y[i] = spots_left
+
+    _, ax = plt.subplots(1,1)
+    ax.bar(x,y, color="maroon")
+    for rect in ax.patches:
+        height = rect.get_height()
+        ax.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),
+                    xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
+    ax.plot(x,y, "o-k")
+    ax.set_title(f"Potential complete barcodes left out of the {nr_total} spots after reach round")
+    ax.set_ylabel("Number of potential complete barcodes remaining")
+    ax.set_xticks(x)
+    ax.set_xticklabels(x_labels, rotation= 45)
+
+    return attribute_dict, plt
 
 
 
@@ -207,14 +241,14 @@ def spotDetectionQCWorkflow(ref_spots_csv, round_csv_dict):
 
 
 if __name__=='__main__':
-    ref_spots_csv = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/blobs/concat_blobs.csv"
+    ref_spots_csv = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/blobs/REF_padded_tiled_4_filtered_blobs.csv"
     # rounds_csv_dict = [f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_3_filtered_registered_hybs.csv" for i in range(2,6)]
     rounds_csv_dict={}
     for round_nr in range(1,5):
             rounds_csv_dict[round_nr] = []
-            for tile_nr in range(1,5):
-                for i in range(2,6):
-                    rounds_csv_dict[round_nr].append(f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_{tile_nr}_filtered_registered_hybs.csv")
+            # for tile_nr in range(1,5):
+            for i in range(2,6):
+                rounds_csv_dict[round_nr].append(f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_4_filtered_registered_hybs.csv")
     spotDetectionQCWorkflow(ref_spots_csv, rounds_csv_dict)
     
 
