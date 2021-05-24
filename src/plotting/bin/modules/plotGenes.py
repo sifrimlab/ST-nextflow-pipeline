@@ -33,6 +33,29 @@ def plotGeneCountDistribution(decoded_genes, top_genes=10):
     ax.set_ylabel("Times decoded")
     plt.show()
     # plt.savefig("OB_gene_expression_top10.svg", format="svg")
+def plotGeneCountR2(decoded_genes1, decoded_genes2):
+    decoded_df1 = pd.read_csv(decoded_genes1)
+    decoded_df2 = pd.read_csv(decoded_genes2)
+    decoded_df1 = decoded_df1.dropna(subset=["Gene"])
+    decoded_df2 = decoded_df2.dropna(subset=["Gene"])
+
+    decoded_df1['Counted'] = decoded_df1.groupby('Barcode')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
+    decoded_df2['Counted'] = decoded_df2.groupby('letters')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
+
+    unique_df1 = decoded_df1[['Gene', 'Barcode', 'Counted']].drop_duplicates()
+    unique_df1 = unique_df1.sort_values(by=['Gene'], ascending=True)
+    unique_df2 = decoded_df2[['Gene', 'letters', 'Counted']].drop_duplicates()
+    unique_df2 = unique_df2.sort_values(by=['Counted'], ascending=True)
+
+    combined_df = unique_df1.merge(unique_df2,on="Gene" how="outer")
+    combined_df.fillna(0)
+
+    _, ax = plt.subplots(1,1)
+    ax.plot(unique_df_top10['Gene'], unique_df_top10['Counted'], "o-k")
+    ax.set_xlabel("Dissertation's pipeline")
+    ax.set_ylabel("Partel et al.")
+    plt.show()
+    # plt.savefig("OB_gene_expression_top10.svg", format="svg")
 
 
 
@@ -46,4 +69,4 @@ if __name__ == '__main__':
 
     decoded_genes = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation/decoded/concat_decoded_genes.csv"
     decoded_genes2 = "/media/Puzzles/gabriele_data/original_data/results/1442_OB/barcodes_corrected.csv"
-    plotGeneCountDistribution(decoded_genes2)
+    plotGeneCountR2(decoded_genes, decoded_genes2)
