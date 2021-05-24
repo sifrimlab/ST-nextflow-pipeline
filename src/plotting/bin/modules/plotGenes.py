@@ -1,7 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from skimage import io
-
+import numpy as np
+from sklearn.metrics import r2_score
 
 def plotGeneExpression(image_path: str, decoded_genes: str, barcode: int):
     img  = io.imread(image_path)
@@ -39,23 +40,44 @@ def plotGeneCountR2(decoded_genes1, decoded_genes2):
     decoded_df1 = decoded_df1.dropna(subset=["Gene"])
     decoded_df2 = decoded_df2.dropna(subset=["Gene"])
 
-    decoded_df1['Counted'] = decoded_df1.groupby('Barcode')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
-    decoded_df2['Counted'] = decoded_df2.groupby('letters')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
+    decoded_df1['Counted_1'] = decoded_df1.groupby('Barcode')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
+    decoded_df2['Counted_2'] = decoded_df2.groupby('letters')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
 
-    unique_df1 = decoded_df1[['Gene', 'Barcode', 'Counted']].drop_duplicates()
-    unique_df1 = unique_df1.sort_values(by=['Gene'], ascending=True)
-    unique_df2 = decoded_df2[['Gene', 'letters', 'Counted']].drop_duplicates()
-    unique_df2 = unique_df2.sort_values(by=['Counted'], ascending=True)
+    unique_df1 = decoded_df1[['Gene', 'Barcode', 'Counted_1']].drop_duplicates()
+    unique_df1 = unique_df1.sort_values(by=['Gene'], ascending=False)
+    unique_df2 = decoded_df2[['Gene', 'letters', 'Counted_2']].drop_duplicates()
+    unique_df2 = unique_df2.sort_values(by=['Gene'], ascending=False)
 
-    combined_df = unique_df1.merge(unique_df2,on="Gene" how="outer")
-    combined_df.fillna(0)
+    combined_df = unique_df1.merge(unique_df2,on="Gene", how="outer")
+    combined_df = combined_df.fillna(0)
+    convert_dict = {'Counted_1': int,
+                    'Counted_2': int }
+    combined_df= combined_df.astype(convert_dict)
+    
+    # Calculate R²
+    combined_only_counted = combined_df[["Counted_1", "Counted_2"]]
+    rsquared_df =np.square( combined_only_counted.corr(method='pearson'))
+    # Extract value from df, this is not very elegant
+    rsquared =round(list(rsquared_df["Counted_1"])[-1], 4)
+    # fit a linear line through it
+    x = combined_only_counted["Counted_1"]
+    y = combined_only_counted["Counted_2"]
+    linear_model=np.polyfit(x,y,1)
+    linear_model_fn=np.poly1d(linear_model)
+    x_range = np.arange(min(x), max(x))
+
+
 
     _, ax = plt.subplots(1,1)
-    ax.plot(unique_df_top10['Gene'], unique_df_top10['Counted'], "o-k")
-    ax.set_xlabel("Dissertation's pipeline")
-    ax.set_ylabel("Partel et al.")
-    plt.show()
-    # plt.savefig("OB_gene_expression_top10.svg", format="svg")
+    ax.scatter(combined_only_counted["Counted_1"], combined_only_counted["Counted_2"], color="maroon")
+    ax.set_xlabel("Dissertation's gene counts")
+    ax.set_ylabel("Partel et al. gene counts")
+    ax.set_title(f"R² as calculated by squaring Pearson's correlation: {rsquared}")
+
+    # plot linear fit
+    ax.plot(x_range,linear_model_fn(x_range),color="black", label="Linear function fitted")
+    ax.legend(loc="upper left")
+    plt.savefig("/media/Puzzles/results_figures/gene_expression/gab_vs_me_r2_plot.png", format="png")
 
 
 
