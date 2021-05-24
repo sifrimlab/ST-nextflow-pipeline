@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from skimage import io, color
 from skimage.util import img_as_uint, img_as_ubyte, img_as_float64
-import matplotlib.pyplot as plt
+from skimage import draw
 
 # tile_image is supposed to be and image with the mask boundaries labeled
 def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str, outfile_prefix):
@@ -27,24 +27,19 @@ def plotAssignedGenesWRTCell(path_to_assigned_genes: str, path_to_tile_image: st
     original_image = io.imread(original_image_path)
     original_image = img_as_ubyte(original_image)
 
-
-    
     for row in assigned_genes.itertuples():
         # clr = color_dict[properties_df[properties_df["Cell_Label"] ==row.Cell_Label]["Image_Label"].iloc[0]]
         clr = properties_df[properties_df["Cell_Label"] ==row.Cell_Label]["Image_Label"].iloc[0]
         if tile_image[row.Y, row.X] == 0:
-            for x in range(-3,4):
-               for y in range(-3,4):
-                   x_coordinate = row.X + x
-                   y_coordinate = row.Y + y
-                   tile_image[y_coordinate, x_coordinate]=clr
+            rr, cc = draw.disk((row.Y, row.X), radius=5)
+            tile_image[rr, cc]=clr
 
-    overlay = color.label2rgb(tile_image,original_image,bg_label=0) 
+    overlay = color.label2rgb(tile_image,original_image,bg_label=0)
 
-    fig, ax = plt.subplots(1,1)
+    _, ax = plt.subplots(1,1)
     ax.imshow(overlay, cmap="viridis")
     plt.axis('off')
-    plt.savefig(f"{outfile_prefix}_plotted.svg", format="svg", dpi=1200)
+    plt.savefig(f"{outfile_prefix}_plotted.png", format="png", dpi=1200)
 
 def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
     labeled_image = io.imread(path_to_labeled_image)
@@ -61,15 +56,15 @@ def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
 if __name__ == '__main__':
     # Starfish
     # voronoi
-    # assigned_genes = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/assigned_voronoi/decoded_tiled_2_assigned.csv"
-    # labeled = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/segmented/DAPI_padded_tiled_2_labeled.tif"
-    # properties = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/segmented/DAPI_padded_tiled_2_properties.csv"
-    # original_image ="/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/tiled_round/Round1_c5_padded_registered_tiled_2.tif" 
-    # plotAssignedGenesWRTCell(assigned_genes,labeled, properties, original_image,"starfish_voronoi_assigned_genes")
+    assigned_genes = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/assigned_voronoi/decoded_tiled_2_assigned.csv"
+    labeled = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/segmented/DAPI_padded_tiled_2_labeled.tif"
+    properties = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/segmented/DAPI_padded_tiled_2_properties.csv"
+    original_image ="/media/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1_c5_padded_registered_tiled_2_bright_annotated.png"
+    plotAssignedGenesWRTCell(assigned_genes,labeled, properties, original_image,"starfish_voronoi_assigned_genes_bright_annotated")
     
     #non-voronoi
-    assigned_genes = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation/assigned/decoded_tiled_2_assigned.csv"
-    labeled = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation/segmented/DAPI_padded_tiled_2_labeled.tif"
+    # assigned_genes = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation/assigned/decoded_tiled_2_assigned.csv"
+    # labeled = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation/segmented/DAPI_padded_tiled_2_labeled.tif"
     # properties = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/segmented/DAPI_padded_tiled_2_properties.csv"
     # original_image ="/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_thresholdSegmentation_voronoiAssignment/tiled_round/Round1_c5_padded_registered_tiled_2.tif" 
     # plotAssignedGenesWRTCell(assigned_genes,labeled, properties, original_image,"starfish_voronoi_assigned_genes")
