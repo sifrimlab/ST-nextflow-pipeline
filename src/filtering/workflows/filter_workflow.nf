@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 params.stitchDir = "filtered"
 
 include{
-    filter_ref; filter_round; filter_gaussian ; deconvolve_PSF
+    filter_ref; filter_round; filter_gaussian_high_pass ; deconvolve_PSF
 } from "../processes/filtering.nf"
 
 include{

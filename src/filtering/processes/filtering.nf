@@ -34,20 +34,37 @@ process filter_round{
     python $binDir/whiteTophatFilter.py ${image} ${params.filter_radius}
     """
 }
-process filter_gaussian{
-    publishDir "$params.outDir/filtered/", mode: 'symlink'
+process filter_gaussian_high_pass{
+    publishDir "$params.outDir/filtered/high_passed/", mode: 'symlink'
     
     input: 
     path image 
 
     output:
-    path "${image.baseName}_filtered.tif"
+    path "${image.baseName}_high_passed.tif"
 
     script:
     """
-    python $binDir/gaussianHighPass.py ${image} ${params.filter_sigma}
+    python $binDir/gaussianHighPass.py ${image} ${params.high_pass_sigma}
     """
 }
+
+process filter_gaussian_low_pass{
+    publishDir "$params.outDir/filtered/low_passed", mode: 'symlink'
+    
+    input: 
+    path image 
+
+    output:
+    path "${image.baseName}_low_passed.tif"
+
+    script:
+
+    """
+    python $binDir/gaussianLowPass.py ${image} ${params.low_pass_sigma}
+    """
+}
+
 process deconvolve_PSF {
     publishDir "$params.outDir/filtered/deconvolved/", mode: 'symlink'
     
