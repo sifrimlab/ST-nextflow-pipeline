@@ -73,6 +73,27 @@ process register_with_maxIP {
     """
 }
 
+
+process merfish_registration {
+    publishDir "$params.outDir/registered/", mode: 'symlink'
+
+    input: 
+    path ref_image
+    path target_image 
+
+    output:
+    path "${target_image.baseName}_registered.tif"
+
+    script:
+    """
+    python $binDir/rigidRegister.py ${ref_image} ${target_image}
+    """        
+
+}
+
+//This process is specifically for if you want to register images that have 
+// been grouped by some regex pattern, such as tiles. 
+// That's what the val(x) catches
 process local_registration {
     publishDir "$params.outDir/local_register/", mode: 'symlink'
 
