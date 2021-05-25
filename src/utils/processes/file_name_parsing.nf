@@ -16,4 +16,19 @@ process add_parent_dir_to_file_name {
 
 }
 
+process rename_file{
+        publishDir "$params.outDir/maxIP/", mode: 'symlink'
 
+        input:
+        path to_rename
+        val string_to_add 
+
+        output:
+        path "${string_to_add}_${to_rename}"
+
+        script:
+        
+        """
+        python $binDir/renameFile.py $to_rename $string_to_add
+        """
+}

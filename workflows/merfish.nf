@@ -4,13 +4,25 @@ nextflow.enable.dsl=2
 // Include processes:
 ///////////////////////
 
+include {
+    rename_file
+} from "../src/utils/processes/file_name_parsing.nf"
+include {
+    convert_to_uin16
+} from "../src/file_conversion/processes/image_type_conversion.nf"
 
 include {
     standard_merfish_tiling as tiling
 } from "../src/tiling/workflows/tiling_workflows.nf"
 include {
-    gaussian_filter_workflow; deconvolve_PSF_workflow; white_tophat_filter_merfish
+    merfish_global_registration
+} from "../src/registration/workflows/merfish_registration.nf"
+include {
+    gaussian_low_pass_filter_workflow; gaussian_high_pass_filter_workflow; deconvolve_PSF_workflow; white_tophat_filter_merfish
 } from "../src/filtering/workflows/filter_workflow.nf"
+include {
+    local_registration_of_tiles
+} from "../src/registration/workflows/local_registration.nf"
 include {
     merfish_threshold_watershed_segmentation as segmentation
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
@@ -31,10 +43,21 @@ workflow merfish {
     main:
         glob_pattern ="${params.dataDir}/${params.image_prefix}*.${params.extension}" 
         rounds = Channel.fromPath(glob_pattern)
+        rounds = convert_to_uin16(rounds)
 
         // Tile the images into equal sized tiles, and store the grid parameters
         // in variables for future use
-        tiling(glob_pattern, rounds, params.DAPI)
+        if (!params.containsKey("reference")){
+            log.info "No Reference image found, one will be created by taking the first imaging round and renaming it."
+            //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
+            params.reference = rename_file(rounds.first(), "REF") //Create reference image by taking maxIP on the first round
+        }
+
+        
+        merfish_global_registration(params.reference, rounds)
+        merfish_global_registration.out.view()
+
+        tiling(glob_pattern, merfish_global_registration.out, params.DAPI)
         tile_size_x = tiling.out.tile_size_x
         tile_size_y = tiling.out.tile_size_y
         grid_size_x = tiling.out.grid_size_x
@@ -46,11 +69,16 @@ workflow merfish {
 
         
         // Gaussian high pass filter 
-        gaussian_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_high_pass_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        deconvolve_PSF_workflow(gaussian_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        deconvolve_PSF_workflow(gaussian_high_pass_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        deconvolve_PSF_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+        /* deconvolve_PSF_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \ */
+        /*                                 | groupTuple() */
+        /*                                 | set {grouped_rounds} */
+
+        gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_rounds}
 
