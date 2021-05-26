@@ -55,7 +55,6 @@ workflow merfish {
 
         
         merfish_global_registration(params.reference, rounds)
-        merfish_global_registration.out.view()
 
         tiling(glob_pattern, merfish_global_registration.out, params.DAPI)
         tile_size_x = tiling.out.tile_size_x
@@ -73,14 +72,14 @@ workflow merfish {
 
         deconvolve_PSF_workflow(gaussian_high_pass_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        /* deconvolve_PSF_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \ */
-        /*                                 | groupTuple() */
-        /*                                 | set {grouped_rounds} */
-
-        gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
-        gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+        deconvolve_PSF_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_rounds}
+
+        /* gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
+        /* gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \ */
+                                        /* | groupTuple() */
+                                        /* | set {grouped_rounds} */
 
 
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
@@ -94,6 +93,6 @@ workflow merfish {
 
         plot_decoded_spots(decoded_genes, rounds.first(), grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        /* segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
 
 }
