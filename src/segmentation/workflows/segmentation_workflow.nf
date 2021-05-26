@@ -37,7 +37,6 @@ workflow merfish_threshold_watershed_segmentation {
         otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
         dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
 
-        plot_segmentation_labels(otsu_thresholding.out.labeled_images)
 
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
@@ -45,7 +44,10 @@ workflow merfish_threshold_watershed_segmentation {
 
 
 
-        plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
+        if (params.plot==true){
+            plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
+            plot_segmentation_labels(otsu_thresholding.out.labeled_images)
+        }
 
         assign_genes_to_cells(combined_decoded_labeled_properties)
         assign_genes_to_cells.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
@@ -84,8 +86,10 @@ workflow threshold_watershed_segmentation {
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
         combined_decoded_genes.join(cell_properties_mapped, by:0).set{combined_decoded_labeled_properties}
 
-        plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
-        /* plot_segmentation_on_ref(combined_ref_labeled_images) */ 
+        if (params.plot==true){
+            plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
+            /* plot_segmentation_on_ref(combined_ref_labeled_images) */ 
+        }
 
         assign_genes_to_cells_voronoi(combined_decoded_labeled_properties)
         assign_genes_to_cells_voronoi.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}
@@ -95,6 +99,7 @@ workflow threshold_watershed_segmentation {
         /* umap(create_count_matrix.out) */
         /* find_seurat_clusters(create_count_matrix.out) */
 
+        
         /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
         /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
 
@@ -135,8 +140,10 @@ workflow stardist_segmentation_workflow {
         decoded_genes_mapped.join(labeled_images_mapped, by:0).set{combined_decoded_genes}
         combined_decoded_genes.join(cell_properties_mapped, by:0).set{combined_decoded_labeled_properties}
 
-        plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
-        /* plot_segmentation_labels_on_ref(combined_ref_labeled_images) */ 
+        if (params.plot == true){
+            plot_segmentation_labels_on_dapi(combined_dapi_labeled_images) 
+            /* plot_segmentation_labels_on_ref(combined_ref_labeled_images) */ 
+        }
 
         assign_genes_to_cells_voronoi(combined_decoded_labeled_properties)
         assign_genes_to_cells_voronoi.out.collectFile(name: "$params.outDir/assigned/concat_assigned_genes.csv", sort:true, keepHeader:true).set {assigned}

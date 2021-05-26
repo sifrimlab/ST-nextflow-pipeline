@@ -53,8 +53,10 @@ workflow spot_detection_iss {
     spot_detection_reference.out.collectFile(name: "$params.outDir/blobs/concat_blobs.csv", sort:true, keepHeader:true).set {blobs}
     blobs_value_channel = blobs.first() //Call first to convert it into a value channel to allow for multiple iteration of a process with multiple inputs
 
-    // Plot all detected spots
-    plot_spots_whole_and_on_tiles(spot_detection_reference.out, blobs, reference, grid_size_x,grid_size_y, tile_size_x, tile_size_y)
+    if (params.plot==true){
+        // Plot all detected spots
+        plot_spots_whole_and_on_tiles(spot_detection_reference.out, blobs, reference, grid_size_x,grid_size_y, tile_size_x, tile_size_y)
+    }
     
     //map round images into a tuple containing their round, channel and tile number, gather intensity code requires this information up front
     round_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
