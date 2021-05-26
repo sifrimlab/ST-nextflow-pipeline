@@ -4,6 +4,7 @@ from skimage import io
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 # compares two tuples and sees if they are "the same", as defined by an interval of allowed pixel mismatch
 def compareTuplesValues(ref_tuple, target_tuple, pixel_mismatch: int):
@@ -40,16 +41,16 @@ def checkSpotsInRoundPrecision(ref_spots_csv: str, round_spots_csv_list, round_n
     ref_array = ref_array.astype(int)
 
     # round_spots_csv_list will be a list of filepath that point towards the hybs detected on a specific channel, we want to combine those
-    channel_array_list=[] # name is out of date, since it'll also take each tile
-    for channel in round_spots_csv_list:
+    round_array_list=[] # name is out of date, since it'll also take each tile
+    for csv_file in round_spots_csv_list:
         try:
-            temp_df = pd.read_csv(channel)
+            temp_df = pd.read_csv(csv_file)
             temp_df = temp_df[[x_column_name, y_column_name]]
             temp_array = temp_df.to_numpy()
             temp_array = temp_array.astype(int)
             # If one of the spot detected lists is empty, it shouldn't be included
             if not len(temp_array)==0:
-                channel_array_list.append(temp_array)
+                round_array_list.append(temp_array)
         except:
             pass
     # Parse ref arrays
@@ -58,12 +59,12 @@ def checkSpotsInRoundPrecision(ref_spots_csv: str, round_spots_csv_list, round_n
 
     # Parse round arrays
     try:
-        channel_array = np.vstack(channel_array_list)
+        round_array = np.vstack(round_array_list)
     # It could be that this tile doesn't actually contain any spots, in that case return should be empty
     except ValueError:
         return
 
-    array_of_tuples = map(tuple, channel_array) #convert arrays to tuples
+    array_of_tuples = map(tuple, round_array) #convert arrays to tuples
     round_tuples = list(array_of_tuples)
     # Now we have a list of tuples where each tuple is an Y,X
 
@@ -206,10 +207,10 @@ def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts, x_column_nam
 def spotDetectionQCWorkflow(ref_spots_csv, round_csv_dict):
     dict_of_closest_ref_point_dicts= {}
     rows_list = []
-    for k,v in rounds_csv_dict.items():
+    for round_nr,hyb_list in rounds_csv_dict.items():
         try:
-            closest_ref_point_dict, attribute_dict = checkSpotsInRoundPrecision(ref_spots_csv, v, k, pixel_distance=3)
-            dict_of_closest_ref_point_dicts[k] = closest_ref_point_dict
+            closest_ref_point_dict, attribute_dict = checkSpotsInRoundPrecision(ref_spots_csv, hyb_list, round_nr, pixel_distance=3)
+            dict_of_closest_ref_point_dicts[round_nr] = closest_ref_point_dict
             rows_list.append(attribute_dict)
         # If no spot are found, it will try to unpack null, which needs to be excepted
         # and then the function needs to exit, since without spots on a certain round, no complete barcode will be found
@@ -241,16 +242,16 @@ def spotDetectionQCWorkflow(ref_spots_csv, round_csv_dict):
 
 
 if __name__=='__main__':
-    ref_spots_csv = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/blobs/REF_padded_tiled_4_filtered_blobs.csv"
+    ref_spots_csv = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/blobs/transformed_concat_blobs.csv"
     # rounds_csv_dict = [f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_3_filtered_registered_hybs.csv" for i in range(2,6)]
     rounds_csv_dict={}
     for round_nr in range(1,5):
-            rounds_csv_dict[round_nr] = []
+        rounds_csv_dict[round_nr] = []
             # for tile_nr in range(1,5):
-            for i in range(2,6):
-                rounds_csv_dict[round_nr].append(f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_4_filtered_registered_hybs.csv")
+        for i in range(1,5):
+            for tile_nr in range(1,49):
+                rounds_csv_dict[round_nr].append(f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/Round{round_nr}_c{i}_maxIP_padded_registered_tiled_{tile_nr}_filtered_registered_hybs_transformed.csv")
     spotDetectionQCWorkflow(ref_spots_csv, rounds_csv_dict)
-    
 
     # original_image = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/tiled_DO/REF_padded_tiled_3.tif"
     # attribute_dict = checkSpotsInRoundPrecision(ref_spots_csv, rounds_csv, pixel_distance=3)
