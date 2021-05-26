@@ -6,6 +6,7 @@ from skimage.util import img_as_float
 from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 
@@ -40,6 +41,7 @@ def parseBarcodes(codebook: str, bit_len: int):
 
 def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix: str, threshold = 0.5176):
     df = parseBarcodes(codebook,bit_len)
+
     # Very important thing here is to sort, because the iteration is important
     # r = re.compile(rf"{img_prefix}(\d+)")
     # def key_func(m):
@@ -89,11 +91,12 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, ma
     regions_table = regionprops_table(region_labeled_image, properties=("label", "area", "centroid"))
     regions_df = pd.DataFrame(regions_table)
     # Remove spots that only have an area of min_area and max_area
-    regions_df[(regions_df['area'] >=min_area) & (regions_df['area'] <=max_area )]
+    regions_df = regions_df[(regions_df['area'] >=min_area) & (regions_df['area'] <= max_area)]
     regions_df['Y'] = [int(y) for y in list(regions_df['centroid-0'])]
     regions_df['X'] = [int(x) for x in list(regions_df['centroid-1'])]
     regions_df = regions_df.drop(columns=[ "centroid-0", "centroid-1" ])
     regions_df = regions_df.rename(columns={"label":"Spot_label"})
+
 
     # combine with the decoded pixels dataframe to add gene name and barcode to the spots
     merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
@@ -110,18 +113,18 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, threshold =
 
 if __name__=="__main__":
     # 320,86 is a good coordinate to benchmark
-    nr_rounds = 8
-    nr_channels = 2
-    dataDir = "/media/david/Puzzles/starfish_test_data/MERFISH/processed"
-    image_path_list = [f"{dataDir}/{i}.tif" for i in range(1,17)]
-    image_list = [io.imread(f"{dataDir}/{i}.tif") for i in range(1,17)]
-    codebook = "/media/david/Puzzles/starfish_test_data/MERFISH/codebook.csv"
+    # nr_rounds = 8
+    # nr_channels = 2
+    # dataDir = "/media/Puzzles/starfish_test_data/MERFISH/processed"
+    # image_path_list = [f"{dataDir}/{i}.tif" for i in range(1,17)]
+    # image_list = [io.imread(f"{dataDir}/{i}.tif") for i in range(1,17)]
+    # codebook = "/media/Puzzles/starfish_test_data/MERFISH/codebook.csv"
     # parsed_codebook = parseBarcodes(codebook, 16)
     # parsed_codebook.to_csv("parsed_codebook.csv")
-    # df = decodePixels(405,205, codebook, 16,image_path_list)
+    # df = decodePixels(200,200, codebook, 16,image_path_list, "test")
     # df.to_csv("test.csv", index=False)
     df = pd.read_csv("test.csv")
-    labelImage(405, 205, df)
+    createSpotsFromDecodedPixels(200, 200, df)
 
     # image testing:
     # pixel_320_86_vector = createPixelVector(320, 86, image_list)
