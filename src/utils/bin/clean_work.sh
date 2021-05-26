@@ -7,7 +7,7 @@ echo $outDir
 echo $workDir
 
 
-# cp -rL $dataDir $dataDir 
-# rm -r $workDir/
+cp -rL $dataDir $dataDir 
+rm -r $workDir/
 
 
