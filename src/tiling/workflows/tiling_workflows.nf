@@ -41,13 +41,15 @@ workflow standard_iss_tiling {
         tile_dapi(pad_dapi.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
         tile_round(register_wrt_maxIP_memory_friendly.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
 
-        // Stitch tiles back as a control
-        stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
-        stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
+        if (params.stitch==true){
+            // Stitch tiles back as a control
+            stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out)
+            stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
-        tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds}
+            tile_round.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds}
 
-        stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, mapped_rounds)
+            stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, mapped_rounds)
+        }
 
     emit:
         reference = tile_ref.out.flatten()
@@ -80,15 +82,18 @@ workflow standard_merfish_tiling {
         tile_dapi(pad_dapi.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
         tile_round(pad_round.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
 
-        // Stitch tiles back as a control
-        stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
-        // Group images by origin image, so that they can be stitched back
-        tile_round.out.flatten().map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
-                            | groupTuple(by:0) \
-                            | set {grouped_rounds}
+        if (params.stitch==true){
+            // Stitch tiles back as a control
+            stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
 
-        stitch_image_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+            // Group images by origin image, so that they can be stitched back
+            tile_round.out.flatten().map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+                                | groupTuple(by:0) \
+                                | set {grouped_rounds}
+
+            stitch_image_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+        }
 
     emit:
         rounds = tile_round.out.flatten()
