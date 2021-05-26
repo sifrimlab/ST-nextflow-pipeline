@@ -51,6 +51,6 @@ process create_html_report {
     path 'spot_detection_qc_report.html'
     script:
     """
-    python $binDir/createSpotDetectionQCHTMLreport.py $template $recall_json $recall_plot $precision_jsons
+    python $binDir/createSpotDetectionQCHTML.py $template $recall_json $recall_plot $precision_jsons
     """
 }

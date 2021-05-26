@@ -9,7 +9,7 @@ include {
 } from "$baseDir/src/quality_control/workflows/spot_detection_qc_workflows.nf"
 
 include {
-    transform_tile_coordinate_system
+    transform_tile_coordinate_system ; transform_tile_coordinate_system as transform_tile_coordinate_system2
 } from "$baseDir/src/file_conversion/processes/coordinate_parsing.nf"
 include {
     plot_spots_whole_and_on_tiles
@@ -41,7 +41,7 @@ workflow spot_detection_iss {
     spot_detection_round(round_images)
     spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
 
-    transform_tile_coordinate_system(spot_detection_round.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) .set {transformed_round_spots}
+    transform_tile_coordinate_system2(spot_detection_round.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) .set {transformed_round_spots}
 
     calculate_iss_precision_and_recall(transformed_blobs, transformed_round_spots) 
 

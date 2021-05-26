@@ -50,6 +50,10 @@ include {
     transform_tile_coordinate_system
 } from "../src/file_conversion/processes/coordinate_parsing.nf"
 
+include {
+    clean_work_dir
+} from "../src/utils/processes/clean_up.nf"
+
 
 
 workflow iss {
@@ -101,5 +105,8 @@ workflow iss {
        iss_decoding_statistics(decoded_genes, decoding.out)
 
        assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
+
+       // Copy every symlink and clean up work dir 
+       /* clean_work_dir() */
     
 }

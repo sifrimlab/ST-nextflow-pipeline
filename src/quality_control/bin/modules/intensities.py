@@ -25,7 +25,7 @@ def plotCombinedHistograms(hist_dict, title = ""):
 
     fig, ax = plt.subplots(1,1)
     ax.set_title(title)
-    ax.set_xlabel("pixel value")
+    ax.set_xlabel("8-bit grayscale pixel value")
     ax.set_ylabel("# times encountered")
 
     for name, hist in hist_dict.items():
@@ -145,8 +145,15 @@ def collectIntensityAnalytics(rows_list):
     return  df  
 
 if __name__ == '__main__':
+    # this is to plot the histogram of hippo_3 manually
+    img_list = [f"/media/tool/gabriele_data/161230_161220_3_1/maxIP-seperate-channels/Round1/Round1_c{i}_maxIP.tif" for i in range(1,5)]
+    names = [f"Round1-Channel{i}" for i in range(1,5)]
+    histograms = {name: getHistogram(image_path) for name, image_path in zip(names, img_list)}
+    plt = plotCombinedHistograms(hist_dict=histograms)
+    plt.savefig("/media/nacho/Puzzles/results_figures/hippo_3_quality_report_zoomed.png")
 
-    img_list = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c{i}.TIF" for i in range(2,6)]
-    hist_dict = {i: getHistogram(img) for i,img in enumerate(img_list)}
 
-    plotCombinedHistograms(hist_dict)
+    # img_list = [f"/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c{i}.TIF" for i in range(2,6)]
+    # hist_dict = {i: getHistogram(img) for i,img in enumerate(img_list)}
+
+    # plotCombinedHistograms(hist_dict)
