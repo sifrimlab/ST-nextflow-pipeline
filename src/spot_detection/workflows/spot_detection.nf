@@ -35,17 +35,17 @@ workflow spot_detection_iss {
     ////////////////////////////////////////////////////////
     //This is for spot detection quality control purposes //
     ////////////////////////////////////////////////////////
-    transform_tile_coordinate_system(spot_detection_reference.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set{transformed_ref_spots}
-    transform_tile_coordinate_system.out.collectFile(name: "$params.outDir/blobs/transformed_concat_blobs.csv", sort:true, keepHeader:true).set {transformed_blobs}
+    if (params.spot_detectionQC==true){
+        transform_tile_coordinate_system(spot_detection_reference.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y).set{transformed_ref_spots}
+        transform_tile_coordinate_system.out.collectFile(name: "$params.outDir/blobs/transformed_concat_blobs.csv", sort:true, keepHeader:true).set {transformed_blobs}
 
-    spot_detection_round(round_images)
-    spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
+        spot_detection_round(round_images)
+        spot_detection_round.out.collectFile(name: "$params.outDir/hybs/concat_hybs.csv", sort:true, keepHeader:true).set {hybs}
 
-    transform_tile_coordinate_system2(spot_detection_round.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) .set {transformed_round_spots}
+        transform_tile_coordinate_system2(spot_detection_round.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) .set {transformed_round_spots}
 
-    calculate_iss_precision_and_recall(transformed_blobs, transformed_round_spots) 
-
-
+        calculate_iss_precision_and_recall(transformed_blobs, transformed_round_spots) 
+    }
     ///////////// end spot detection QC ///////////////////
 
 

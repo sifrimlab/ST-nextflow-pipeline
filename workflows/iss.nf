@@ -96,7 +96,9 @@ workflow iss {
        transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y) // Add original X and Y coordinates for later downstream analysis
 
        // Plot decoded genes
-       plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       if (params.plot==true){
+           plot_decoded_genes(tiling.out.reference, decoding.out, decoded_genes, tiling.out.padded_whole_reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+       }
        
        // Segmentation
        segmentation(tiling.out.dapi, decoding.out, tiling.out.reference,  grid_size_x, grid_size_y, tile_size_x, tile_size_y)
