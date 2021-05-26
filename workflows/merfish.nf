@@ -76,10 +76,10 @@ workflow merfish {
                                         | groupTuple()
                                         | set {grouped_rounds}
 
-        /* gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
-        /* gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \ */
-                                        /* | groupTuple() */
-                                        /* | set {grouped_rounds} */
+        gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+                                        | groupTuple()
+                                        | set {grouped_rounds}
 
 
         // Map the images to their respective tiles, since for decoding they need to be in the correct order

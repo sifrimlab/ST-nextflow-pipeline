@@ -14,6 +14,6 @@ bit_len =  int(sys.argv[5])
 threshold = float(sys.argv[6])
 image_prefix= sys.argv[7]
 image_path_list = [sys.argv[i] for i in range(8, len(sys.argv))]
-decoded_df = decodePixelBased(x_dim,y_dim, codebook, bit_len, image_path_list,threshold)
+decoded_df = decodePixelBased(x_dim,y_dim, codebook, bit_len, image_path_list,image_prefix,threshold)
 decoded_df['Tile'] = [tile_nr_int for i in range(0,len(decoded_df))]
 decoded_df.to_csv(f"decoded_{tile_nr}.csv", index=False)

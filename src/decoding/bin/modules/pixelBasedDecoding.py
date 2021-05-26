@@ -7,6 +7,7 @@ from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from icecream import ic
 
 
 
@@ -43,15 +44,17 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix: str
     df = parseBarcodes(codebook,bit_len)
 
     # Very important thing here is to sort, because the iteration is important
-    # r = re.compile(rf"{img_prefix}(\d+)")
-    # def key_func(m):
-    #     return int(r.search(m).group(1))
-    # img_path_list.sort(key=key_func)
+    r = re.compile(rf"{img_prefix}(\d+)")
+    def key_func(m):
+        return int(r.search(m).group(1))
+    img_path_list.sort(key=key_func)
+    ic(image_path_list)
 
-    img_path_list.sort()
+
+    # img_path_list.sort()
     image_list =  [img_as_float(io.imread(img)) for img in img_path_list]
     rows_list = []
-    for x in range(0,x_dim):
+    for x in tqdm(range(0,x_dim)):
         for y in range(0,y_dim):
             attribute_dict = {}
             attribute_dict['X'] = x
@@ -103,8 +106,8 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, ma
     return merged_df
 
 # threshold based on a 1-bit error in euclidean distance
-def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, threshold = 0.5176):
-    decoded_pixels_df = decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, threshold)
+def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176):
+    decoded_pixels_df = decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list,img_prefix, threshold)
     decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df)
     return decoded_spots_df
 
@@ -112,6 +115,22 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, threshold =
 
 
 if __name__=="__main__":
+    # x_dim = 2048
+    # y_dim = 2048
+    x_dim = 405
+    y_dim = 205
+
+    # tile_nr =  sys.argv[3]
+    # tile_nr_int = int(re.findall(r"\d+", tile_nr)[0])
+    codebook = "/media/Puzzles/starfish_test_data/MERFISH/codebook.csv"
+    bit_len = 16
+    threshold = 0.5176
+    image_prefix="merfish_"
+    image_path_list = [f"/media/Puzzles/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
+    decoded_df = decodePixelBased(x_dim,y_dim, codebook, bit_len, image_path_list,image_prefix,threshold)
+    # decoded_df['Tile'] = [tile_nr_int for i in range(0,len(decoded_df))]
+    decoded_df.to_csv("decoded.csv", index=False)
+
     # 320,86 is a good coordinate to benchmark
     # nr_rounds = 8
     # nr_channels = 2
@@ -123,8 +142,8 @@ if __name__=="__main__":
     # parsed_codebook.to_csv("parsed_codebook.csv")
     # df = decodePixels(200,200, codebook, 16,image_path_list, "test")
     # df.to_csv("test.csv", index=False)
-    df = pd.read_csv("test.csv")
-    createSpotsFromDecodedPixels(200, 200, df)
+    # df = pd.read_csv("test.csv")
+    # createSpotsFromDecodedPixels(200, 200, df)
 
     # image testing:
     # pixel_320_86_vector = createPixelVector(320, 86, image_list)

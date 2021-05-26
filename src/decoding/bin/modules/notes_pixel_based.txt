@@ -1,8 +1,3 @@
-- metric based decoding: normalize the distance vectors
-- parameters: 
-        - distance metric
-        - min intenisty
-        - distance threshold
 
 how?
 - make a normalized intensity vector for each pixel
