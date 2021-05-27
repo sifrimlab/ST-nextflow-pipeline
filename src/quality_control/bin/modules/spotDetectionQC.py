@@ -75,14 +75,19 @@ def checkSpotsInRoundPrecision(ref_spots_csv: str, round_spots_csv_list, round_n
     closest_distance_dict = {}  # key = spot in round, value = distance to closest ref spot
     for round_tuple in round_tuples:
         # min returns the original iterable, not the result of the key function
-        closest_ref_point = min(ref_tuples, key=lambda x: calculateEuclideanDistance2D(round_tuple, x))
-        closest_distance =  calculateEuclideanDistance2D(round_tuple, closest_ref_point)
-        all_closest_ref_point_dict[round_tuple] = closest_ref_point
-        all_closest_distance_dict[round_tuple] = closest_distance
-        if closest_distance <= pixel_distance:
-            # print(f"round_tuple = {round_tuple}, closest_ref_tuple = {closest_ref_point}, with distance = {closest_distance}")
-            closest_ref_point_dict[round_tuple] = closest_ref_point
-            closest_distance_dict[round_tuple] = closest_distance
+        try:
+            closest_ref_point = min(ref_tuples, key=lambda x: calculateEuclideanDistance2D(round_tuple, x))
+            closest_distance =  calculateEuclideanDistance2D(round_tuple, closest_ref_point)
+            all_closest_ref_point_dict[round_tuple] = closest_ref_point
+            all_closest_distance_dict[round_tuple] = closest_distance
+            if closest_distance <= pixel_distance:
+                # print(f"round_tuple = {round_tuple}, closest_ref_tuple = {closest_ref_point}, with distance = {closest_distance}")
+                closest_ref_point_dict[str(round_tuple)] = str(closest_ref_point)
+                closest_distance_dict[str(round_tuple)] = closest_distance
+        # If there are no spots in the ref image, this needs to be excepted
+        # Then this point will also not be added, so end result is the same
+        except ValueError:
+            pass
 
     # create the table of info
     attribute_dict = {}
@@ -93,37 +98,42 @@ def checkSpotsInRoundPrecision(ref_spots_csv: str, round_spots_csv_list, round_n
     attribute_dict['# matched spots'] = nr_matched_spots
     attribute_dict['# unmatched spots'] = nr_unmatched_spots
     attribute_dict['Total Spots'] = nr_round_spots_total
-    attribute_dict['Ratio of matched spots'] = round(nr_matched_spots / nr_round_spots_total, 3)*100
 
-    if original_image:
-        # read in image, pure for plotting purposes
-        original_image = io.imread(original_image)
-        _ , axs = plt.subplots(1,2)
-        axs[0].imshow(original_image, cmap='gray')
-        axs[0].set_title("Reference")
-        axs[1].imshow(original_image, cmap='gray')
-        axs[1].set_title("Round")
-        for key, value in closest_ref_point_dict.items():
-            # key & value in format: (Y,X)
-            color=np.random.rand(3,)
-            circ1 = plt.Circle((key[1],key[0]), 2, color=color)
-            circ2 = plt.Circle((value[1],value[0]), 2, color=color)
-            axs[0].add_patch(circ1)
-            axs[1].add_patch(circ2)
+    try: # if no spots were found in the round, then this will divide by zero
+        attribute_dict['Ratio of matched spots'] = round(nr_matched_spots / nr_round_spots_total, 3)*100
+    except ZeroDivisionError:
+        attribute_dict['Ratio of matched spots'] = 0
+
+
+    # if original_image:
+    #     # read in image, pure for plotting purposes
+    #     original_image = io.imread(original_image)
+    #     _ , axs = plt.subplots(1,2)
+    #     axs[0].imshow(original_image, cmap='gray')
+    #     axs[0].set_title("Reference")
+    #     axs[1].imshow(original_image, cmap='gray')
+    #     axs[1].set_title("Round")
+    #     for key, value in closest_ref_point_dict.items():
+    #         # key & value in format: (Y,X)
+    #         color=np.random.rand(3,)
+    #         circ1 = plt.Circle((key[1],key[0]), 2, color=color)
+    #         circ2 = plt.Circle((value[1],value[0]), 2, color=color)
+    #         axs[0].add_patch(circ1)
+    #         axs[1].add_patch(circ2)
 
         # Plot duplicate assignement counted
-        _, axs = plt.subplots(1,1)
-        axs.set_title("Multiple assigned reference spots plotted by counts")
-        axs.set_xlabel("# round spots a reference spot is assigned to")
-        axs.set_ylabel("# times counted")
-        closest_ref_points = closest_ref_point_dict.values()
-        counted_dict = Counter(closest_ref_points)
-        duplicate_ref_point_dict ={k: v for k, v in counted_dict.items() if v > 1}
-        axs.hist(duplicate_ref_point_dict.values())
-        for rect in axs.patches:
-            height = rect.get_height()
-            axs.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),
-                         xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
+        # _, axs = plt.subplots(1,1)
+        # axs.set_title("Multiple assigned reference spots plotted by counts")
+        # axs.set_xlabel("# round spots a reference spot is assigned to")
+        # axs.set_ylabel("# times counted")
+        # closest_ref_points = closest_ref_point_dict.values()
+        # counted_dict = Counter(closest_ref_points)
+        # duplicate_ref_point_dict ={k: v for k, v in counted_dict.items() if v > 1}
+        # axs.hist(duplicate_ref_point_dict.values())
+        # for rect in axs.patches:
+        #     height = rect.get_height()
+        #     axs.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),
+        #                  xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
         # plt.show()
     return closest_ref_point_dict, attribute_dict
 
@@ -148,6 +158,7 @@ def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts, x_column_nam
     complete_barcodes = [] #If a spot ends up having a complete barcode, add it to this list
     round_not_found = {} # key = round_nr, value = count of how many barcodes did not find a match in the given round
     for ref_tuple in ref_tuples:
+        ref_tuple = str(ref_tuple)
         for round_nr in round_numbers:
             matched_ref_points = dict_of_closest_ref_point_dicts[round_nr].values()
             if ref_tuple not in matched_ref_points:
