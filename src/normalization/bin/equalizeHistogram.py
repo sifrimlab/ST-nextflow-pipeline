@@ -1,6 +1,6 @@
 import os
 import sys
-from modules.equalizeHistogram import equalizeHist16bit
+from modules.histogramNormalizing import equalizeHist16bit
 import cv2
 
 image = sys.argv[1]

@@ -20,7 +20,7 @@ process clip_and_rescale {
     """
 }
 process equalize_histogram {
-    publishDir "$params.outDir/normalized", mode: 'copy'
+    publishDir "$params.outDir/normalized", mode: 'symlink'
 
     input: 
     path image
@@ -31,5 +31,21 @@ process equalize_histogram {
     script:
     """
     python $binDir/equalizeHistogram.py $image
+    """
+}
+
+process match_histogram {
+    publishDir "$params.outDir/normalized", mode: 'symlink'
+
+    input: 
+    path reference
+    path target
+
+    output:
+    path "${target.baseName}_matched.tif"
+
+    script:
+    """
+    python $binDir/matchHistogram.py $reference $target
     """
 }

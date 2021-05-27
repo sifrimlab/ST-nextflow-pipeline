@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 /* moduleName="quality_control" */
 /* binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/") */
-binDir = "/home/david/Documents/communISS/src/quality_control/bin"
+binDir = "/home/nacho/Documents/Code/communISS/src/quality_control/bin"
 
 process calculate_precision {
     publishDir "$params.outDir/quality_control/spot_detection_QC/precision", mode: 'symlink'
@@ -55,16 +55,17 @@ process create_html_report {
     """
 }
 workflow{
-    ref_spots = Channel.fromPath("/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/blobs/transformed_concat_blobs.csv")
+    ref_spots = Channel.fromPath("/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/blobs/transformed_concat_blobs.csv")
     ref_spots_value = ref_spots.first()
 
-    round_spots = Channel.fromPath("/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/Round*_c*_maxIP_padded_registered_tiled_*_filtered_registered_hybs_transformed.csv")
+    round_spots = Channel.fromPath("/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/Round*_c*_maxIP_padded_registered_tiled_*_filtered_registered_hybs_transformed.csv")
 
 
-    params.outDir = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/"
+    params.outDir = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/"
     round_spots.map { file -> tuple((file =~ /Round\d+/)[0], file)} 
              | groupTuple(by:0)   
              | set {grouped_by_round_spots}
+
 
     calculate_precision(ref_spots_value, grouped_by_round_spots)
 

@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 params.stitchDir = "normalized"
 
 include{
-    clip_and_rescale;clip_and_rescale as clip_and_rescale_ref
+    match_histogram ; clip_and_rescale;clip_and_rescale as clip_and_rescale_ref
 } from "../processes/normalization.nf"
 
 include{
@@ -52,4 +52,16 @@ workflow CLIP_AND_RESCALE_TILES {
     emit:
         normalized_ref = clip_and_rescale_ref.out
         normalized_rounds = clip_and_rescale.out
+}
+
+workflow MATCH_HISTOGRAMS{
+    take:
+        // Here "reference" refers to the reference for the histogram matching,
+        // NOT to an ISS reference image
+        reference_image
+        target_images
+    main:
+        match_histogram(ref_image, target_images)
+    emit:
+        normalized_images = match_histogram.out
 }

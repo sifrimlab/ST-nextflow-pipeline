@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage import io
+from skimage.exposure import match_histograms
 # create our cumulative sum function
 def cumsum(a):
     a = iter(a)
@@ -45,9 +47,17 @@ def equalizeHist16bit(image_path):
     img_new = np.reshape(img_new, img.shape)
     return img_new
 
+def matchHistograms(image_ref_path, image_target_path):
+    reference = io.imread(image_ref_path)
+    target = io.imread(image_target_path)
+
+    matched = match_histograms(target, reference)
+
+    return matched
+
 
 if __name__ == '__main__':
-    # normal_image = "/media/david/Puzzles/gabriele_data/1442_OB/DO/REF.tif"
-    normal_image = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/Round1/Round1_c5.TIF"
-    equalizeHist8bit(normal_image)
+    reference = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c2_maxIP.tif"
+    target = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP.tif"
+    matchHistograms(reference, target)
 
