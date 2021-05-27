@@ -72,3 +72,5 @@ def findOptimalDivisor(number: int, target_quotient: int):
     quotients = [number/divisor for divisor in divisors]
     min_loss = min(quotients, key=lambda x:abs(x-target_quotient))
     return min_loss
+if __name__=='__main__':
+    print(calculateOptimalTileSize(2048,2048,500,500))

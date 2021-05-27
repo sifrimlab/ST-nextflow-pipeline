@@ -21,7 +21,7 @@ def deconvolvePSF(image_path, psf, iterations):
     img += np.amax(img)* 1E-5
     # Restore Image using Richardson-Lucy algorithm
     deconvolved_RL = restoration.richardson_lucy(img, psf, iterations)
-    deconvolved_RL = img_as_int(deconvolved_RL)
+    # deconvolved_RL = img_as_int(deconvolved_RL)
     return deconvolved_RL
 
 def createGaussianKernel(shape, sigma:float):

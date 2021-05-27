@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from icecream import ic
 from skimage import io
 from skimage.exposure import match_histograms
 from skimage.util import img_as_uint
+from PIL import Image
 # create our cumulative sum function
 def cumsum(a):
     a = iter(a)
@@ -50,21 +52,28 @@ def equalizeHist16bit(image_path):
 
 def matchHistograms(image_ref_path, image_target_path):
     reference = io.imread(image_ref_path)
-    print(reference.dtype, reference.shape)
+    ic(reference.dtype, reference.shape, type(reference))
     target = io.imread(image_target_path)
-    print(target.dtype, target.shape)
+    ic(target.dtype, target.shape, type(target))
 
     matched = match_histograms(target, reference)
-    print(matched.dtype, matched.shape)
-    plt.imshow(matched, cmap='gray')
-    plt.show()
+    ic(matched.dtype, matched.shape, type(matched))
+    data = Image.fromarray(matched)
+    saving the final output 
+    # as a PNG file
+    data.save('/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP_matched.tif')
+    # plt.imshow(matched, cmap='gray')
+    # plt.show()
+    # io.imsave("hippo_3_r1c3_tile28.png", reference)
+    # io.imsave("hippo_3_r1c1_tile28.png", target)
+    # io.imsave("hippo_3_r1c1_matched_tile28.png", matched)
     
 
     # return matched
 
 
 if __name__ == '__main__':
-    reference = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c2_maxIP.tif"
-    target = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP.tif"
+    reference = "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/tiled_round/Round1_c3_maxIP_padded_registered_tiled_28.tif"
+    target = "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/tiled_round/Round1_c1_maxIP_padded_registered_tiled_28.tif"
     matchHistograms(reference, target)
     # io.imsave("/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP_matched.tif", matched)

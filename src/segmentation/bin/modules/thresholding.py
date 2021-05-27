@@ -132,15 +132,13 @@ def otsuThresholding(path_to_image: str, tile_nr=""):
 
 
 if __name__=='__main__':
-    image_path = "/media/david/Puzzles/gabriele_data/1442_OB/DO/DAPI.tif"
-    original_image = io.imread(image_path)
-    cut_image = original_image[3000:5000, 2000:4000]
-    # cut_image_8bit = img_as_ubyte(cut_image)
-    io.imsave("test.tif", cut_image)
-    label_image, attribute_df = otsuThresholding("test.tif")
+    # image_path = "/media/david/Puzzles/gabriele_data/1442_OB/DO/DAPI.tif"
+    image_path = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation/tiled_DO/DAPI_padded_tiled_29.tif"
+    label_image, attribute_df = otsuThresholding(image_path)
     colored_image = color.label2rgb(label_image, bg_label=0) 
-    fig, axs = plt.subplots(1,2)
-    axs[0].imshow(colored_image)
-    axs[1].imshow(cut_image)
-    plt.show()
+    io.imsave("/media/Puzzles/results_figures/tile_29_threshold_segmented_labeled.tif", colored_image)
+    # fig, axs = plt.subplots(1,2)
+    # axs[0].imshow(colored_image)
+    # axs[1].imshow(cut_image)
+    # plt.show()
 

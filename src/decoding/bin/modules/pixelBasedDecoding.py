@@ -48,7 +48,7 @@ def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix: str
     def key_func(m):
         return int(r.search(m).group(1))
     img_path_list.sort(key=key_func)
-    ic(image_path_list)
+    ic(img_path_list)
 
 
     # img_path_list.sort()

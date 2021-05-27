@@ -79,10 +79,12 @@ workflow gaussian_high_pass_filter_workflow {
 
         // stitche the tiles for visualization 
 
-       filter_gaussian_high_pass.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+        if (params.stitch==true){
+               filter_gaussian_high_pass.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
                             .groupTuple(by:[0]).set {grouped_rounds}
                             
-       stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+               stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+        }
 
     emit:
         filtered_gaussian = filter_gaussian_high_pass.out.flatten()
@@ -103,10 +105,12 @@ workflow gaussian_low_pass_filter_workflow {
 
         // stitche the tiles for visualization 
 
-       filter_gaussian_low_pass.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
-                            .groupTuple(by:[0]).set {grouped_rounds}
+        if (params.stitch==true){
+            filter_gaussian_low_pass.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+                              .groupTuple(by:[0]).set {grouped_rounds}
                             
-       stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+            stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+        }
 
     emit:
         filtered_gaussian = filter_gaussian_low_pass.out.flatten()
@@ -123,13 +127,16 @@ workflow deconvolve_PSF_workflow {
         tile_size_x
         tile_size_y
     main: 
-       deconvolve_PSF(round_tiles)
+        deconvolve_PSF(round_tiles)
 
+        if (params.stitch==true){
         // stitche the tiles for visualization 
 
-       deconvolve_PSF.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
-                            .groupTuple(by:[0]).set {grouped_rounds}
-       stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+            deconvolve_PSF.out.map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
+                                .groupTuple(by:[0]).set {grouped_rounds}
+
+            stitch_image_tiles(tile_grid_size_x, tile_grid_size_y, tile_size_x, tile_size_y,grouped_rounds)
+        }
 
     emit:
         deconvolved_PSF = deconvolve_PSF.out.flatten()
