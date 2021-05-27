@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
 from skimage.exposure import match_histograms
+from skimage.util import img_as_uint
 # create our cumulative sum function
 def cumsum(a):
     a = iter(a)
@@ -49,15 +50,21 @@ def equalizeHist16bit(image_path):
 
 def matchHistograms(image_ref_path, image_target_path):
     reference = io.imread(image_ref_path)
+    print(reference.dtype, reference.shape)
     target = io.imread(image_target_path)
+    print(target.dtype, target.shape)
 
     matched = match_histograms(target, reference)
+    print(matched.dtype, matched.shape)
+    plt.imshow(matched, cmap='gray')
+    plt.show()
+    
 
-    return matched
+    # return matched
 
 
 if __name__ == '__main__':
     reference = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c2_maxIP.tif"
     target = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP.tif"
     matchHistograms(reference, target)
-
+    # io.imsave("/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP_matched.tif", matched)

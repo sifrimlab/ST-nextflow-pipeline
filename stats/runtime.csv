@@ -9,5 +9,7 @@ Time, Stopping_Point, Dataset, special
 2.11.14, count_matrix, hippo_4,(1000x1000tiles)
 27.5,count_matrix,1442_OB,spot_detection_qc
 28.19,count_matrix,1442_OB,spot_detection_qc
-30.36, count_matrix, 1442_OB, (4000x4000 tiles),
+30.36, count_matrix, 1442_OB, 4000x4000 tiles,
+37.16, count_matrix, 1442_OB, 1000x1000 tiles,
+
 
