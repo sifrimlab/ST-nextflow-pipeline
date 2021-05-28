@@ -5,7 +5,8 @@ nextflow.enable.dsl=2
 /* moduleName="quality_control" */
 /* binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/") */
 binDir = "/home/nacho/Documents/Code/communISS/src/quality_control/bin"
-workDir = "/media/nacho/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/quality_control/work"
+workDir = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/quality_control_pixel_distance_1/work"
+
 
 process calculate_precision {
     publishDir "$params.outDir/quality_control/spot_detection_QC/precision", mode: 'symlink'
@@ -18,7 +19,7 @@ process calculate_precision {
 
     script:
     """
-    python $binDir/calculatePrecision.py $tile_nr $round_nr 2 $ref_spots  $round_spots
+    python $binDir/calculatePrecision.py $tile_nr $round_nr 1 $ref_spots  $round_spots
     """
 }
 
@@ -85,15 +86,15 @@ process create_html_report {
     """
 }
 workflow{
-    params.outDir = "/media/nacho/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/quality_control_pixel_distance_2"
+    params.outDir = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/quality_control_pixel_distance_1/"
 
-    ref_spots = Channel.fromPath("/media/nacho/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/blobs/REF_padded_tiled_*_filtered_blobs.csv")
+    ref_spots = Channel.fromPath("/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/blobs/REF_padded_tiled_*_filtered_blobs.csv")
 
     ref_spots.map { file -> tuple((file =~ /tiled_\d+/)[0], file)} 
              | groupTuple(by:0)   
              | set {grouped_by_tile_ref_spots}
 
-    round_spots = Channel.fromPath("/media/nacho/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/hybs/Round*_c*_maxIP_padded_tiled_*_filtered_registered_hybs.csv")
+    round_spots = Channel.fromPath("/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC_without_global_registration/hybs/Round*_c*_maxIP_padded_tiled_*_filtered_registered_hybs.csv")
     round_spots.map { file -> tuple((file =~ /tiled_\d+/)[0], (file =~ /Round\d+/)[0], file)} 
              | groupTuple(by:[0,1])   
              | set {grouped_by_round_and_tile_spots}
