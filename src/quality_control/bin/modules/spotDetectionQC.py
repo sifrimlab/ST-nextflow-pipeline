@@ -173,7 +173,10 @@ def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts, x_column_nam
     nr_complete = len(complete_barcodes)
     nr_total = len(ref_tuples)
     nr_incomplete = nr_total - nr_complete
-    ratio_complete = round(nr_complete / nr_total, 3)*100
+    try:
+        ratio_complete = round(nr_complete / nr_total, 3)*100
+    except ZeroDivisionError: # If number total = 0, this'll throw a ZeroDivisionError
+        ratio_complete = 0
 
     attribute_dict = {}
     attribute_dict["spots on ref"] = nr_total
@@ -210,7 +213,7 @@ def calculateRecall(ref_spots_csv, dict_of_closest_ref_point_dicts, x_column_nam
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation= 45)
 
-    return attribute_dict, plt
+    return attribute_dict, round_not_found, plt
 
 
 

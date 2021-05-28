@@ -59,7 +59,7 @@ def matchHistograms(image_ref_path, image_target_path):
     matched = match_histograms(target, reference)
     ic(matched.dtype, matched.shape, type(matched))
     data = Image.fromarray(matched)
-    saving the final output 
+    # saving the final output 
     # as a PNG file
     data.save('/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP_matched.tif')
     # plt.imshow(matched, cmap='gray')
@@ -73,7 +73,7 @@ def matchHistograms(image_ref_path, image_target_path):
 
 
 if __name__ == '__main__':
-    reference = "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/tiled_round/Round1_c3_maxIP_padded_registered_tiled_28.tif"
-    target = "/media/Puzzles/gabriele_data/hippo_3/results_minsigma3_maxsigma5/tiled_round/Round1_c1_maxIP_padded_registered_tiled_28.tif"
+    reference = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c2_maxIP.tif"
+    target = "/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP.tif"
     matchHistograms(reference, target)
     # io.imsave("/media/nacho/Puzzles/gabriele_data/hippo_3/Round1/Round1_c1_maxIP_matched.tif", matched)

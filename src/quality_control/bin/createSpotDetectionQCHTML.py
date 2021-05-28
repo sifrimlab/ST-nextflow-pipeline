@@ -23,6 +23,7 @@ for json_path in precision_jsons_list:
         data = json.load(json_file)
         precision_rows_list.append(data)
 precision_df = pd.DataFrame(precision_rows_list)
+precision_df = precision_df.sort_values(by='Round #')
 precision_html_table = precision_df.to_html(index=False)
 
 # Same for recall json
@@ -43,11 +44,14 @@ with open(template, 'r') as template_file:
 h2_list = template_soup.find_all('h2')
 h2_index = 0
 
-h2_list[h2_index].insert_after(recall_html_table)
+# Read recall table tag
+recall_soup = BeautifulSoup(recall_html_table, features="html.parser")
+table_tag = recall_soup.find('table')
+h2_list[h2_index].insert_after(table_tag)
 h2_index+=1
 
 image_tag = template_soup.new_tag('img')
-image_tag['src']= recall_plot
+image_tag['src']= f"./recall/{recall_plot}"
 image_tag['width']= 700
 image_tag['height']= 500
 h2_list[h2_index].insert_after(image_tag)
@@ -55,7 +59,9 @@ h2_index+=1
 
 
 
-h2_list[h2_index].insert_after(precision_html_table)
+precision_soup = BeautifulSoup(precision_html_table, features="html.parser")
+table_tag = precision_soup.find('table')
+h2_list[h2_index].insert_after(table_tag)
 h2_index+=1
 
 with open('spot_detection_qc_report.html', 'w') as result_file:
