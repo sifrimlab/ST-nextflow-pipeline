@@ -6,8 +6,6 @@ from skimage.util import img_as_float
 from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
-from tqdm import tqdm
-from icecream import ic
 
 
 
@@ -43,18 +41,18 @@ def parseBarcodes(codebook: str, bit_len: int):
 def decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix: str, threshold = 0.5176):
     df = parseBarcodes(codebook,bit_len)
 
-    # Very important thing here is to sort, because the iteration is important
+    # Very important thing here is to sort based on the passed img_prexi, because the iteration needs to be done in order
     r = re.compile(rf"{img_prefix}(\d+)")
     def key_func(m):
         return int(r.search(m).group(1))
+
     img_path_list.sort(key=key_func)
-    ic(img_path_list)
 
 
     # img_path_list.sort()
     image_list =  [img_as_float(io.imread(img)) for img in img_path_list]
     rows_list = []
-    for x in tqdm(range(0,x_dim)):
+    for x in range(0,x_dim):
         for y in range(0,y_dim):
             attribute_dict = {}
             attribute_dict['X'] = x
