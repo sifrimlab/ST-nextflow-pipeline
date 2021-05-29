@@ -32,6 +32,10 @@ For an explanation on all possible parameters you might encounter in the generat
 						--with_conda comunISS.yaml			\
 	```
 
+### Things you might want to know
+- Nextflow's philosophy is technically to parallelize processes based on simple in and output. However in a usecase such as an ST expermiment, a higher control over input is necessary, since sometimes you need to combine information coming from different axes, such as all round, all tiles, all channels etc. 
+Since all processes in nextflow comminucte with eachother through files, this framework filters input and output based on regex patterns on the filenames. The *_prefix variables, which have to be filled in the config file, are used for this, so it's important this is filled in correctly. If at any point the pipeline errors out with and index[1] error, this will most likely be due the regex pattern not finding any hits.
+![regex_file_matcher](./assets/regex_file_matcher.png)
 
 ### Repository file hierarchy explanation
 - *main.nf*: Running the pipeline should always start from here. Dynamically defined paths in the functionality count on the starting point of the "nextflow run"-command being the main.nf file.
