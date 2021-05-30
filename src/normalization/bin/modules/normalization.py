@@ -65,12 +65,3 @@ def csbDeepNormalization():
         return alpha*x + beta
 
 
-
-
-def basicNormalizeOverMultipleImages(img_path_list):
-    img_list = [io.imread(img) for img in img_path_list]
-    minima = [np.amin(img) for img in img_list]
-    minimum = min(minima)
-    maxima = [np.amax(img) for img in img_list]
-    maximum = max(maxima)
-    normalized_imgs = [(image - minimum) * (1.0 / (maximum - minimum)) for image in img_list]
