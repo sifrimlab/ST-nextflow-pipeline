@@ -1,15 +1,15 @@
-runtime,data,pixel_distance,special,ratio
-8,1442_OB,3,normal,93.0
-8,1442_OB,3,no_global_registration,90.1
-7.50, 1442_OB,3,no_registration,87.4
-7.57,1442_OB,2,normal,86.8
-8.12,1442_OB,2,no_global_registration,83.2
-7.34, 1442_OB,2,no_registration,76.6
-9.12, 1442_OB,1,normal,66.9
-8.19, 1442_OB,1,no_global_registration,63.3
-8.25, 1442_OB,1,no_registration,52.8
-7.52,1442_OB,0,normal,27.6
-8.18, 1442_OB,0,no_global_registration,25.5
-7.47, 1442_OB,0,no_registration,18.4
+runtime,data,pixel_distance,special,complete_ratio,decoding_ratio
+8,1442_OB,3,normal,93.0,61.6
+8,1442_OB,3,no_global_registration,90.1,0
+7.50, 1442_OB,3,no_registration,87.4,0
+7.57,1442_OB,2,normal,86.8,45.9
+8.12,1442_OB,2,no_global_registration,83.2,0
+7.34, 1442_OB,2,no_registration,76.6,0
+9.12, 1442_OB,1,normal,66.9,20.0
+8.19, 1442_OB,1,no_global_registration,63.3,0
+8.25, 1442_OB,1,no_registration,52.8,0
+7.52,1442_OB,0,normal,27.6,0.0241
+8.18, 1442_OB,0,no_global_registration,25.5,0
+7.47, 1442_OB,0,no_registration,18.4,0
 
 

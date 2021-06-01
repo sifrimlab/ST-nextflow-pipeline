@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 def helpMessage() {
     log.info """\
-    COMMUNISS PIPELINE   
+    STAPLE PIPELINE   
     =============================
     Welcome to the starting point of the ISS pipeline. This pipeline is designed to be completely modular and adaptable to your specific usecase,
     However, if you would like to just run a pipeline where you don't have to make any decisions or understand what it's doing, then the default settings will be just fine.
@@ -15,27 +15,27 @@ def helpMessage() {
 
     dataDir
     |
-    |_______DO
+    |___________DO
     |           |____REF.TIF
     |           |____DAPI.TIF
     |
     |________Round1
-        |       |____channel1.TIF
-        |       |____channel2.TIF
-        |       |____channel3.TIF
-        |       |____channel4.TIF
+        |       |____Round1_channel1.TIF
+        |       |____Round1_channel2.TIF
+        |       |____Round1_channel3.TIF
+        |       |____Round1_channel4.TIF
         |
         |____Round2
-        |       |____channel1.TIF
-        |       |____channel2.TIF
-        |       |____channel3.TIF
-        |       |____channel4.TIF
+        |       |____Round2_channel1.TIF
+        |       |____Round2_channel2.TIF
+        |       |____Round2_channel3.TIF
+        |       |____Round2_channel4.TIF
         |
         |____RoundN
-        |       |____channel1.TIF
-        |       |____channel2.TIF
-        |       |____channel3.TIF
-        |       |____channel4.TIF
+        |       |____{round_prefix}N_{channel_prefix}1.{extension}
+        |       |____RoundN_channel2.TIF
+        |       |____RoundN_channel3.TIF
+        |       |____RoundN_channel4.TIF
         ....
     
     If your extensions deviate from the above pattern (eg.: .tif instead of .TIF), you'll have to make some changes

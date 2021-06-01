@@ -40,13 +40,14 @@ def whiteFilter(image, radius):
 
 
 def detectSpotsLoG(image, min_sigma=1, max_sigma=10, num_sigma=10, threshold=0.2, overlap=0.5):
+    image = image.astype('uint8')
     blobs = blob_log(image, min_sigma, max_sigma, num_sigma, threshold, overlap)
     return blobs
 
 filtered_image = whiteFilter(image, tophat_filter_radius)
 
 
-blobs = blob_log(image, min_sigma, max_sigma, num_sigma, threshold, overlap)
+blobs = blob_log(image, min_sigma=min_sigma, max_sigma= max_sigma, num_sigma=num_sigma, threshold=threshold, overlap=overlap)
 initial_number = len(blobs)
 
 
