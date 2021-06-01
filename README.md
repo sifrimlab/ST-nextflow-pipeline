@@ -1,4 +1,4 @@
-# communISS: Spatial Transcriptomics processing end-to-end pipeline
+# STAPLE: Spatial Transcriptomics Automated PipeLinE 
 
 This repository represents the code-base behind the author's dissertation of his master in bioinformatics of 2021.
 It contains an entire end-to-end image processing and analysis pipeline for Spatial Transcriptomics. 
@@ -11,12 +11,12 @@ Currently it supports both ISS data and MERFISH data.
 ### Running the pipeline
 - Update your version of the repo to the most recent stable version:
 - 	```bash
-	nextflow pull WoutDavid/communISS ; cd communISS
+	nextflow pull WoutDavid/ST-nextflow-pipeline ; cd communISS
 	```
 - Create a conda environment containing all the dependencies of the current pipeline, and activate it
 - 	```bash
-	conda env create --file=communiss.yml --prefix ./communiss_env/
-	conda activate ./communiss_env/
+	conda env create --file=staple.yml --prefix ./staple_env/
+	conda activate ./staple_env/
 	```
 - Create a personal config file containing all the parameters you'll need for the functionality you want:
 - ```bash
@@ -29,7 +29,7 @@ For an explanation on all possible parameters you might encounter in the generat
 - ```bash
   nextflow -C standard_iss_experiment.config run  main.nf	\
 						-entry iss							\
-						--with_conda comunISS.yaml			\
+						--with_conda staple.yml			\
 	```
 
 ### Things you might want to know
