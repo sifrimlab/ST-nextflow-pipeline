@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+import json
 
 # compares two tuples and sees if they are "the same", as defined by an interval of allowed pixel mismatch
 def compareTuplesValues(ref_tuple, target_tuple, pixel_mismatch: int):
@@ -244,8 +245,37 @@ def spotDetectionQCWorkflow(ref_spots_csv, round_csv_dict):
     recall_df.to_html("reference_spot_recall.html", index=False)
 
 
+# implemented in a dumb way: just calculate complete barcodes again, but with the ref list being only those that were inside the decoded genes
+def checkCompleteBarcodeDecodingRatio(decoded_genes, dict_of_closest_ref_point_dicts, nr_rounds):
+    decoded_genes = pd.read_csv(decoded_genes)
+    decoded_genes = decoded_genes[decoded_genes['Gene'].isnull()!=True]
+    decoded_complete_barcodes = 0
+    times_broken = 0
+    # (dict_of_closest_ref_point_dicts[1][5]) = file
+    counter = 0
+
+    for row in tqdm(decoded_genes.itertuples()):
+        # create a string tuple for X and Y
+        row_tuple = f"({row.X}, {row.Y})"
+        tile_nr = row.Tile
+        for round_nr in range(1,nr_rounds+1):
+            with open(dict_of_closest_ref_point_dicts[round_nr][tile_nr], 'r') as json_file:
+                data = json.load(json_file)
+                ref_points_in_this_round =list(data.values())
+                if row_tuple in ref_points_in_this_round:
+                    if round_nr == 5:
+                        decoded_complete_barcodes+=1
+                else:
+                    times_broken+=1
+                    break
+
+        # print(f"decoded_complete_barcodes = {decoded_complete_barcodes}, times_broken = {times_broken}, round_reached = {round_nr}")
+
+    with open("normal_pixel_distance_3.txt", "w") as file:
+        file.write(f"decoded_complete_barcodes = {decoded_complete_barcodes}, times_broken = {times_broken}, adds up to {decoded_complete_barcodes + times_broken}, decoded genes length= {len(decoded_genes)}")
 
 
+    # total_n_tiles, tile_grid_array, _, _ = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)
 
 
 
@@ -256,16 +286,21 @@ def spotDetectionQCWorkflow(ref_spots_csv, round_csv_dict):
 
 
 if __name__=='__main__':
-    ref_spots_csv = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/blobs/transformed_concat_blobs.csv"
-    # rounds_csv_dict = [f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_3_filtered_registered_hybs.csv" for i in range(2,6)]
-    rounds_csv_dict={}
-    for round_nr in range(1,5):
-        rounds_csv_dict[round_nr] = []
-            # for tile_nr in range(1,5):
-        for i in range(1,5):
-            for tile_nr in range(1,49):
-                rounds_csv_dict[round_nr].append(f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/Round{round_nr}_c{i}_maxIP_padded_registered_tiled_{tile_nr}_filtered_registered_hybs_transformed.csv")
-    spotDetectionQCWorkflow(ref_spots_csv, rounds_csv_dict)
+    # ref_spots_csv = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/blobs/transformed_concat_blobs.csv"
+    # # rounds_csv_dict = [f"/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/hybs/Round{round_nr}_c{i}_padded_registered_tiled_3_filtered_registered_hybs.csv" for i in range(2,6)]
+    # rounds_csv_dict={}
+    # for round_nr in range(1,5):
+    #     rounds_csv_dict[round_nr] = []
+    #         # for tile_nr in range(1,5):
+    #     for i in range(1,5):
+    #         for tile_nr in range(1,49):
+    #             rounds_csv_dict[round_nr].append(f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/Round{round_nr}_c{i}_maxIP_padded_registered_tiled_{tile_nr}_filtered_registered_hybs_transformed.csv")
+    # spotDetectionQCWorkflow(ref_spots_csv, rounds_csv_dict)
 
-    # original_image = "/media/Puzzles/starfish_test_data/ExampleInSituSequencing/results_minsigma1_maxsigma2_filter3_hybDetection_thresholdSegmentation_voronoiAssignment/tiled_DO/REF_padded_tiled_3.tif"
-    # attribute_dict = checkSpotsInRoundPrecision(ref_spots_csv, rounds_csv, pixel_distance=3)
+    decoded_genes = "/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/final/concat_decoded_genes_transformed.csv"
+    dict_of_closest_ref_point_dicts = {}
+    for round_nr in range(1,6):
+        dict_of_closest_ref_point_dicts[round_nr] ={}
+        for tile_nr in range(1,49):
+            dict_of_closest_ref_point_dicts[round_nr][tile_nr] =f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/quality_control_pixel_distance_3/spot_detection_QC/precision/tiled_{tile_nr}_Round{round_nr}_closest_ref_point_dict.json"
+    checkCompleteBarcodeDecodingRatio(decoded_genes, dict_of_closest_ref_point_dicts, 5)
