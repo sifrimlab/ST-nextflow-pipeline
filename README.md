@@ -1,4 +1,6 @@
 # STAPLE: Spatial Transcriptomics Automated PipeLinE 
+Author: David Wouters
+
 
 This repository represents the code-base behind the author's dissertation of his master in bioinformatics of 2021.
 It contains an entire end-to-end image processing and analysis pipeline for Spatial Transcriptomics. 
