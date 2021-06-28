@@ -66,7 +66,7 @@ workflow iss {
             rounds = iss_round_adder()
             params.reference = create_reference_image(rounds.groupTuple(by:0).first()) //Create reference image by taking maxIP on the first round
         }
-        // Create the channel of round images, reference is implicitely defined in the config file as params.reference
+        // Create the channel of round images, reference is explicitely defined in the config file as params.reference
        rounds = Channel.fromPath("${params.dataDir}/${params.round_prefix}*/${params.round_prefix}*_${params.channel_prefix}*.${params.extension}")
        
 
@@ -78,11 +78,8 @@ workflow iss {
        grid_size_x = tiling.out.grid_size_x
        grid_size_y = tiling.out.grid_size_y
 
-       //normalize round and ref tiles
-       /* CLIP_AND_RESCALE_TILES(tiling.out.reference,tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
        
        //perform white tophat filtering on both reference and round images
-       /* white_tophat_filter(CLIP_AND_RESCALE_TILES.out.normalized_ref,CLIP_AND_RESCALE_TILES.out.normalized_rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
        white_tophat_filter(tiling.out.reference,tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
        // Register tiles locally:
