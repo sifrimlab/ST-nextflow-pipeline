@@ -13,16 +13,16 @@ The current working version is guaranteed to work with nextflow version 20.10, h
 
 - Clone/fork the current master branch of the pipeline to your system.
  ```bash
-	git clone https://github.com/WoutDavid/ST-nextflow-pipeline; cd ST-nextflow-pipeline
+git clone https://github.com/WoutDavid/ST-nextflow-pipeline; cd ST-nextflow-pipeline
   ```
 - Create a conda environment containing all the dependencies of the current pipeline, and activate it.
  ```bash
-	conda env create --file=staple.yml --prefix ./staple_env/
-	conda activate ./staple_env/
+conda env create --file=staple.yml --prefix ./staple_env/
+conda activate ./staple_env/
   ```
 - Create a personal config file containing all the parameters you'll need for the functionality you want:
  ```bash
-	nextflow config -profile iss >> standard_iss_experiment.config
+nextflow config -profile iss >> standard_iss_experiment.config
   ```
 - *Note that this config file is where you change everything that you want to change, such as data directory, output directory, image format etc.*
 For more details about the configuration of a pipeline run, see [Configuration](configuration.md).
@@ -32,7 +32,7 @@ For more details about the configuration of a pipeline run, see [Configuration](
 
 
  ```bash
-  nextflow -C standard_iss_experiment.config run  main.nf	\
+nextflow -C standard_iss_experiment.config run  main.nf	\
 						-entry iss							\
 						--with_conda staple.yml			\
 ```
