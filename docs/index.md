@@ -1,4 +1,4 @@
-                View in [Github Pages](https://woutdavid.github.io/ST-nextflow-pipeline/) or directly on [Github](https://github.com/WoutDavid/ST-nextflow-pipeline/) 
+View in [Github Pages](https://woutdavid.github.io/ST-nextflow-pipeline/) or directly on [Github](https://github.com/WoutDavid/ST-nextflow-pipeline/) 
 
 # General
 

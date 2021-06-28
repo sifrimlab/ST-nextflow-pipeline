@@ -12,14 +12,14 @@ The current working version is guaranteed to work with nextflow version 20.10, h
 ### Installation
 
 - Clone/fork the current master branch of the pipeline to your system.
- 	```bash
+ ```bash
 	git clone https://github.com/WoutDavid/ST-nextflow-pipeline; cd ST-nextflow-pipeline
-	```
+  ```
 - Create a conda environment containing all the dependencies of the current pipeline, and activate it.
- 	```bash
+ ```bash
 	conda env create --file=staple.yml --prefix ./staple_env/
 	conda activate ./staple_env/
-	```
+  ```
 - Create a personal config file containing all the parameters you'll need for the functionality you want:
  ```bash
 	nextflow config -profile iss >> standard_iss_experiment.config
