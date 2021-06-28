@@ -13,7 +13,7 @@ Currently it supports both ISS data and MERFISH data.
 ### Running the pipeline
 - Update your version of the repo to the most recent stable version:
 - 	```bash
-	nextflow pull WoutDavid/ST-nextflow-pipeline ; cd communISS
+	nextflow pull WoutDavid/ST-nextflow-pipeline ; cd ST-nextflow-pipeline
 	```
 - Create a conda environment containing all the dependencies of the current pipeline, and activate it
 - 	```bash
