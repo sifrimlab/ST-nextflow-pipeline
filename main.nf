@@ -123,7 +123,6 @@ workflow convert_czi {
     } from "./src/file_conversion/workflows/czi_conversion.nf"
 
     SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS("$params.dataDir/*.czi")
-    SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS.out.view()
 }
 workflow quality_control{
     

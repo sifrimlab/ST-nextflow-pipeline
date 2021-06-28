@@ -20,21 +20,24 @@ git clone https://github.com/WoutDavid/ST-nextflow-pipeline; cd ST-nextflow-pipe
 conda env create --file=staple.yml --prefix ./staple_env/
 conda activate ./staple_env/
   ```
+
+That is everything that needs to be installed. After this, general usage of the pipeline is performed as such:
+
+### Usage
 - Create a personal config file containing all the parameters you'll need for the functionality you want:
  ```bash
-nextflow config -profile iss >> standard_iss_experiment.config
+nextflow config -profile iss >> iss_exp.config
   ```
 - *Note that this config file is where you change everything that you want to change, such as data directory, output directory, image format etc.*
 For more details about the configuration of a pipeline run, see [Configuration](configuration.md).
 
-### Usage
  After making the needed changes to the config file, you can run pipeline by specifying an entry point with "-entry", which takes as argument the name of one of the workflows included in the main.nf file.  
 
 
  ```bash
-nextflow -C standard_iss_experiment.config run  main.nf	\
-						-entry iss							\
-						--with_conda staple.yml			\
+nextflow -C iss_exp.config run main.nf	                \
+			        -entry iss	        \
+				--with_conda staple.yml	\
 ```
 
 The *--with_conda* flag is only needed if you decide not the activate the conda environment prior to running the pipeline. This can be useful when submitting jobs to a high compute cluster.
