@@ -3,10 +3,10 @@
 ### Requirements
 For the current version of the pipeline, you only need two frameworks are required to run it on any system that has acces to the pipeline.
 
-- **Nextflow**: This can be installed by following the instructions at https://www.nextflow.io/docs/latest/getstarted.html.
+- **Nextflow**: This can be installed by following the instructions at [Nextflow's documentation](https://www.nextflow.io/docs/latest/getstarted.html).
 The current working version is guaranteed to work with nextflow version 20.10, however it will soon be updated to be compatible to the most recent nextflow version.
 
-- **Conda**: Any form of environment managent will most likely do. The recomended software is (Ana)Conda, which can be installed folowwing these steps: https://conda.io/projects/conda/en/latest/user-guide/install/index.html. This is used to automatically create the programming environment with all used languages and software packages without creating version conflicts.
+- **Conda**: Any form of environment managent will most likely do. The recomended software is (Ana)Conda, which can be installed folowwing [these steps](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  This is used to automatically create the programming environment with all used languages and software packages without creating version conflicts.
 
 
 ### Installation
