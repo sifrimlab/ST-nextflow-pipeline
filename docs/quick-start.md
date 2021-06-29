@@ -9,20 +9,19 @@ All Quick Starts assume that the installation of the pipeline was performed as d
 - [In Situ Sequencing](#in-situ-sequencing)
 - [MERFISH](#MERFISH)
 
+## Converting raw images to seperated images
 
-## In Situ Sequencing
+Commercial microscopy acquisition technology often have a proprietary raw output file format (e.g. .ndi, .czi). Since these are meant to be processed by their own proprietary software, the pipeline cannot work based off of raw images. Input images are expected to be single-stacked (OME-)TIFF images. 
 
-### File formatting
-
-#### Converting raw images to seperated images
-
-Commercial microscopy acquisition technology often have their own raw output file format. Since these are meant to be processed by their own proprietary software, the pipeline cannot work based off of raw images. Input images are expected to be single-stacked (OME-)TIF images. For .czi images, as acquired by Zeiss microscopes, converter is available in the pipeline using the profile -convert\_czi:
+For .czi images, as acquired by Zeiss microscopes, a converter is available in the pipeline using the entry *-convert\_czi*:
 ```bash
 nextflow run main.nf -entry convert_czi --dataDir fill_in_directory
 ```
-For other raw image formats, the converting to seperate non-stacked images will have to be done by the user, using the software specific to their microscope.
+For other raw image formats, conversion to seperate non-stacked images will have to be done by the user, using the software specific to their microscope.
 
-#### Prerequisites of input data
+## In Situ Sequencing
+
+### Prerequisites of input data
 
 For the ISS workflow, it is assumed that your input data adheres to some **prerequisites**:
 
@@ -58,15 +57,37 @@ An ideal file layout would as such look like this:
         ....
 ```
 
-#### Running the pipeline
+## MERFISH 
+### Prerequisites of input data
+
+For the MERFISH workflow, it is also assumed that your data follows a simple naming convention, which is an image prefix, followed by a number denoting its position in the imaging order. This prefix, available under **\$image\_prefix**, is used to make sure the order of the images is correct when performing Pixel Based Decoding. 
+
+In MERFISH, different rounds/channels are irrelevant for its processing, so they need to be converted into regular ascending numbers. 
+
+
+```
+    dataDir
+    |
+    |____DAPI.tif
+    |____merfish_1.tif
+    |____merfish_2.tif
+    |____merfish_3.tif
+    |____merfish_4.tif
+     ....
+```
+
+
+
+### Running the pipeline
 - Create a personal config file containing all the parameters you'll need for the functionality you want. All available profiles are denoted on the [home page](index.md).
  ```bash
 nextflow config -profile iss >> iss_exp.config
   ```
-- *Note that this config file is where you change everything that you want to change, such as data directory, output directory, image format etc.*
+- *For the default pipeline, the only thing that needs to be configured are the filepaths that point to the data.*
+
 For more details about the configuration of a pipeline run, see [Configuration](configuration.md).
 
- After making the needed changes to the config file, you can run pipeline by specifying an entry point with "-entry", which takes as argument the name of one of the workflows included in the main.nf file. This is often just the same thing as the profile you used to create your personal config file.
+ After making the needed changes to the config file, you can run the pipeline by specifying an entry point with "-entry", which takes as argument the name of one of the workflows included in the main.nf file (for an overview of all options, see the [homepage](index.md)). This is often just the same thing as the profile you used to create your personal config file.
 
 
  ```bash
@@ -75,15 +96,16 @@ nextflow -C iss_exp.config run main.nf	                \
 				--with_conda staple.yml	        \
 ```
 
-The *--with_conda* flag is only needed if you decide not the activate the conda environment prior to running the pipeline, as described in [Installation & Usage](installation.md) . This can be useful when submitting jobs to a high compute cluster.
+The *\-\-with_conda* flag is only needed if you decide not the activate the conda environment prior to running the pipeline, as described in [Installation & Usage](installation.md). This can be useful when submitting jobs to a high compute cluster.
 
 
 
-#### Aftermath
-All output images will be stored in the path available in the **\$outDir** parameter. Depending on whether intermediate images were asked to be created and stored, this directory can vary in size. However, Nextflow works by using files as communication between processes, and these are all stored in the directory created by the **$workDir** parameter. Depending on the size of your input, the storage load of this directory can become quite sizeable, and dynamical workDir cleaning is not yet supported by Nextflow. A bash script is available in ~/src/utils/bin/clean_work.sh that commits the symlinks in the outDir to memory, and subsequently removes the entire workDir. 
+### Aftermath
+All output images will be stored in the path available in the **\$outDir** parameter. Depending on whether intermediate images were asked to be created and stored, this directory can vary in size. However, Nextflow works by using files as communication between processes, and these are all stored in the directory created by the **$workDir** parameter. Depending on the size of your input, the storage load of this directory can become quite sizeable, and dynamical workDir cleaning is not yet supported by Nextflow. 
+
+A bash script is available in ~/src/utils/bin/clean_work.sh that commits the symlinks in the outDir to memory, and subsequently removes the entire workDir. 
 ````bash
 ./clean_work.sh fill_in_dataDir fill_in_workDir
-
 ````
 
 

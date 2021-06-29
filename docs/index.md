@@ -13,9 +13,16 @@ that allows you to customize and run a completely automated pipeline to process 
 * [Documentation](documentation-start.md)
 * [Configuration](configuration.md)
 * [Contributing](contributing.md)
+* [Contex](#context)
 * [Contact](#contact)
 
 * * *
+
+### Context
+This project was created as the basis of my thesis "Development of an automated data
+analysis framework for highly-multiplexed transcriptomic assays", in the context of my final Master's year in Bioinformatics at the KU Leuven. 
+
+The development of the framework will be continued within the scope of my PhD in the same hostlab, the Laboratory of Laboratory of Multi-omic Integrative Bioinformatics (lmib), under the superivision of Prof. Alejandro Sifrim. 
 
 ### Contact 
 
