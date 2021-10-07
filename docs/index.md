@@ -2,6 +2,8 @@ View in [Github Pages](https://woutdavid.github.io/ST-nextflow-pipeline/) or dir
 
 # General
 
+<span style="color:red">***WARNING: This documentation website is still under construction.***</span>
+
 Welcome to STAPLE. This website represents everything you need to know about the end-to-end framework 
 that allows you to customize and run a completely automated pipeline to process your Spatial Transcriptomic dataset.
 

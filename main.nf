@@ -79,18 +79,10 @@ if (params.help){
     exit 0
 }
 
-// Input parsing/validation
-def checkBackslash(input_string){
-     if (input_string ==~ /.*\/$/){
-        return_string = input_string
-         
-     }
-     else {
-        return_string = input_string + "/"
-     }
-     return return_string
+if( !nextflow.version.matches('0.20+') ) {
+    println "This workflow requires Nextflow version 0.20 or greater -- You are running version $nextflow.version"
+    exit 1
 }
-
 // Prints a nice intro message before running the pipeline
 log.info """\
          COMMUNISS PIPELINE   
@@ -108,9 +100,8 @@ log.info """\
 // Include experiment-specific workflows //
 ///////////////////////////////////////////
 
-
-// Actual workflows
 workflow rename_files{
+
     include {
     add_parent_dir_to_file_name 
     } from "./src/utils/processes/file_name_parsing.nf"
@@ -118,6 +109,7 @@ workflow rename_files{
     add_parent_dir_to_file_name()
 }
 workflow convert_czi {
+
     include{
     SPLIT_CZI_ROUNDS_INTO_CHANNEL_TIFS
     } from "./src/file_conversion/workflows/czi_conversion.nf"
