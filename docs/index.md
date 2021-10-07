@@ -13,7 +13,7 @@ that allows you to customize and run a completely automated pipeline to process 
 * [Documentation](documentation-start.md)
 * [Configuration](configuration.md)
 * [Contributing](contributing.md)
-* [Contex](#context)
+* [Context](#context)
 * [Contact](#contact)
 
 * * *
