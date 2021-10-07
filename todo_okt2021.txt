@@ -1,25 +1,26 @@
 TODO:
 
-Functionality:
+#### Functionality:
 - More robust/scalable way of creating the HTML pages
 - Tiling to be more robust
 - write a test suite to make it an official github repo that can be added to
-- Create reference image uses .first(), but that is a random one in the context of Nextflow since the order isn't guarantied
 - Create more options for registering, if people care about that sorta thing
 - better spot detection, or more options
 - work out normalization, instead of just saying "oh yeah this seemed to work"
 - add graph-based decoding 
 - Fix plotting assigned genes on a large scale, that for some reason got stuck everytime, still no clue why
 
+Small debugs:
+- Create reference image uses .first(), but that is a random one in the context of Nextflow since the order isn't guarantied
+- Fix threshold line on decoding QC
+
 
 MERFISH
 - get rid of the requirement that the images have to be 16-bit
 - register wrt to a choice of image, not just to the random first one that asynchronously enters the function
-- Improve decoding to be more scalable by means of a more intelligent find nearest neighbour searching algorithm instead of just hardcoding it.
+- Improve decoding to be more scalable by means of a more intelligent find nearest neighbour searching algorithm instead of just hardcoding it, because now it's not really usable
 
-
-
-Style:
+#### Style:
 - Naming convention of workflow hierarchy
 - write a better/more accurate help message
 - Function documentation
