@@ -10,6 +10,6 @@ process clean_work_dir {
 
     script:
     """
-    python $binDir/clean_work.sh $params.outDir $params.workDir
+    bash $binDir/clean_work.sh $params.outDir $params.workDir
     """
 }
