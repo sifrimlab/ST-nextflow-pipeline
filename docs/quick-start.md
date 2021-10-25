@@ -20,7 +20,7 @@ nextflow run main.nf -entry convert_czi --dataDir fill_in_directory
 For other raw image formats, conversion to seperate non-stacked images will have to be done by the user, using the software specific to their microscope.
 
 ## Codebook
-Codebooks for all experiment types are required to be .csv files that consist of 2 columns and a header, where the header are the columns "Gene" and Barcode" (order does not matter, spelling does). The barcodes in an ISS experiment are also supposed to be in terms of channel numbers, not letters (i.e. [4 ,2 ,1 ,3], not [A, T, G, C]). A small python script is available at ~/src/file_conversion/bin/modules/codebookParsin.py to convert letters to numbers using a user-inputted index file. MERFISH barcodes are expected to be binary. 
+Codebooks for all experiment types are required to be .csv files that consist of 2 columns and a header, where the header are the columns "Gene" and Barcode" (order does not matter, capitalization does). The barcodes in an ISS experiment are also supposed to be in terms of channel numbers, not letters (i.e. [4 ,2 ,1 ,3], not [A, T, G, C]). A small python script is available at ~/src/file_conversion/bin/modules/codebookParsin.py to convert letters to numbers using a user-inputted index file. MERFISH barcodes are expected to be binary. 
 
 Here are examples of how the codebooks are expected to be formatted.
 

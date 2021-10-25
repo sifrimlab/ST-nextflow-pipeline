@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 from scipy import ndimage
 from skimage import measure, color, io
 from skimage.util import img_as_ubyte 
-from icecream import ic
 
 
 def collectProperties(property_csv_list: str):

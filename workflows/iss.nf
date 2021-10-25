@@ -43,7 +43,7 @@ include {
     plot_decoded_genes 
 } from "../src/plotting/workflows/decoded_genes_workflow.nf" 
 include {
-    stardist_segmentation_workflow as segmentation //threshold_watershed_segmentation as segmentation
+   threshold_watershed_segmentation as segmentation //stardist_segmentation_workflow as segmentation //
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
@@ -110,6 +110,6 @@ workflow iss {
        assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
 
        // Copy every symlink and clean up work dir 
-       clean_work_dir()
+       /* clean_work_dir() */
     
 }

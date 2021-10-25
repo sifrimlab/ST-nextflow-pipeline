@@ -4,7 +4,6 @@ from skimage import io
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 import json
 
 # compares two tuples and sees if they are "the same", as defined by an interval of allowed pixel mismatch

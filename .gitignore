@@ -1,8 +1,8 @@
 .vscode/
 .ipynb_checkpoints/
-image_processing_env/
 communiss_env/
-__pycache__/
+*__pycache__/
 .nextflow*
 work/
 results/
+*env/

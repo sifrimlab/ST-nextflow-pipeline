@@ -174,6 +174,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     # parse the dict such that the value becomes gene name, count, and respective barcode. this makes it easier to convert to a df
     gene_dict = {gene: [gene,count, df.loc[df['Gene']==gene].iloc[0]['Barcode']] for gene, count in gene_dict.items()}
     gene_df = pd.DataFrame.from_dict(list(sorted(gene_dict.values(),key=lambda x: x[1], reverse=True)))
+    print(gene_df)
     gene_df.columns=['Gene', 'Counts', 'Barcode']
     gene_df.to_html("recognized_barcodes_per_gene.html")
 

@@ -1,7 +1,6 @@
 import sys
 import json
 import re
-from icecream import ic
 import matplotlib.pyplot as plt
 
 

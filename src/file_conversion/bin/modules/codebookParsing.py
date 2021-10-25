@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 import csv
-from icecream import ic
 
 
 def convertLettersToNumbers(path_to_codebook: str, path_to_conversion_index: str, outfile, index_to_keep=0):

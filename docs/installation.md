@@ -6,8 +6,25 @@ For the current version of the pipeline, you only need two frameworks are requir
 - **Nextflow**: This can be installed by following the instructions at [Nextflow's documentation](https://www.nextflow.io/docs/latest/getstarted.html).
 The current working version is guaranteed to work with nextflow version 20.10, however it will soon be updated to be compatible to the most recent nextflow version.
 
-- **Conda**: Any form of environment managent will most likely do. The recomended software is (Ana)Conda, which can be installed folowwing [these steps](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  This is used to automatically create the programming environment with all used languages and software packages without creating version conflicts.
+- **Conda**: Any form of environment management will most likely do. The recomended software is (Ana)Conda, which can be installed folowing [these steps](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  This is used to automatically create the programming environment with all used languages and software packages without creating version conflicts.
 
+
+### Dependencies
+Here is a list of all dependencies that were installed to run the full pipeline in case you'd like to build them from scratch.
+A complete list including version numbers can be found in the form of the staple.yml file, as can be described below.
+- python
+- numpy
+- pip
+- imagecodecs
+- scikit-image
+- scikit-learn
+- pandas
+- beautifusoup4
+- umap-learn
+- aicspylibczi
+- tensorflow
+- stardist
+- csbdeep
 
 ### Installation
 
@@ -24,7 +41,7 @@ conda activate ./staple_env/
 That is everything that needs to be installed. After this, general usage of the pipeline is performed as such:
 
 ### Usage
-- Create a personal config file containing all the parameters you'll need for the functionality you want:
+- Create a personal config file containing all the parameters for your experiment. 
  ```bash
 nextflow config -profile iss >> iss_exp.config
   ```

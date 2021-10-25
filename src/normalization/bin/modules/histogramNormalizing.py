@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from icecream import ic
 from skimage import io
 from skimage.exposure import match_histograms
 from skimage.util import img_as_uint

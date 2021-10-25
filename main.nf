@@ -79,10 +79,10 @@ if (params.help){
     exit 0
 }
 
-if( !nextflow.version.matches('0.20+') ) {
-    println "This workflow requires Nextflow version 0.20 or greater -- You are running version $nextflow.version"
-    exit 1
-}
+/* if( !nextflow.version.matches('0.20+') ) { */
+/*     println "This workflow requires Nextflow version 0.20 or greater -- You are running version $nextflow.version" */
+/*     exit 1 */
+/* } */
 // Prints a nice intro message before running the pipeline
 log.info """\
          COMMUNISS PIPELINE   

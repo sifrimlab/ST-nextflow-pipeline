@@ -3,7 +3,6 @@ import os
 import cv2
 import sys
 import glob
-from icecream import ic
 from PIL import Image
 # important for giant tiff files, otherwise PIL thinks it's malware
 Image.MAX_IMAGE_PIXELS = None  

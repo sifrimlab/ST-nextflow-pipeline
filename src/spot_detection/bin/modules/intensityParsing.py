@@ -1,5 +1,4 @@
 import sys
-from icecream import ic
 import pandas as pd
 
 def getMaxIntensityPerRound(path_to_intensity_csv: str):

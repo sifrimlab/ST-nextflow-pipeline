@@ -3,7 +3,6 @@ import os
 import sys
 import numpy as np
 import re
-from icecream import ic
 from modules.spotDetection import laplacianOfGaussianBlobDetector
 
 ## Argument parsing:

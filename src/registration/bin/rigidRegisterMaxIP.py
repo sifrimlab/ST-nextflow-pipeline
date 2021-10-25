@@ -2,7 +2,6 @@ import SimpleITK as sitk
 import sys
 import os
 import re
-from icecream import ic
 from modules.calculateTransform import calculateTransform, warpImage
 # input: 
 # REF_padded.tif Round1 Round1_maxIP.tif Round1_c1_padded.tif Round1_c3_padded.tif Round1_c4_padded.tif Round1_c2_padded.tif

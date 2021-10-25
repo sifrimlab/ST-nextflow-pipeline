@@ -6,7 +6,6 @@ import sys
 import math
 from matplotlib import pyplot as plt
 from modules.tilingHelperFunctions import roundUpTo100
-from icecream import ic
 from PIL import Image
 # important for giant tiff files, otherwise PIL thinks it's malware
 Image.MAX_IMAGE_PIXELS = None
