@@ -4,16 +4,12 @@
     <head>
         <meta charset="utf-8">
 
-        <title>Assignment metrics</title>
-<style>
-            html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-            .w3-sidebar {
-              z-index: 3;
-              width: 250px;
-              top: 43px;
-              bottom: 0;
-              height: inherit;
-            }
+        <title>Assignment Metrics</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
         .dataframe {
             border-collapse: collapse;
             margin: 25px 0;
@@ -45,12 +41,37 @@
                </style>
     </head>
     <body>
-        <h1>Assignment metrics</h1>
+        <!-- Navbar -->
+        <div class="w3-top">
+            <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+            <a href="#stats" class="w3-bar-item w3-button w3-hide-small w3-hide-medium w3-hover-white">Decoding intensity QC</a>
+            </div>
+        </div>
 
-        <h2>general_stats</h2>
+        <!-- Overlay effect when opening sidebar on small screens -->
+        <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+            <div class="w3-row w3-padding-64">
+                <div class="w3-twothird w3-container">
+                <h1 class="w3-text-teal">Statistics about assigned genes to segmented cells</h1>
+                </div>
+                <div class="w3-third w3-container">
+                </div>
+            </div>
 
-        <h2>top10_assigned_cells</h2>
+        <h2 id=stats>General statistics</h2>
+        <p>
+        This table shows the ratio of assigned vs unassigned spots found in the data.
+        </p>
 
-        <h2>top10_assigned_genes</h2>
+        <h2>Top 10 Assigned Cells</h2>
+        <p>
+        This table shows which 10 cells have the most spots assigned to them.
+        </p>
+
+        <h2>Top 10 Assigned Genes</h2>
+        <p>
+        This table shows 10 genes where found mostly assigned to any cell.
+        </p>
     </body>
 </html>

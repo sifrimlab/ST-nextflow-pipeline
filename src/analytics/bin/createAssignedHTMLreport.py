@@ -9,16 +9,16 @@ with open(template, 'r') as template_file:
     contents = template_file.read()
     template_soup = BeautifulSoup(contents, features="html.parser")
 
-h2_list = template_soup.find_all('h2')
-h2_index = 0
+p_list = template_soup.find_all('p')
+p_index = 0
 
 for element in table_list:
     with open(element, 'r') as html_file:
         contents = html_file.read()
         html_soup = BeautifulSoup(contents, features='html.parser')
         table_tag = html_soup.find('table')
-        h2_list[h2_index].insert_after(table_tag)
-        h2_index+=1
+        p_list[p_index].insert_after(table_tag)
+        p_index+=1
 
 with open('assignment_report.html', 'w') as result_file:
     result_file.write(str( template_soup ))
