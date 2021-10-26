@@ -40,6 +40,7 @@ include {
 } from "../src/plotting/processes/plotting.nf"
 
 workflow merfish {
+
     main:
         glob_pattern ="${params.dataDir}/${params.image_prefix}*.${params.extension}" 
         rounds = Channel.fromPath(glob_pattern)

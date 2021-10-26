@@ -25,6 +25,7 @@ def getResolution(filepath):
     int, int
         returns the amount of width and height pixels the input image has: (X,Y)
     """
+    print(filepath)
     im = Image.open(filepath)
     width, height = im.size
     return width, height
