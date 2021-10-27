@@ -21,6 +21,7 @@ def createPixelVector(x_coordinate: int,y_coordinate: int, image_list, norm="L2"
     return barcode_array
 
 def createBarcodeVector(barcode):
+    # Turn string barcode into array of floats
     array = np.array([float(char) for char in str(barcode)]) 
     return array/np.linalg.norm(array) 
 
