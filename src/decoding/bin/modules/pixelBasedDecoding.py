@@ -116,17 +116,17 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:
 if __name__=="__main__":
     # x_dim = 2048
     # y_dim = 2048
-    x_dim = 405
-    y_dim = 205
+    # x_dim = 405
+    # y_dim = 205
 
     # tile_nr =  sys.argv[3]
     # tile_nr_int = int(re.findall(r"\d+", tile_nr)[0])
-    codebook = "/media/Puzzles/starfish_test_data/MERFISH/codebook.csv"
+    codebook = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
     bit_len = 16
     threshold = 0.5176
     image_prefix="merfish_"
-    image_path_list = [f"/media/Puzzles/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
-    decoded_df = decodePixelBased(x_dim,y_dim, codebook, bit_len, image_path_list,image_prefix,threshold)
+    image_path_list = [f"/media/tool/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
+    decoded_df = decodePixelBased(405,205, codebook, bit_len, image_path_list,image_prefix,threshold)
     # decoded_df['Tile'] = [tile_nr_int for i in range(0,len(decoded_df))]
     decoded_df.to_csv("decoded.csv", index=False)
 

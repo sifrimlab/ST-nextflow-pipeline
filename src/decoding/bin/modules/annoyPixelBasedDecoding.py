@@ -120,14 +120,14 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:
 
 
 if __name__ == "__main__":
-    codebook_path = "/home/david/Documents/communISS/data/merfish/codebook.csv"
-    image_path_list = [f"/media/sdb1/starfish_test_data/MERFISH/processed/merfish_{i}.tif" for i in range(1, 17)]
-    # createAnnoyIndex(codebook_path, bit_len=16, n_trees=10)
+    codebook_path = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
+    image_path_list = [f"/media/tool/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
+    createAnnoyIndex(codebook_path, bit_len=16, n_trees=10)
     bit_len = 16
     threshold = 0.5176
-    x_dim, y_dim = (100,100)
+    x_dim, y_dim = (405,205)
     image_prefix="merfish_"
-    result_df = findNN(x_dim, y_dim, codebook_index_path="codebook_index.ann", codebook_path=codebook_path, bit_len=bit_len, img_path_list=image_path_list, img_prefix=image_prefix)
+    result_df = decodePixelBased(x_dim, y_dim, codebook=codebook_path, bit_len=bit_len, img_path_list=image_path_list, img_prefix=image_prefix)
     result_df.to_csv("annoy.csv", index=False)
     # for pixel in image_array:
     #     print(u.get_item_vector((u.get_nns_by_vector(pixel, 1, search_k=-1, include_distances=False))[0])) # This is a way to get the closest vector
