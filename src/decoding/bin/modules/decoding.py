@@ -4,7 +4,24 @@ import csv
 import re
 
 
-def decodeSequentialMaxIntensity(path_to_max_intensity_csv: str, path_to_codebook_csv: str, tile_nr: int):
+def decodeSequentialMaxIntensity(path_to_max_intensity_csv: str, path_to_codebook_csv: str, tile_nr: int) -> pd.DataFrame:
+    """decodeSequentialMaxIntensity.
+
+    Parameters
+    ----------
+    path_to_max_intensity_csv : str
+        path_to_max_intensity_csv
+    path_to_codebook_csv : str
+        path_to_codebook_csv
+    tile_nr : int
+        tile_nr
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe that countains each decoded spot.
+
+    """
     # Create empty dict
     codebook_dict = {}
     # First we parse the codebook into a usable dict
