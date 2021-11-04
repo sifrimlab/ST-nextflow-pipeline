@@ -7,7 +7,6 @@ from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
 from typing import List
-from icecream import ic
 
 
 
