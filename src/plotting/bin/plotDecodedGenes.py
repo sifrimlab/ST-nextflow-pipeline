@@ -1,8 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import colorConverter
-import pandas as pd
-import cv2
 import sys
 from ast import literal_eval as make_tuple
 from modules.imageViewing import plotDecodedGenesOnWholeImage
