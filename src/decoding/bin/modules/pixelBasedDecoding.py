@@ -7,7 +7,16 @@ from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
 from typing import List
+import time
 
+def measureTime(func):
+    def wrapper(*args, **kwargs):
+        starttime = time.perf_counter()
+        temp = func(*args, **kwargs)
+        endtime = time.perf_counter()
+        print(f"Time needed to run {func.__name__}: {endtime - starttime} seconds")
+        return(temp)
+    return wrapper
 
 
 def createPixelVector(x_coordinate: int,y_coordinate: int, image_list: List[np.array], norm:str ="L2") -> np.array:
@@ -202,6 +211,7 @@ def createSpotsFromDecodedPixels(x_dim: int, y_dim: int, decoded_pixels_df: pd.D
     return merged_df
 
 # threshold based on a 1-bit error in euclidean distance
+@measureTime
 def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176):
     # First decode each pixel in the image
     decoded_pixels_df = decodePixels(x_dim, y_dim, codebook, bit_len, img_path_list,img_prefix, threshold)
@@ -224,12 +234,14 @@ if __name__=="__main__":
 
     # tile_nr =  sys.argv[3]
     # tile_nr_int = int(re.findall(r"\d+", tile_nr)[0])
-    codebook = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
+    codebook_path = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
+    image_path_list = [f"/media/tool/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
     bit_len = 16
     threshold = 0.5176
+    x_dim, y_dim = (405,205)
     image_prefix="merfish_"
-    image_path_list = [f"/media/tool/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
-    decoded_df = decodePixelBased(405,205, codebook, bit_len, image_path_list,image_prefix,threshold)
-    # decoded_df['Tile'] = [tile_nr_int for i in range(0,len(decoded_df))]
-    decoded_df.to_csv("decoded.csv", index=False)
+    result_df = decodePixelBased(x_dim, y_dim, codebook=codebook_path, bit_len=bit_len, img_path_list=image_path_list, img_prefix=image_prefix)
+    result_df['Tile'] = [1 for i in range(0,len(result_df))]
+    result_df.to_csv("decoded.csv", index=False)
+
 

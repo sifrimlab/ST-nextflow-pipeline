@@ -70,7 +70,7 @@ def findNN(x_dim: int, y_dim: int, codebook_path:str, bit_len: int, img_path_lis
     result_df = pd.DataFrame(rows_list)
     return result_df
 # this code assumes that all pixel combinations are present in the decoded_pixels_df 
-def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, max_area=10000):
+def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=4, max_area=10000):
     # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
