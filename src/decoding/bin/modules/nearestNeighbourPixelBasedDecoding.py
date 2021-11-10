@@ -1,5 +1,4 @@
 import re
-import time
 from sklearn.neighbors import NearestNeighbors
 from pixelBasedDecoding import parseBarcodes, createBarcodeVector, createPixelVector
 from skimage import io
@@ -8,19 +7,7 @@ from skimage.measure import label, regionprops_table
 import numpy as np
 import pandas as pd
 
-
-def measureTime(func):
-    def wrapper(*args, **kwargs):
-        starttime = time.perf_counter()
-        temp = func(*args, **kwargs)
-        endtime = time.perf_counter()
-        print(f"Time needed to run {func.__name__}: {endtime - starttime} seconds")
-        return(temp)
-    return wrapper
-
-
-
-def createCodebookTree(codebook_path: str, bit_len:int, algorithm="kd_tree"):
+def createCodebookTree(codebook_path: str, bit_len:int, algorithm="ball_tree"):
 
     def extractVectorsFromCodebook(codebook: str, bit_len: int):
         df = pd.read_csv(codebook)
@@ -61,7 +48,6 @@ def findNN(x_dim: int, y_dim: int, codebook_path:str, bit_len: int, img_path_lis
             minimal_distance_array, index_array = tree.kneighbors(pixel_vector.reshape(1, -1)) # rehsape is necessary because the function expects a 2D array
             minimal_distance, index = minimal_distance_array[0][0], index_array[0][0] # return type of kneighbors is an array, so we gotta unpack the single value
             # We should just have the index of the closest vector now, so we can index the df
-            print(index)
             attribute_dict['Barcode'] = df.at[index,'Barcode']# alternative that might be faster: df.iloc[index]['Barcode']
             attribute_dict['Distance'] = minimal_distance
             attribute_dict['Gene'] = df.at[index,'Gene']# alternative that might be faster: df.iloc[index]['Barcode']
@@ -105,7 +91,6 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, ma
     merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
     return merged_df
 
-@measureTime
 def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176):
     decoded_pixels_df = findNN(x_dim, y_dim, codebook_path=codebook_path, bit_len=16, img_path_list=image_path_list, img_prefix=img_prefix)
     decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df)
@@ -124,8 +109,8 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:
 
 
 if __name__ == "__main__":
-    codebook_path = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
-    image_path_list = [f"/media/tool/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
+    codebook_path = "/home/david/Documents/communISS/data/merfish/codebook.csv"
+    image_path_list = [f"/media/sda1/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
     bit_len = 16
     threshold = 0.5176
     x_dim, y_dim = (405,205)
