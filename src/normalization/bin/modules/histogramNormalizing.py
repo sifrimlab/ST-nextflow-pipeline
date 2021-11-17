@@ -5,6 +5,7 @@ from skimage import io
 from skimage.exposure import match_histograms
 from skimage.util import img_as_uint
 from PIL import Image
+
 # create our cumulative sum function
 def cumsum(a):
     a = iter(a)

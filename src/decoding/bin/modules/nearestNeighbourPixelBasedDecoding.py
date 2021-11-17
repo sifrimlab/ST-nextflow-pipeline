@@ -1,6 +1,6 @@
 import re
 from sklearn.neighbors import NearestNeighbors
-from pixelBasedDecoding import parseBarcodes, createBarcodeVector, createPixelVector
+from modules.pixelBasedDecoding import parseBarcodes, createBarcodeVector, createPixelVector
 from skimage import io
 from skimage import img_as_float
 from skimage.measure import label, regionprops_table
@@ -92,7 +92,7 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=4, ma
     return merged_df
 
 def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176):
-    decoded_pixels_df = findNN(x_dim, y_dim, codebook_path=codebook_path, bit_len=16, img_path_list=image_path_list, img_prefix=img_prefix)
+    decoded_pixels_df = findNN(x_dim, y_dim, codebook_path=codebook, bit_len=bit_len, img_path_list=img_path_list, img_prefix=img_prefix, threshold=threshold)
     decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df)
     return decoded_spots_df
 

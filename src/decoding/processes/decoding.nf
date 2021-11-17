@@ -36,3 +36,20 @@ process pixel_based_decoding {
     """
 
 }
+
+process nn_pixel_based_decoding {
+    publishDir "$params.outDir/decoded", mode: 'symlink'
+
+    input:
+    val x_dim
+    val y_dim
+    tuple val(tile_nr), path(tile_images)
+
+    output:
+    path "decoded_${tile_nr}.csv"
+
+    """
+    python $binDir/nnDecodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $params.image_prefix $tile_images 
+    """
+
+}
