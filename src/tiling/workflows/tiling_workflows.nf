@@ -102,4 +102,5 @@ workflow standard_merfish_tiling {
         tile_size_y = calculate_tile_size.out.tile_size_y
         grid_size_x = calculate_tile_size.out.grid_size_x
         grid_size_y = calculate_tile_size.out.grid_size_y
+        padded_whole_reference = pad_round.out.first()
 }

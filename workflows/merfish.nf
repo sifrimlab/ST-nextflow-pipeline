@@ -28,7 +28,7 @@ include {
 } from "../src/segmentation/workflows/segmentation_workflow.nf"
 
 include {
-    nn_pixel_based_decoding as pixel_based_decoding //pixel_based_decoding
+     nn_pixel_based_decoding as pixel_based_decoding  
 } from "../src/decoding/processes/decoding.nf"
 
 include {
@@ -90,7 +90,7 @@ workflow merfish {
         pixel_based_decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
         transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
-        plot_decoded_spots(decoded_genes, images.first(), grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
         /* segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y) */
 
