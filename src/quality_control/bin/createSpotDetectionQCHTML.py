@@ -41,28 +41,28 @@ with open(template, 'r') as template_file:
     contents = template_file.read()
     template_soup = BeautifulSoup(contents, features="html.parser")
 
-h2_list = template_soup.find_all('h2')
-h2_index = 0
+p_list = template_soup.find_all('p')
+p_index = 0
 
 # Read recall table tag
 recall_soup = BeautifulSoup(recall_html_table, features="html.parser")
 table_tag = recall_soup.find('table')
-h2_list[h2_index].insert_after(table_tag)
-h2_index+=1
+p_list[p_index].insert_after(table_tag)
+p_index+=1
 
 image_tag = template_soup.new_tag('img')
 image_tag['src']= f"./recall/{recall_plot}"
 image_tag['width']= 700
 image_tag['height']= 500
-h2_list[h2_index].insert_after(image_tag)
-h2_index+=1
+p_list[p_index].insert_after(image_tag)
+p_index+=1
 
 
 
 precision_soup = BeautifulSoup(precision_html_table, features="html.parser")
 table_tag = precision_soup.find('table')
-h2_list[h2_index].insert_after(table_tag)
-h2_index+=1
+p_list[p_index].insert_after(table_tag)
+p_index+=1
 
 with open('spot_detection_qc_report.html', 'w') as result_file:
     result_file.write(str( template_soup ))

@@ -12,6 +12,6 @@ image = io.imread(image_path)
 prefix = os.path.splitext(image_path)[0]
 sigma = float(sys.argv[2])
 filtered_image = gaussianLowPass(image_path, sigma)
-# filtered_image = img_as_uint(filtered_image)
+filtered_image = img_as_uint(filtered_image)
 io.imsave(f"{prefix}_low_passed.tif", filtered_image)
 

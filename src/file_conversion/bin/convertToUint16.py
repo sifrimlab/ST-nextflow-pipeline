@@ -1,7 +1,7 @@
 import sys
 import os
 from skimage import io
-from skimage.util import img_as_uint
+from skimage import img_as_uint
 
 image_path = sys.argv[1]
 prefix = os.path.splitext(image_path)[0]

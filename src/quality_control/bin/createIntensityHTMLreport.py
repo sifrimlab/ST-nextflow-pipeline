@@ -32,16 +32,16 @@ with open(intensities, "r") as intensity_file:
     table_tag = intensity_soup.find('table')
 
 # add Intensity Statistics Per Image
-h2_list = template_soup.find_all('h2')
-h2_list[0].insert_after(table_tag)
+p_list = template_soup.find_all('p')
+p_list[0].insert_after(table_tag)
 
-def addListOfImages(template_soup, image_list, h2_title_index):
+def addListOfImages(template_soup, image_list, p_title_index):
     # Plot first image 
     image_tag = template_soup.new_tag('img')
     image_tag['src']= image_list[0]
     image_tag['width']= 500
     image_tag['height']= 500
-    h2_list[h2_title_index].insert_after(image_tag)
+    p_list[p_title_index].insert_after(image_tag)
     # then plot the other images right after the previous one
     for i,image in enumerate(image_list):
         if i==0:

@@ -5,15 +5,11 @@
         <meta charset="utf-8">
 
         <title>Quality control report</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <style>
-            html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-            .w3-sidebar {
-              z-index: 3;
-              width: 250px;
-              top: 43px;
-              bottom: 0;
-              height: inherit;
-            }
         .dataframe {
             border-collapse: collapse;
             margin: 25px 0;
@@ -45,10 +41,38 @@
                </style>
     </head>
     <body>
-        <h1>Quality Control Report</h1>
+        <!-- Navbar -->
+        <div class="w3-top">
+            <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+            <a href="#stats" class="w3-bar-item w3-button w3-theme-l1">General Stats</a>
+            </div>
+        </div>
+
+        <!-- Overlay effect when opening sidebar on small screens -->
+        <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+            <div class="w3-row w3-padding-64">
+                <div class="w3-twothird w3-container">
+                <h1 class="w3-text-teal">Intensity Quality Control</h1>
+                </div>
+                <div class="w3-third w3-container">
+                </div>
+            </div>
         <h2>Intensity Statistics Per Image</h2>
+        <p>
+        This table
+        </p>
         <h2>Combined Round Histograms</h2>
+        <p>
+        This table
+        </p>
         <h2>Combined Channel Histograms</h2>
+        <p>
+        This table
+        </p>
         <h2>Intensity Histograms Per Image</h2>
+        <p>
+        This table
+        </p>
     </body>
 </html>

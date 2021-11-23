@@ -1,24 +1,19 @@
-<!DOCTYPE html>
-
+<!-- Everything here was stolen from https://dev.to/dcodeyt/creating-beautiful-html-tables-with-css-428l -->
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <title>Decoding statistics</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-        <title>Decoding quality metrics</title>
-<style>
-            html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-            .w3-sidebar {
-              z-index: 3;
-              width: 250px;
-              top: 43px;
-              bottom: 0;
-              height: inherit;
-            }
+        <style>
         .dataframe {
             border-collapse: collapse;
             margin: 25px 0;
             font-size: 0.9em;
-            font-family: "Roboto", sans-serif;
+            font-family: "Roboto",  sans-serif;
             min-width: 400px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
                 }
@@ -39,28 +34,67 @@
             background-color: #f3f3f3;
         }
 
-        .dataframe tbody tr:last-of-type {
+       .dataframe tbody tr:last-of-type {
             border-bottom: 2px solid #009879;
         }
-               </style>
+        </style>
+
     </head>
     <body>
-        <h1>Decoding control report</h1>
+        <!-- Navbar -->
+        <div class="w3-top">
+            <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+            <a href="#stats" class="w3-bar-item w3-button w3-theme-l1">General Stats</a>
+            <a href="#recognized" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Recognized</a>
+            <a href="#barcalling" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Barcode Calling</a>
+            <a href="#tile" class="w3-bar-item w3-button w3-hide-small w3-hide-medium w3-hover-white">Per-Tile</a>
+            <a href="#decodingpotential" class="w3-bar-item w3-button w3-hide-small w3-hide-medium w3-hover-white">Decoding Potential</a>
+            <a href="#decodingintensity" class="w3-bar-item w3-button w3-hide-small w3-hide-medium w3-hover-white">Decoding intensity QC</a>
+            </div>
+        </div>
 
-        <h2>general_stats</h2>
-        <h2>decoded_stat_report</h2>
-        <h2>recognized_barcodes_per_gene</h2>
-        <h2>unique_barcodes_called_counted</h2>
+        <!-- Overlay effect when opening sidebar on small screens -->
+        <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+            <div class="w3-row w3-padding-64">
+                <div class="w3-twothird w3-container">
+                <h1 class="w3-text-teal">Decoding Statistics</h1>
+                </div>
+                <div class="w3-third w3-container">
+                </div>
+            </div>
 
-        <h2>channels_called</h2>
-        <h2>barcodes_counted</h2>
+        <h2 id=stats>General Statistics</h2>
+        <p>Overview of how many spots were recognized in the codebook and which were not.</p>
 
-        <h2>tile_stats</h2>
-        <h2>recognized_genes_per_tile</h2>
+        <h2>decoded stat report</h2>
+        <p>Statistics that indicate how not-random the results are. This table could reveal whether the barcodes called follow a semi-random pattern.</p>
+
+        <h2 id=recognized>Recognized Barcodes per Gene</h2>
+        <p>Overview of how many times each gene was decoded.</p>
+
+        <h2 id=barcalling>Unique Barcodes Counted</h2>
+        <p>Overview of how many times each barcode was called.</p>
+
+        <h2>Channels Called</h2>
+        <p>Overview of how many times each channel was called (recognized or not) in each round. This table could reveal any biases in your image dataset, such as a channel being consistantly counted more than others.</p>
+        <h2>Barcodes Counted</h2>
+        <p>Scatterplot of which barcode was called how many times. Red dots are unrecognized barcodes, green are recognized barcodes.
+        </p>
+
+        <h2 id=tile>tile stats</h2>
+        <p>Overview of the recognized/unrecognized stats like <a href="recognized">above</a>, but seperated by tile. This can reveal low quality tiles that might be better to leave out of future analysis</p>
+        <h2>recognized genes per tile</h2>
+        <p>Barplot of recognized vs unrecognized barcodes called per tile.</p>
         
-        <h2>Decoding Potential</h2>
+        <h2 id=decodingpotential>Decoding Potential</h2>
+        <p>Line plot of the decoding potential as the rounds progress. Decoding potential is defined as the ratio of spots that could still represent a recognized barcode in the following rounds. This means that decoding potential at the final round = the decoding ratio seen <a href="#stats">here</a>.
 
-        <h2>Decoding Intensity QC Plot</h2>
-        
+        This means that if the decoding potential drop notably in a certain round, it could be that either something is wrong with that round, or that the order or your rounds/codebook is wrong. Keep in mind that a drop is logical in the first and last round. 
+        </p>
+
+        <h2 id=decodingintensity>Decoding Intensity Quality Control Plot</h2>
+        <p>Plot that show the number of spots that whose intensity ratio is larger than a certain ratio. Black vertical line is a suggested cutoff to include as many recognized barcodes and as little unrecognized barcodes in future downstream analysis.</p>
     </body>
 </html>
+ 
