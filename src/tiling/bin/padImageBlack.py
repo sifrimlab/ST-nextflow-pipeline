@@ -46,7 +46,7 @@ def pad(filepath, target_width, target_height, expected_width=0, expected_height
     differenceWidth = (target_width-currentWidth) - widthToAdd*2
     differenceHeight = (target_height-currentHeight) - heightToAdd*2
 
-    paddedImage = cv2.cv2.copyMakeBorder(img, heightToAdd+differenceHeight, heightToAdd, widthToAdd, widthToAdd+differenceWidth, cv2.cv2.BORDER_CONSTANT)
+    paddedImage = cv2.copyMakeBorder(img, heightToAdd+differenceHeight, heightToAdd, widthToAdd, widthToAdd+differenceWidth, cv2.BORDER_CONSTANT)
     newHeight = paddedImage.shape[0]
     newWidth = paddedImage.shape[1]
 
