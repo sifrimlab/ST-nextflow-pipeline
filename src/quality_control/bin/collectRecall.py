@@ -68,6 +68,6 @@ ax.set_ylabel("Number of potential complete barcodes remaining")
 ax.set_xticks(x)
 ax.set_xticklabels(x_labels, rotation= 45)
 
-plt.savefig("total_drop_complete_barcodes_per_round.svg", dpi=600)
+plt.savefig("total_drop_complete_barcodes_per_round.png")
 
 

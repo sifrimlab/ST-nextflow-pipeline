@@ -11,7 +11,7 @@ process plot_intensity_histogram {
     path image
 
     output:
-    path "${image.baseName}_intensity_histogram.svg"
+    path "${image.baseName}_intensity_histogram.png"
 
     script:
     """
@@ -24,7 +24,7 @@ process plot_combined_histogram {
     tuple val(prefix), path(images)
 
     output:
-    path "${prefix}_intensity_histogram.svg"
+    path "${prefix}_intensity_histogram.png"
 
     script:
     """

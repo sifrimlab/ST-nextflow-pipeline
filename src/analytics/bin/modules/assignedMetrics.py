@@ -42,7 +42,7 @@ def countGeneralAssignedStats(assigned_genes_csv: str, merfish = False):
             axs.annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),
                         xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
         fig.tight_layout()
-        plt.savefig("area_of_pixels_counted.svg")
+        plt.savefig("area_of_pixels_counted.png")
 
         # number of spots per cell
         grouped_by_cell_gene_counts = df.groupby(['Cell_Label'])['n_genes_in_cell'].size()

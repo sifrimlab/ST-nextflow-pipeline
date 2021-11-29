@@ -10,7 +10,7 @@ barcode = os.path.splitext(barcode)[0]
 prefix = f"{image_prefix}_{barcode}_expression_plotted"
 
 plot=plotGeneExpression(image, decoded_genes, barcode)
-plot.savefig(f"{prefix}.svg")
+plot.savefig(f"{prefix}.png")
 
 
 

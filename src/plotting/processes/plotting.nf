@@ -11,7 +11,7 @@ process plotDecodingPotential {
     path decoded_genes
 
     output:
-    path "decoding_potential_plot.svg"
+    path "decoding_potential_plot.png"
 
     script:
     """
@@ -24,7 +24,7 @@ process  plotTileDecodingPotential {
     path decoded_genes
 
     output:
-    path "${decoded_genes.baseName}_decoding_potential_plot.svg"
+    path "${decoded_genes.baseName}_decoding_potential_plot.png"
 
     script:
     """
@@ -88,7 +88,7 @@ process plot_detected_spots_on_tile {
     
     
     output:
-    path "${detected_spots.baseName}_plotted.svg"
+    path "${detected_spots.baseName}_plotted.png"
     script:
     """
     python $binDir/plotDetectedSpotsOnTile.py $tile_image $detected_spots 1
@@ -101,7 +101,7 @@ process plot_decoded_genes_on_tile {
     tuple val(tile_nr), path(tile_image), path(decoded_genes)
     
     output:
-    path "${decoded_genes.baseName}_plotted.svg"
+    path "${decoded_genes.baseName}_plotted.png"
     script:
     """
     python $binDir/plotDecodedGenesOnTile.py $tile_image $decoded_genes 1
@@ -160,7 +160,7 @@ process plot_assigned_genes {
     tuple val(tile_nr), path(assigned_genes), path(labeled_image)
     
     output:
-    path "${assigned_genes.baseName}_plotted.svg"
+    path "${assigned_genes.baseName}_plotted.png"
 
     script:
     """
@@ -178,7 +178,7 @@ process plot_specific_barcode {
     
     
     output:
-    path "${image.baseName}_{gene}_expression_plotted.svg"
+    path "${image.baseName}_{gene}_expression_plotted.png"
 
     script:
     """

@@ -25,7 +25,7 @@ with open(f"{tile_nr_prefix}_recall_stats.json", "a+") as jsonfile:
 with open(f"{tile_nr_prefix}_round_not_found.json", "a+") as jsonfile:
     json.dump(round_not_found, jsonfile)
 
-plot.savefig(f"{tile_nr_prefix}_recall_per_round.svg", format="svg")
+plot.savefig(f"{tile_nr_prefix}_recall_per_round.png")
 
 
 
