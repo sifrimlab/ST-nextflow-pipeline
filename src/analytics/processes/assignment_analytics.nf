@@ -15,7 +15,6 @@ process get_assigned_stats {
     path "general_assignment_information.html"
     path "top10_assigned_cells.html"
     path "top10_assigned_genes.html"
-    /* path "area_of_pixels_counters.svg" */
 
     script:
     """

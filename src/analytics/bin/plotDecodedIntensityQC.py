@@ -37,7 +37,7 @@ def plotSpotsLeftAfterIntensityThresholding(path_to_decoded_genes: str):
     fig.tight_layout()
 
     plt.legend()
-    plt.savefig("decoding_intensity_QC.svg", format="svg", dpi=1200)
+    plt.savefig("decoding_intensity_QC.png")
 
 # argparsing
 

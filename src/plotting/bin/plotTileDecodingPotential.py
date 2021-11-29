@@ -9,4 +9,4 @@ codebook = sys.argv[2]
 
 plt = plotDecodingPotential(decoded_genes, codebook)
 plt.title(f"{prefix} decoding potential per round")
-plt.savefig(f"{prefix}_decoding_potential_plot.svg", format='svg', dpi=1200)
+plt.savefig(f"{prefix}_decoding_potential_plot.png")

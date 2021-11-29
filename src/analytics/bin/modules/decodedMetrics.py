@@ -66,7 +66,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         plt.title("Barcodes counted")
         plt.xlabel("Barcode combination")
         plt.ylabel("Number of times recognized")
-        plt.savefig("barcodes_counted.svg")
+        plt.savefig("barcodes_counted.png")
 
         # Evaluate randomness
         possible_barcode_combinations = int(num_channels) ** int(num_rounds)
@@ -166,7 +166,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     ax.bar_label(rects1, padding=3)
     ax.bar_label(rects2, padding=3)
     fig.tight_layout()
-    plt.savefig("recognized_genes_per_tile.svg")
+    plt.savefig("recognized_genes_per_tile.png")
 
 
     
@@ -183,7 +183,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     plt.title("Recognized genes counted")
     plt.xlabel("Gene name")
     plt.ylabel("Number of times recognized")
-    plt.savefig("recognized_genes_counts.svg")
+    plt.savefig("recognized_genes_counts.png")
 
 if __name__ == '__main__':
         decoded_genes = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/concat_decoded_genes.csv" 

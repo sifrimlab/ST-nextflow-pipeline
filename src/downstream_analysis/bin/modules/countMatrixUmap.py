@@ -36,4 +36,4 @@ def createAndPlotUmap(count_matrix_csv: str):
 if __name__=="__main__":
     count_matrix_csv = "/media/david/Puzzles/starfish_test_data/MERFISH/seperate_stacks_cropped/results_tiled_whitetophat/final/count_matrix.csv"
     plot = createAndPlotUmap(count_matrix_csv)
-    plot.savefig("/media/david/Puzzles/starfish_test_data/MERFISH/seperate_stacks_cropped/results_tiled_whitetophat/final/count_matrix_umap.svg")
+    plot.savefig("/media/david/Puzzles/starfish_test_data/MERFISH/seperate_stacks_cropped/results_tiled_whitetophat/final/count_matrix_umap.png")
