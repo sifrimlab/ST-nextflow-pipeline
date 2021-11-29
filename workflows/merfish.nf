@@ -49,7 +49,7 @@ workflow merfish {
         // Tile the images into equal sized tiles, and store the grid parameters
         // in variables for future use
         if (!params.containsKey("reference")){
-            log.info "No Reference image found, one will be created by taking the first imaging round and renaming it."
+            log.info "No Reference image found, one will be created by taking a random imaging round and renaming it."
             //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
             params.reference = rename_file(images.first(), "REF") //Create reference image by taking maxIP on the first round
         }
