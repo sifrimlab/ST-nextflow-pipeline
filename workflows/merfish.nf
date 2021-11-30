@@ -39,6 +39,10 @@ include {
     plot_decoded_spots
 } from "../src/plotting/processes/plotting.nf"
 
+include{
+    assignment_statistics_workflow
+} from "../src/analytics/workflows/assigned_statistics.nf"
+
 workflow merfish {
 
     main:
@@ -86,5 +90,7 @@ workflow merfish {
         plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
         segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        // Calculate assignment stats
+        assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
 
 }

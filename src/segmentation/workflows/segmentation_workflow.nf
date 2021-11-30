@@ -56,6 +56,10 @@ workflow merfish_threshold_watershed_segmentation {
         create_count_matrix(assigned_genes)
         /* umap(create_count_matrix.out) */
         /* find_seurat_clusters(create_count_matrix.out) */
+        emit:
+            concat_assigned_genes = assigned
+            count_matrix = create_count_matrix.out
+                
 }
 
 workflow threshold_watershed_segmentation {
