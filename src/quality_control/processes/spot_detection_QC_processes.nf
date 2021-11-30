@@ -30,7 +30,7 @@ process calculate_recall {
 
     output:
     path "recall_stats.json"
-    path "recall_per_round.svg"
+    path "recall_per_round.png"
 
     script:
     """

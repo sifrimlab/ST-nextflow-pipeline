@@ -33,7 +33,6 @@ def plotGeneCountDistribution(decoded_genes, top_genes=10):
     ax.set_xlabel("Top 10 expressed genes")
     ax.set_ylabel("Times decoded")
     plt.show()
-    # plt.savefig("OB_gene_expression_top10.svg", format="svg")
 def plotGeneCountR2(decoded_genes1, decoded_genes2):
     decoded_df1 = pd.read_csv(decoded_genes1)
     decoded_df2 = pd.read_csv(decoded_genes2)

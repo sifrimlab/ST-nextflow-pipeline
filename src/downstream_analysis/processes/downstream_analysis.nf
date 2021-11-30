@@ -14,7 +14,7 @@ process umap {
     path count_matrix
     
     output:
-    path "count_matrix_umap.svg"
+    path "count_matrix_umap.png"
 
     script:
     """

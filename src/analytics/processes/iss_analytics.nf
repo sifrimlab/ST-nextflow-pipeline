@@ -17,9 +17,9 @@ process get_decoded_stats {
     path "recognized_barcodes_per_gene.html"
     path "unique_barcodes_called_counted.html"
     path "channels_called.html"
-    path "barcodes_counted.svg"
+    path "barcodes_counted.png"
     path "tile_stats.html"
-    path "recognized_genes_per_tile.svg"
+    path "recognized_genes_per_tile.png"
     /* env max_expressed_non_recognized_barcode, emit: most_prominent_unrecognized_barcode */
 
     script:
@@ -36,7 +36,7 @@ process plot_decoding_intensity_QC {
     path decoded_genes
 
     output:
-    path "decoding_intensity_QC.svg"
+    path "decoding_intensity_QC.png"
 
     script:
     """

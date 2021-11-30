@@ -9,4 +9,4 @@ radius =  int(sys.argv[3])
 prefix = os.path.splitext(detected_spots)[0]
 plt = plotSpotsOnTile(tile_image, detected_spots,radius)
 plt.axis('off')
-plt.savefig(f"{prefix}_plotted.svg", format='svg', dpi=1200)
+plt.savefig(f"{prefix}_plotted.png")

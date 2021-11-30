@@ -16,7 +16,7 @@ process get_decoded_stats {
     path "recognized_barcodes_per_gene.html"
     path "unique_barcodes_called_counted.html"
     path "tile_stats.html"
-    path "recognized_genes_per_tile.svg"
+    path "recognized_genes_per_tile.png"
     /* env max_expressed_non_recognized_barcode, emit: most_prominent_unrecognized_barcode */
 
     script:
