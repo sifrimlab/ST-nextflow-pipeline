@@ -89,7 +89,7 @@ def parseBarcodes(codebook: str, bit_len: int) -> pd.DataFrame:
 
     """
     df = pd.read_csv(codebook)
-    df['Barcode'] = [f"{barcode:0{bit_len}}" for barcode in list(df['Barcode'])] #This adds leading 0's back, because converting 001 to df makes it 1 since pandas thinks it's just an int
+    df['Barcode'] = [f"{barcode:0>{bit_len}}" for barcode in list(df['Barcode'])] #This adds leading 0's back, because converting 001 to df makes it 1 since pandas thinks it's just an int
     df['Index'] = list(range(1,len(df)+1)) # add an index row, to be used to label images later on
     df['Vector'] = [createBarcodeVector(barcode) for barcode in df['Barcode']] # convert string barcodes into int
     return df

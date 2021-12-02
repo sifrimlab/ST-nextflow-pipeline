@@ -1,6 +1,7 @@
 import re
 from sklearn.neighbors import NearestNeighbors
 from modules.pixelBasedDecoding import parseBarcodes, createBarcodeVector, createPixelVector
+from icecream import ic
 from skimage import io
 from skimage import img_as_float
 from skimage.measure import label, regionprops_table
@@ -11,13 +12,14 @@ def createCodebookTree(codebook_path: str, bit_len:int, algorithm="ball_tree"):
 
     def extractVectorsFromCodebook(codebook: str, bit_len: int):
         df = pd.read_csv(codebook)
-        df['Barcode'] = [f"{barcode:0{bit_len}}" for barcode in list(df['Barcode'])]
+        ic(type(list(df['Barcode'])[0]), list(df['Barcode'])[0])
+        df['Barcode'] = [f"{barcode:0>{bit_len}}" for barcode in list(df['Barcode'])]
         df['Vector'] = [createBarcodeVector(barcode) for barcode in df['Barcode']]
         # array_of_codebook_vectors = np.array(df['Vector'])
         array_of_codebook_vectors = np.vstack([vector for vector in df['Vector']])
         return array_of_codebook_vectors
 
-    array_of_codebook_vectors = extractVectorsFromCodebook(codebook_path, 16)
+    array_of_codebook_vectors = extractVectorsFromCodebook(codebook_path, bit_len)
     tree = NearestNeighbors(n_neighbors=1, algorithm='kd_tree').fit(array_of_codebook_vectors)
     return tree, array_of_codebook_vectors
 
@@ -70,7 +72,7 @@ def findNN(x_dim: int, y_dim: int, codebook_path:str, bit_len: int, img_path_lis
     result_df = pd.DataFrame(rows_list)
     return result_df
 # this code assumes that all pixel combinations are present in the decoded_pixels_df 
-def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=4, max_area=10000):
+def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, max_area=10000):
     # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
