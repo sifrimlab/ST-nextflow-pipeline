@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import random
 import numpy as np
+import seaborn as sns
 
 def countChannelsInBarcodeList(path_to_decoded_genes: str):
     '''
@@ -185,9 +186,52 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     plt.ylabel("Number of times recognized")
     plt.savefig("recognized_genes_counts.png")
 
+def getGeneralMerfishStats(decoded_genes: str, codebook: str):
+    sns.set_theme()
+    decoded_genes_df = pd.read_csv(decoded_genes)
+    codebook_df = pd.read_csv(codebook)
+    print(decoded_genes_df["Gene"])
+
+    # calculate average area and distance
+    areas = list(decoded_genes_df['area'])
+    distances =  list(decoded_genes_df['Distance'])
+    avg_area = np.mean(areas)
+    avg_distance = np.mean([float(distance) for distance in distances])
+
+    # Making distribution plots
+    fig, axs = plt.subplots(1,2)
+    axs[0].set_title("Area distribution", fontweight="bold")
+    sns.histplot(areas, bins=np.arange(min(areas), max(areas)+2) -0.5, kde=True, ax=axs[0], color="blue")
+    axs[0].set_xticks(range(min(areas),max(areas) +1))
+    for rect in axs[0].patches:
+        height = rect.get_height()
+        axs[0].annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
+
+    axs[1].set_title("Distance distribution",fontweight="bold" )
+    sns.histplot(distances, kde=True, ax=axs[1], color="red")
+    for rect in axs[1].patches:
+        height = rect.get_height()
+        axs[1].annotate(f'{int(height)}', xy=(rect.get_x()+rect.get_width()/2, height),xytext=(0, 5), textcoords='offset points', ha='center', va='bottom')
+
+
+    # Caclulate gene counts
+    decoded_genes_df = decoded_genes_df.dropna(subset=["Gene"])
+    decoded_genes_df['Counted'] = decoded_genes_df.groupby('Gene')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
+    unique_df = decoded_df[['Gene', 'Counted']].drop_duplicates()
+    unique_df = unique_df.sort_values(by=['Counted'], ascending=False)
+    unique_df_top10 = unique_df.head(top_genes)
+
+    unique_df = unique_df.sort_values(by=['Counted'], ascending=True)
+    unique_df_top10 = unique_df.head(top_genes)
+
+
+
+
+
 if __name__ == '__main__':
-        decoded_genes = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/results/decoded/concat_decoded_genes.csv" 
-        codebook = "/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/codebook_wrong.csv"
+    decoded_genes = "./concat_decoded_genes_transformed.csv"
+    codebook = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
+    getGeneralMerfishStats(decoded_genes, codebook)
         # countChannelsInBarcodeList(decoded_genes)
-        evaluateRandomCalling(decoded_genes, codebook, 4,4)
+        # evaluateRandomCalling(decoded_genes, codebook, 4,4)
         # countRecognizedBarcodeStats(decoded_genes)
