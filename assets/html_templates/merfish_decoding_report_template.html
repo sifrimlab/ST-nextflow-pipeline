@@ -1,0 +1,77 @@
+<!-- Everything here was stolen from https://dev.to/dcodeyt/creating-beautiful-html-tables-with-css-428l -->
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Decoding statistics</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <style>
+        .dataframe {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: "Roboto",  sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+                }
+        .dataframe thead tr {
+                background-color: #009879;
+                color: #ffffff;
+                text-align: left;
+        }
+        .dataframe th,
+        .dataframe td {
+            padding: 10px 12px;
+        }
+        .dataframe tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .dataframe tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+       .dataframe tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+        </style>
+
+    </head>
+    <body>
+        <!-- Navbar -->
+        <div class="w3-top">
+            <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+            <a href="#stats" class="w3-bar-item w3-button w3-theme-l1">General Stats</a>
+            <a href="#topgenes" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Top Genes</a>
+            <a href="#distributions" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Distributions</a>
+            </div>
+        </div>
+
+        <!-- Overlay effect when opening sidebar on small screens -->
+        <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+            <div class="w3-row w3-padding-64">
+                <div class="w3-twothird w3-container">
+                <h1 class="w3-text-teal">Decoded Statistics</h1>
+                </div>
+                <div class="w3-third w3-container">
+                </div>
+            </div>
+
+        <h2 id=stats>General Statistics</h2>
+        <p>Overview of general decoding statistics.</p>
+
+        <h2 id=topgenes>Top Genes</h2>
+        <p>Most expressed genes</p>
+
+        <h2>Bottom Genes</h2>
+        <p>Least expressed genes</p>
+
+        <h2 id=distributions>Area and distance distributions</h2>
+        <p>Distributions of the areas and distances of each spot plotted. </p>
+    </body>
+</html>
+ 

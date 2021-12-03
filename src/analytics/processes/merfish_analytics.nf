@@ -10,19 +10,17 @@ process get_decoded_stats {
 
     input:
     path decoded_genes
+    path codebook
 
     output:
     path "general_stats.html"
-    path "recognized_barcodes_per_gene.html"
-    path "unique_barcodes_called_counted.html"
-    path "tile_stats.html"
-    path "recognized_genes_per_tile.png"
-    /* env max_expressed_non_recognized_barcode, emit: most_prominent_unrecognized_barcode */
+    path "top10_genes.html"
+    path "bot10_genes.html"
+    path "distributions.png"
 
     script:
-
     """
-    python $binDir/extractStatsFromMERFISHDecodedBarcodes.py $decoded_genes
+    python $binDir/extractStatsFromMERFISHDecodedBarcodes.py $decoded_genes $codebook
     """
 }
 
@@ -31,23 +29,15 @@ process create_html_report {
     input:
     path template
     path general_stats
-    path decoded_stat
-    path recognized_barcodes_per_gene
-    path unique_barcodes_called_counted
-    path channels_called
-    path barcodes_counted
-    path tile_stats
-    path recognized_genes_per_tile
-    //decoding potential process
-    path decoding_potential_plot
-    // Decoding intensity qc
-    path decoding_intensity_QC_plot
+    path top10_genes
+    path bot10_genes
+    path distributions
 
     output: 
     path "decoding_report.html"
 
     script:
     """
-    python $binDir/createHTMLreport.py $template $general_stats $decoded_stat $recognized_barcodes_per_gene $unique_barcodes_called_counted $channels_called $barcodes_counted  $tile_stats $recognized_genes_per_tile $decoding_potential_plot $decoding_intensity_QC_plot
+    python $binDir/createDecodedMerfishHTMLreport.py $template $general_stats $top10_genes $bot10_genes $distributions
     """
 }

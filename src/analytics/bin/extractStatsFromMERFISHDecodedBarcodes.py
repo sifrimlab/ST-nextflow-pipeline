@@ -1,11 +1,7 @@
-import os 
-import pandas as pd
-import matplotlib.pyplot as plt
 import sys
-import random
-import numpy as np
-from modules.decodedMetrics import countRecognizedBarcodeStats
+from modules.decodedMetrics import getGeneralMerfishStats
 
 decoded_genes = sys.argv[1]
+codebook = sys.argv[2]
 
-countRecognizedBarcodeStats(decoded_genes)
+getGeneralMerfishStats(decoded_genes, codebook)

@@ -190,13 +190,14 @@ def getGeneralMerfishStats(decoded_genes: str, codebook: str):
     sns.set_theme()
     decoded_genes_df = pd.read_csv(decoded_genes)
     codebook_df = pd.read_csv(codebook)
-    print(decoded_genes_df["Gene"])
 
     # calculate average area and distance
     areas = list(decoded_genes_df['area'])
     distances =  list(decoded_genes_df['Distance'])
     avg_area = np.mean(areas)
     avg_distance = np.mean([float(distance) for distance in distances])
+
+    n_genes = len(decoded_genes_df)
 
     # Making distribution plots
     fig, axs = plt.subplots(1,2)
@@ -217,20 +218,44 @@ def getGeneralMerfishStats(decoded_genes: str, codebook: str):
     # Caclulate gene counts
     decoded_genes_df = decoded_genes_df.dropna(subset=["Gene"])
     decoded_genes_df['Counted'] = decoded_genes_df.groupby('Gene')['Gene'].transform('size') # count every barcode-gene combination and make a new column out of it
-    unique_df = decoded_df[['Gene', 'Counted']].drop_duplicates()
+    unique_df = decoded_genes_df[['Gene', 'Counted']].drop_duplicates()
+
+    # Count how many genes have Counted == 1
+    n_1_genes =(len(unique_df.loc[unique_df['Counted'] == 1]))
+
     unique_df = unique_df.sort_values(by=['Counted'], ascending=False)
-    unique_df_top10 = unique_df.head(top_genes)
+    unique_df_top10 = unique_df.head(10)
+
 
     unique_df = unique_df.sort_values(by=['Counted'], ascending=True)
-    unique_df_top10 = unique_df.head(top_genes)
+    unique_df_bot10 = unique_df.head(10)
 
+
+    # create general stats table
+    row_list = []
+    attribute_dict = {}
+    attribute_dict['# decoded spots'] = n_genes
+    attribute_dict['Average area'] = avg_area
+    attribute_dict['Average distance'] = avg_distance
+    attribute_dict['# one-shot genes'] = n_1_genes
+
+    row_list.append(attribute_dict)
+
+    general_stats_df = pd.DataFrame(row_list)
+    general_stats_df.to_html("general_stats.html")
+
+    unique_df_top10.to_html("top10_genes.html")
+    unique_df_bot10.to_html("bot10_genes.html")
+
+
+    plt.savefig("distributions.png")
 
 
 
 
 if __name__ == '__main__':
-    decoded_genes = "./concat_decoded_genes_transformed.csv"
-    codebook = "/home/nacho/Documents/communISS/data/merfish/codebook.csv"
+    decoded_genes = "./concat_decoded_genes.csv"
+    codebook = "/home/david/Documents/communISS/data/merfish/codebook.csv"
     getGeneralMerfishStats(decoded_genes, codebook)
         # countChannelsInBarcodeList(decoded_genes)
         # evaluateRandomCalling(decoded_genes, codebook, 4,4)
