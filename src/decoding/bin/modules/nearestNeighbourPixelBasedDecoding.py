@@ -12,7 +12,6 @@ def createCodebookTree(codebook_path: str, bit_len:int, algorithm="ball_tree"):
 
     def extractVectorsFromCodebook(codebook: str, bit_len: int):
         df = pd.read_csv(codebook)
-        ic(type(list(df['Barcode'])[0]), list(df['Barcode'])[0])
         df['Barcode'] = [f"{barcode:0>{bit_len}}" for barcode in list(df['Barcode'])]
         df['Vector'] = [createBarcodeVector(barcode) for barcode in df['Barcode']]
         # array_of_codebook_vectors = np.array(df['Vector'])
@@ -72,11 +71,12 @@ def findNN(x_dim: int, y_dim: int, codebook_path:str, bit_len: int, img_path_lis
     result_df = pd.DataFrame(rows_list)
     return result_df
 # this code assumes that all pixel combinations are present in the decoded_pixels_df 
-def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, max_area=10000):
+def createSpotsFromDecodedPixels(x_dim: int, y_dim: int, decoded_pixels_df: pd.DataFrame, min_area: int=2, max_area: int=10000) -> pd.DataFrame:
     # Create an empty image to store the gene labels in
     gene_labeled_image = np.zeros((y_dim, x_dim))
     for row in decoded_pixels_df.itertuples():
         gene_labeled_image[row.Y, row.X] = row.Gene_Label
+
     # aggregate the pixels with the same gene label using skimage.measure.label
     region_labeled_image, num_spots = label(gene_labeled_image, background=0, return_num=True)
     # Convert the found "spot" regions into a dataframe
@@ -89,13 +89,17 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, ma
     regions_df = regions_df.drop(columns=[ "centroid-0", "centroid-1" ])
     regions_df = regions_df.rename(columns={"label":"Spot_label"})
 
+
     # combine with the decoded pixels dataframe to add gene name and barcode to the spots
     merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
+    # This puts back the genes with gene_label 0 though, so we want to filter those out, cause they're not decoded spots
+    
     return merged_df
 
 def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176, min_area=2):
     decoded_pixels_df = findNN(x_dim, y_dim, codebook_path=codebook, bit_len=bit_len, img_path_list=img_path_list, img_prefix=img_prefix, threshold=threshold)
     decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area = min_area)
+    
     return decoded_spots_df
 
 
@@ -112,12 +116,11 @@ def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:
 
 if __name__ == "__main__":
     codebook_path = "/home/david/Documents/communISS/data/merfish/codebook.csv"
-    image_path_list = [f"/media/sda1/starfish_test_data/MERFISH/processed/cropped/merfish_{i}.tif" for i in range(1, 17)]
+    image_path_list = [f"/home/david/Documents/communISS/data/merfish/merfish_{i}.tif" for i in range(1, 17)]
     bit_len = 16
     threshold = 0.5176
-    x_dim, y_dim = (405,205)
+    x_dim, y_dim = (694,420)
     image_prefix="merfish_"
     result_df = decodePixelBased(x_dim, y_dim, codebook=codebook_path, bit_len=bit_len, img_path_list=image_path_list, img_prefix=image_prefix)
-    result_df.to_csv("sklearn.csv", index=False)
     # for pixel in image_array:
     #     print(u.get_item_vector((u.get_nns_by_vector(pixel, 1, search_k=-1, include_distances=False))[0])) # This is a way to get the closest vector
