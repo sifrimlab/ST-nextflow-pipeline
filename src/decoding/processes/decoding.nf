@@ -43,13 +43,14 @@ process nn_pixel_based_decoding {
     input:
     val x_dim
     val y_dim
+    val min_area
     tuple val(tile_nr), path(tile_images)
 
     output:
     path "decoded_${tile_nr}.csv"
 
     """
-    python $binDir/nnDecodePixelBased.py $x_dim $y_dim $tile_nr $params.codebook $params.bit_length $params.distance_threshold $params.image_prefix $tile_images 
+    python $binDir/nnDecodePixelBased.py $x_dim $y_dim $min_area $tile_nr $params.codebook $params.bit_length $params.distance_threshold $params.image_prefix $tile_images 
     """
 
 }

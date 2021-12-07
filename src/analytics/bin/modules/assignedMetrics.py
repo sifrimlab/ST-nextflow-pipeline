@@ -46,7 +46,7 @@ def countGeneralAssignedStats(assigned_genes_csv: str, merfish = False):
 
         # number of spots per cell
         grouped_by_cell_gene_counts = df.groupby(['Cell_Label'])['n_genes_in_cell'].size()
-        pd.DataFrame(grouped_by_cell_gene_counts).to_html("per_cell_gene_counts.html")
+        pd.DataFrame(grouped_by_cell_gene_counts).to_html("per_cell_gene_counts.html", index=False)
     # Cells with the highest expression
     df_sorted_cells = df_only_assigned.sort_values(by=['n_genes_in_cell'], ascending=False,ignore_index=True)
     df_sorted_cells = df_sorted_cells.drop_duplicates(subset=['Cell_Label'])

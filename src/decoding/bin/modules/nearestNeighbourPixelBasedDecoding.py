@@ -62,7 +62,7 @@ def findNN(x_dim: int, y_dim: int, codebook_path:str, bit_len: int, img_path_lis
                 # attribute_dict['Barcode'] =row.Barcode
                 # attribute_dict['Distance'] = minimal_distance
                 # attribute_dict['Gene'] = row.Gene
-                # If minimal distance not passing the threshold, it will be labeled as background
+            # If minimal distance not passing the threshold, it will be labeled as background
             if minimal_distance > threshold:
                 gene_label = 0
             else:
@@ -93,9 +93,9 @@ def createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area=2, ma
     merged_df = regions_df.merge(decoded_pixels_df, on=["X", "Y"], how="left")
     return merged_df
 
-def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176):
+def decodePixelBased(x_dim, y_dim, codebook, bit_len, img_path_list, img_prefix:str, threshold = 0.5176, min_area=2):
     decoded_pixels_df = findNN(x_dim, y_dim, codebook_path=codebook, bit_len=bit_len, img_path_list=img_path_list, img_prefix=img_prefix, threshold=threshold)
-    decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df)
+    decoded_spots_df = createSpotsFromDecodedPixels(x_dim, y_dim, decoded_pixels_df, min_area = min_area)
     return decoded_spots_df
 
 

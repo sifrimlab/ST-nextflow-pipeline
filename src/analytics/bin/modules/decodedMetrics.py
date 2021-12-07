@@ -38,7 +38,7 @@ def countChannelsInBarcodeList(path_to_decoded_genes: str):
         rows_list.append(temp_dict)
     count_df = pd.DataFrame(rows_list)
     wide_df = count_df.pivot_table(index=["channel_nr"], columns='round_nr', values='count', margins=True, aggfunc='sum')
-    wide_df.to_html("channels_called.html")
+    wide_df.to_html("channels_called.html", index=False)
 
     
 def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num_rounds: int, num_channels: int, ratio_recognized_barcodes: int = 0, simulate=False):
@@ -59,7 +59,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         non_recognized_barcodes = [barcode for barcode in list(unique_df['Barcode']) if barcode not in list(codebook_df['Barcode'])]
         non_recognized_df= unique_df[unique_df.Barcode.isin(non_recognized_barcodes)]
         
-        unique_df.to_html("unique_barcodes_called_counted.html")
+        unique_df.to_html("unique_barcodes_called_counted.html", index=False)
 
         color_list = ['green' if barcode in list(codebook_df['Barcode']) else 'red' for barcode in decoded_df['Barcode']] 
         fig= plt.figure(figsize=(13,9))
@@ -84,7 +84,7 @@ def evaluateRandomCalling(path_to_decoded_genes: str, path_to_codebook: str, num
         rows_list=[]
         rows_list.append(attribute_dict)
         analytics_df = pd.DataFrame(rows_list)
-        analytics_df.to_html("decoded_stat.html")
+        analytics_df.to_html("decoded_stat.html", index=False)
 
     
 def countRecognizedBarcodeStats(path_to_decoded_genes: str):
@@ -125,7 +125,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     general_row_list = []
     general_row_list.append(general_attribute_dict)
     general_df = pd.DataFrame(general_row_list)
-    general_df.to_html("general_stats.html")
+    general_df.to_html("general_stats.html", index=False)
 
     # Now we parse the tile dicts
     tile_row_list= []
@@ -141,7 +141,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
 
     tile_df = pd.DataFrame(tile_row_list)
     tile_df = tile_df.sort_values(by=['Tile'])
-    tile_df.to_html("tile_stats.html")
+    tile_df.to_html("tile_stats.html", index=False)
 
     # Create a Barpot plotting recognized an unrecognized genes per tile, for quality control purposes
 
@@ -177,7 +177,7 @@ def countRecognizedBarcodeStats(path_to_decoded_genes: str):
     gene_df = pd.DataFrame.from_dict(list(sorted(gene_dict.values(),key=lambda x: x[1], reverse=True)))
     print(gene_df)
     gene_df.columns=['Gene', 'Counts', 'Barcode']
-    gene_df.to_html("recognized_barcodes_per_gene.html")
+    gene_df.to_html("recognized_barcodes_per_gene.html", index=False)
 
     fig= plt.figure(figsize=(13,9))
     plt.plot(gene_df['Gene'], gene_df['Counts'], 'o')
@@ -242,10 +242,10 @@ def getGeneralMerfishStats(decoded_genes: str, codebook: str):
     row_list.append(attribute_dict)
 
     general_stats_df = pd.DataFrame(row_list)
-    general_stats_df.to_html("general_stats.html")
+    general_stats_df.to_html("general_stats.html", index=False)
 
-    unique_df_top10.to_html("top10_genes.html")
-    unique_df_bot10.to_html("bot10_genes.html")
+    unique_df_top10.to_html("top10_genes.html", index=False)
+    unique_df_bot10.to_html("bot10_genes.html", index=False)
 
 
     plt.savefig("distributions.png")

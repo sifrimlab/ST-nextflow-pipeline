@@ -122,7 +122,7 @@ def plotSpotsOnWholeImage(path_to_spotsCSV: str, tile_grid_shape: Tuple[int, int
             ax.add_patch(circ)
         fig.tight_layout()
         plt.axis('off')
-        plt.savefig("detected_spots_plotted.pdf")
+        plt.savefig("detected_spots_plotted.png")
 
 
 
@@ -160,7 +160,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
     fig.tight_layout()
 
     plt.axis('off')
-    plt.savefig("decoded_genes_plotted.pdf")
+    plt.savefig("decoded_genes_plotted.png")
     # plt.show()
 
     # Now the same with nonrecognized spots included
@@ -184,7 +184,7 @@ def plotDecodedGenesOnWholeImage(path_to_original_image: str,  path_to_spotsCSV:
         ax.add_patch(circ)
     # legendWithoutDuplicateLabels(ax)
     fig.tight_layout()
-    plt.savefig("all_decoded_spots_plotted.pdf")
+    plt.savefig("all_decoded_spots_plotted.png")
 
 def plotSpotsOnTile(path_to_tile_image: str, path_to_spotsCSV: str, radius: int):
     image = io.imread(path_to_tile_image)
@@ -246,7 +246,7 @@ def plotDecodedGenesOnTile(path_to_tile_image: str, path_to_decoded_spots: str, 
     #     ax.add_patch(circ)
     # # legendWithoutDuplicateLabels(ax)
     # fig.tight_layout()
-    # plt.savefig("all_decoded_spots_plotted.pdf")
+    # plt.savefig("all_decoded_spots_plotted.png")
 
 if __name__=='__main__':
     reference_image = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/DO/REF.tif"
