@@ -42,7 +42,7 @@ def createPatchCountMatrix(decoded_df_csv, patch_labeled_image_path, neighbour_d
         # Now we have all coordinates, now we check the matches in the decoded df
         for coordinate_row in coordinate_to_check:
             try:
-                gene = decoded_df.query('Original_X ==@coordinate_row[1] & Original_Y ==@coordinate_row[0]')
+                gene = decoded_df.query('global_X ==@coordinate_row[1] & global_Y ==@coordinate_row[0]')
                 attributes_dict[gene] = attributes_dict.get(gene, 0) + 1
             except:
                 continue

@@ -15,10 +15,10 @@ def plotAssignedGenes(path_to_assigned_genes: str, path_to_tile_image: str, outf
     ax.imshow(tile_image, cmap="gray")
     for row in assigned_genes.itertuples():
         clr = 'green' if str(row.Cell_Label) != '0' else 'red'
-        circ = plt.Circle((row.Original_X, row.Original_Y), radius=2, color=clr)
+        circ = plt.Circle((row.global_X, row.global_Y), radius=2, color=clr)
         ax.add_patch(circ)
     plt.axis('off')
-    plt.savefig(f"{outfile_prefix}_plotted.png", format="png", dpi=1200)
+    plt.savefig(f"{outfile_prefix}_plotted.png", format="png")
 
 def plotAssignedGenesWRTCell(path_to_assigned_genes: str, path_to_tile_image: str, path_to_cell_propreties, original_image_path, outfile_prefix):
     assigned_genes = pd.read_csv(path_to_assigned_genes) # only has Cell_Label
@@ -39,7 +39,7 @@ def plotAssignedGenesWRTCell(path_to_assigned_genes: str, path_to_tile_image: st
     _, ax = plt.subplots(1,1)
     ax.imshow(overlay, cmap="viridis")
     plt.axis('off')
-    plt.savefig(f"{outfile_prefix}_plotted.png", format="png", dpi=1200)
+    plt.savefig(f"{outfile_prefix}_plotted.png", format="png")
 
 def plotLabeledImages(path_to_labeled_image: str, overlay_image = ""):
     labeled_image = io.imread(path_to_labeled_image)

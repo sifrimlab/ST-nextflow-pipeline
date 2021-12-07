@@ -61,8 +61,8 @@ def transformTileCoordinateSystem(path_to_csv: str, tile_grid_shape, tile_size_x
         y_coordinate = row.Y + y_adder
         original_x_column.append(x_coordinate)
         original_y_column.append(y_coordinate)
-    decoded_df['Original_X'] = original_x_column
-    decoded_df['Original_Y'] = original_y_column
+    decoded_df['global_X'] = original_x_column
+    decoded_df['global_Y'] = original_y_column
     return decoded_df
 
 if __name__=="__main__":
