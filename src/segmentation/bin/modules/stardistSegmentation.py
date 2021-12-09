@@ -55,7 +55,7 @@ def getProperties(labeled_image, dapi_image, tile_nr=""):
         attribute_dict['Center_Y'] = int(center_y)
         for i,prop in enumerate(propList):
             if(prop == 'Area'): 
-                attribute_dict['area'] = region_props[prop]*pixels_to_um**2 
+                attribute_dict['area'] = region_props[prop]*pixels_to_um**2
             elif(prop.find('Intensity') < 0):          # Any prop without Intensity in its name
                 attribute_dict[prop] = region_props[prop]*pixels_to_um
             else: 
@@ -66,7 +66,7 @@ def getProperties(labeled_image, dapi_image, tile_nr=""):
 
 if __name__=='__main__':
     # image_path = "/media/tool/gabriele_data/1442_OB/maxIP-seperate-channels/results_minsigma2_maxsigma20/tiled_DO/DAPI_padded_tiled_29.tif"
-    image_path ="/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/DAPI.TIF" 
+    image_path ="/media/david/Puzzles/starfish_test_data/ExampleInSituSequencing/DO/DAPI.TIF"
     model_versatile = StarDist2D.from_pretrained('2D_versatile_fluo')
     labeled_image, attribute_df1 = segment(image_path, model_versatile)
     dapi_image = io.imread(image_path)

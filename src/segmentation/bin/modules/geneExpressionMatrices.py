@@ -7,8 +7,11 @@ def createCountMatrix(assigned_genes:str):
     original_df = pd.read_csv(assigned_genes)
     original_df = original_df[original_df.Cell_Label != 0]
     df1 = pd.crosstab(original_df.Gene,original_df.Cell_Label,original_df.Cell_Label,aggfunc='count').fillna(0)
-    df2 = original_df.groupby('Gene')['Cell_Label'].value_counts().unstack('Cell_Label', fill_value=0).reset_index()
-    return df1
+    # Now we remove 0 col
+    df1 = df1.drop('0', 1)
+    
+    # Transpose to get each row as cell, not each cell = gene
+    return df1.T
 
 # we're gonna write it like we're assigning globally, not on tiles, so the input is the transformed decoded df, not the one with Tile X and Y coordinates
 def createPatchCountMatrix(decoded_df_csv, patch_labeled_image_path, neighbour_dict_path):
@@ -54,3 +57,7 @@ def createPatchCountMatrix(decoded_df_csv, patch_labeled_image_path, neighbour_d
 
     return gene_expression_df
 
+if __name__ == "__main__":
+    assigned_genes ="../../../../test_output_todelete/assigned/concat_assigned_genes.csv"
+    df= createCountMatrix(assigned_genes)
+    print(df)
