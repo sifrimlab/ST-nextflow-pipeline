@@ -49,30 +49,55 @@ include {
 workflow merfish {
 
     main:
-        glob_pattern ="${params.dataDir}/${params.image_prefix}*.${params.extension}" 
-        images = Channel.fromPath(glob_pattern)
-        images = convert_to_uin16(images)
+        // If n_tiles isn't in the config, that means the input images are whole-tissue images
+        if (!params.containsKey("n_tiles")){
+            glob_pattern ="${params.dataDir}/${params.image_prefix}*.${params.extension}" 
+            images = Channel.fromPath(glob_pattern)
+            images = convert_to_uin16(images)
 
-        // Tile the images into equal sized tiles, and store the grid parameters
-        // in variables for future use
-        if (!params.containsKey("reference")){
-            log.info "No Reference image found, one will be created by taking a random imaging round and renaming it."
-            //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
-            params.reference = rename_file(images.first(), "REF") //Create reference image by taking maxIP on the first round
+            // Tile the images into equal sized tiles, and store the grid parameters
+            // in variables for future use
+            if (!params.containsKey("reference")){
+                log.info "No Reference image found, one will be created by taking a random imaging round and renaming it."
+                //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
+                params.reference = rename_file(images.first(), "REF") //Create reference image by taking maxIP on the first round
+            }
+
+            
+            merfish_global_registration(params.reference, images)
+
+            tiling(glob_pattern, merfish_global_registration.out, params.DAPI)
+            tile_size_x = tiling.out.tile_size_x
+            tile_size_y = tiling.out.tile_size_y
+            grid_size_x = tiling.out.grid_size_x
+            grid_size_y = tiling.out.grid_size_y
+            tiled_rounds = tiling.out.rounds
+            tiled_dapi = tiling.out.dapi
         }
+        // Otherwise, the images are already tiled, so the input to image processing needs to be done differently
+        else{
+            log.info("reached")
+            glob_pattern ="${params.dataDir}/${params.tile_prefix}*${params.image_prefix}*.${params.extension}" 
+            images = Channel.fromPath(glob_pattern)
+            images = convert_to_uin16(images)
+            tiled_rounds = images
 
-        
-        merfish_global_registration(params.reference, images)
-
-        tiling(glob_pattern, merfish_global_registration.out, params.DAPI)
-        tile_size_x = tiling.out.tile_size_x
-        tile_size_y = tiling.out.tile_size_y
-        grid_size_x = tiling.out.grid_size_x
-        grid_size_y = tiling.out.grid_size_y
+            if (!params.containsKey("reference")){
+                log.info "No Reference image found, one will be created by taking a random imaging round and renaming it."
+                //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
+                params.reference = rename_file(images.first(), "REF") //Create reference image by taking maxIP on the first round
+            }
+            // We're assuming they are already registered and that they vollow the naming convention with tiled_*
+            tiled_dapi =  Channel.fromPath(params.dapi_glob_pattern)
+            tile_size_x = params.tile_size_x
+            tile_size_y = params.tile_size_y
+            grid_size_x = params.grid_size_x
+            grid_size_y = params.grid_size_y
+        }
         
         
         // Gaussian high pass filter 
-        gaussian_high_pass_filter_workflow(tiling.out.rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_high_pass_filter_workflow(tiled_rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
 
         // Deconvolution with richardson_lucy
         deconvolve_PSF_workflow(gaussian_high_pass_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
@@ -85,13 +110,16 @@ workflow merfish {
                                         
         pixel_based_decoding(tile_size_x, tile_size_y, params.min_area, grouped_images)
         pixel_based_decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
-        transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+
+        // Analysis processes only to do if the input image are whole-slide
+        if (!params.containsKey("n_tiles")){
+            transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+            plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        }
 
         merfish_decoding_statistics(decoded_genes, params.codebook)
 
-        plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
-
-        segmentation(tiling.out.dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        segmentation(tiled_dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
         // Calculate assignment stats
         assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
 }
