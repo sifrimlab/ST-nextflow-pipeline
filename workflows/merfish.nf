@@ -69,9 +69,6 @@ workflow merfish {
         tile_size_y = tiling.out.tile_size_y
         grid_size_x = tiling.out.grid_size_x
         grid_size_y = tiling.out.grid_size_y
-        tiling.out.rounds.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
-                                        | groupTuple()
-                                        | set {grouped_images}
         
         
         // Gaussian high pass filter 
