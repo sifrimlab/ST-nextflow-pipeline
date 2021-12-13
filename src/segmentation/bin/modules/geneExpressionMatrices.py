@@ -7,8 +7,11 @@ def createCountMatrix(assigned_genes:str):
     original_df = pd.read_csv(assigned_genes)
     original_df = original_df[original_df.Cell_Label != 0]
     df1 = pd.crosstab(original_df.Gene,original_df.Cell_Label,original_df.Cell_Label,aggfunc='count').fillna(0)
-    # Now we remove 0 col
-    df1 = df1.drop('0', 1)
+    # Now we remove 0 col, this only happens for merfish, where the background is counted as a segmentation label
+    try:
+        df1 = df1.drop('0', 1)
+    except KeyError: # if there is none (when not merfish), this will throw an error
+        pass
     
     # Transpose to get each row as cell, not each cell = gene
     return df1.T
