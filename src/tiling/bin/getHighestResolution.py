@@ -1,36 +1,16 @@
 # importing the module 
 import os
-import cv2
 import sys
-import glob
-from PIL import Image
-# important for giant tiff files, otherwise PIL thinks it's malware
-Image.MAX_IMAGE_PIXELS = None  
+from modules.adaptedTileFunction import calculateOptimalLargestResolution
 
-def getResolution(filepath):
-    """Prints the resolution of the given image.
 
-    Parameters
-    ----------
-    filepath : str
-        Path to input image.
+target_tile_x = int(sys.argv[1])
+target_tile_y = int(sys.argv[2])
+glob_path= [sys.argv[i] for i in range(3, len(sys.argv))]
 
-    Returns
-    -------
-    int, int
-        returns the amount of width and height pixels the input image has: (X,Y)
-    """
-    im = Image.open(filepath)
-    width, height = im.size
-    return width, height
-    # if x:
-    #     return width
-    # else:
-    #     return height
-glob_path=sys.argv[1]
 
-x__list, y__list = zip(*[getResolution(file) for file in glob.glob(glob_path)])
-max_x = max(x__list)
-max_y = max(y__list)
+max_y, max_x, ydiv, xdiv = calculateOptimalLargestResolution(images = glob_path, target_tile_height = target_tile_y, target_tile_width = target_tile_x) 
 print(max_x)
 print(max_y)
+print(xdiv)
+print(ydiv)

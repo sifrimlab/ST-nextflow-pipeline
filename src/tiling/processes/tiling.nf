@@ -9,16 +9,20 @@ binDir = Paths.get(workflow.projectDir.toString(), "src/$moduleName/bin/")
 process calculate_biggest_resolution {
     echo = true
     input: 
+    val target_tile_x
+    val target_tile_y
     val glob_pattern
 
     output:
     env max_x_resolution, emit: max_x_resolution
     env max_y_resolution, emit: max_y_resolution
+    env xdiv, emit: xdiv
+    env ydiv, emit: ydiv
     script:
     """
-    resolution_shape=(`python $binDir/getHighestResolution.py $glob_pattern`)
-    max_x_resolution=\${resolution_shape[0]} ; max_y_resolution=\${resolution_shape[1]}
-    echo "Calculated max resolution: \$max_x_resolution x \$max_y_resolution"
+    reso_output=(`python $binDir/getHighestResolution.py $target_tile_x $target_tile_y $glob_pattern`)
+    max_x_resolution=\${reso_output[0]} ; max_y_resolution=\${reso_output[1]} ;xdiv=\${reso_output[2]}; ydiv=\${reso_output[3]}
+    echo "Calculated optimal max resolution: \$max_x_resolution x \$max_y_resolution"
     """
 }
 
@@ -41,7 +45,7 @@ process calculate_tile_size{
     """
 }
 
-process pad_reference { 
+process pad_image { 
     publishDir "$params.outDir/padded", mode: 'symlink'
 
     input:
@@ -57,49 +61,18 @@ process pad_reference {
     """
 }
 
-// The pad round process is responsable for getting the round number into the working image name.
-process pad_round {
-    publishDir "$params.outDir/padded", mode: 'symlink'
 
-    input:
-    path image 
-    val target_x
-    val target_y
-
-    output:
-    path "${image.baseName}_padded.tif"
-
-    """
-    python $binDir/padImageBlack.py $image $target_x $target_y
-    """
-}
-
-process tile_ref {
-    publishDir "$params.outDir/tiled_DO/", mode: 'symlink'
+process tile_image {
+    publishDir "$params.outDir/tiles/", mode: 'symlink'
     input:
     path image
-    val tile_size_x
-    val tile_size_y
+    val xdiv
+    val ydiv
 
     output:
-    path "${image.baseName}_tiled_*.tif"
+    path "${image.baseName}_tile*.tif"
 
     """
-    python $binDir/tiling_script.py $image $tile_size_x $tile_size_y
+    python $binDir/tiling_script.py $image $xdiv $ydiv
     """
 }
-
-process tile_round {
-    publishDir "$params.outDir/tiled_round/", mode: 'symlink'
-    input: 
-    path image 
-    val tile_size_x
-    val tile_size_y
-    output: 
-    path "${image.baseName}_tiled_*.tif"
-    
-    """
-    python $binDir/tiling_script.py $image $tile_size_x $tile_size_y
-    """
-}
-
