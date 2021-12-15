@@ -45,7 +45,7 @@ def stitchImageList(image_path_list, tile_grid_shape, tile_size_x: int, tile_siz
     #  Now we create a list of the original path images, but sorted by tile number:
     # By first creating a dict where the key is the tile number, and the value is the path
     # Tile number is extracted by re.findalling on "tiled_d" and then extracting the number from that, i cast it to int to make the sorting work like it should
-    tile_image_dict = {int(re.findall(f"\d+", re.findall(r"tiled_\d+", image_path)[0])[0]): image_path for image_path in image_path_list}
+    tile_image_dict = {int(re.findall(f"\d+", re.findall(r"tile\d+", image_path)[0])[0]): image_path for image_path in image_path_list}
     sorted_tile_images = [value for (key, value) in sorted(tile_image_dict.items(), key=lambda x:x[0])]
 
     total_n_tiles, tile_grid_array, original_x, original_y = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)

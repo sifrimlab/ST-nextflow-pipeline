@@ -43,8 +43,8 @@ workflow standard_iss_tiling {
 
         /* calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution) */
                 
-        pad_dapi(reference, max_x_resolution, max_y_resolution) 
-        pad_ref(DAPI, max_x_resolution, max_y_resolution)
+        pad_dapi(DAPI, max_x_resolution, max_y_resolution) 
+        pad_ref(reference, max_x_resolution, max_y_resolution)
         pad_round(data, max_x_resolution, max_y_resolution)
 
         register_wrt_maxIP_memory_friendly(pad_ref.out, pad_round.out)
@@ -53,15 +53,15 @@ workflow standard_iss_tiling {
         tile_dapi(pad_dapi.out, xdiv, ydiv)
         tile_image(register_wrt_maxIP_memory_friendly.out, xdiv, ydiv)
 
-        /* if (params.stitch==true){ */
-        /*     // Stitch tiles back as a control */
-            /* stitch_ref_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_ref.out) */
-            /* stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out) */
+        if (params.stitch==true){
+            // Stitch tiles back as a control
+            stitch_ref_tiles(xdiv, ydiv, params.target_tile_x, params.target_tile_y, tile_ref.out)
+            stitch_dapi(xdiv, ydiv, params.target_tile_x, params.target_tile_y, tile_dapi.out)
 
-            /* tile_image.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds} */
+            tile_image.out.map() {file -> tuple((file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file)} .set {mapped_rounds}
 
-            /* stitch_round_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, mapped_rounds) */
-        /* } */
+            stitch_round_tiles(xdiv, ydiv, params.target_tile_x, params.target_tile_y, mapped_rounds)
+        }
 
     emit:
         reference = tile_ref.out.flatten()

@@ -87,7 +87,7 @@ workflow merfish {
                 //If you even want to remove the round tuple value from this:  rounds.groupTuple(by:0).map {round_nr, files -> files}.first()
                 params.reference = rename_file(images.first(), "REF") //Create reference image by taking maxIP on the first round
             }
-            // We're assuming they are already registered and that they vollow the naming convention with tiled_*
+            // We're assuming they are already registered and that they vollow the naming convention with tile*
             tiled_dapi =  Channel.fromPath(params.dapi_glob_pattern)
             tile_size_x = params.tile_size_x
             tile_size_y = params.tile_size_y
@@ -104,7 +104,7 @@ workflow merfish {
 
         gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
-        gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)} \
+        gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_images}
                                         

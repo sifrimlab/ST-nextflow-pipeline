@@ -49,7 +49,7 @@ def writeTiles(img_path, prefix,tile_size_x, tile_size_y):
             multiplier = (int(math.ceil(img_shape[1]/(offset[0] * 1.0)))) 
             cropped_img = img[offset[1]*i:min(offset[1]*i+tile_size[1], img_shape[0]), offset[0]*j:min(offset[0]*j+tile_size[0], img_shape[1])]
             tile_number = multiplier*int(i) + int(j) +1
-            cv2.imwrite(f"{prefix}_tiled_{tile_number}.tif", cropped_img)
+            cv2.imwrite(f"{prefix}_tile{tile_number}.tif", cropped_img)
 
 
 

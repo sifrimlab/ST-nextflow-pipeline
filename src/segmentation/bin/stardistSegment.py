@@ -15,7 +15,7 @@ model_versatile = StarDist2D(None, name='2D_versatile_fluo', basedir=model_path)
 model_versatile.load_weights('weights_best.h5')
 try:
     # Check if there's a tile number in the image
-    tile_nr = re.findall(r"\d+", re.findall(r"tiled_\d+", prefix)[0])[0]
+    tile_nr = re.findall(r"\d+", re.findall(r"tile\d+", prefix)[0])[0]
 except:
     tile_nr=""
 labeled_image= segment(img, model_versatile)

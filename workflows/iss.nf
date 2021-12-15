@@ -75,6 +75,7 @@ workflow iss {
        // Output of this is used often, so we rename the global variables for readability:
        grid_size_x = tiling.out.grid_size_x
        grid_size_y = tiling.out.grid_size_y
+       print(tiling.out.reference)
 
        
        //perform white tophat filtering on both reference and round images

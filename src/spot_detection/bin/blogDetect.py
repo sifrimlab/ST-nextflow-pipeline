@@ -11,7 +11,7 @@ from modules.spotDetection import laplacianOfGaussianBlobDetector
 '''
 image = io.imread(sys.argv[1])
 prefix = os.path.splitext(sys.argv[1])[0]
-tile_number = re.findall(r'tiled_\d+', sys.argv[1])[0].split("_")[1]
+tile_number =re.findall(r'\d+', re.findall(r'tile\d+', sys.argv[1])[0])[0]
 
 if len(sys.argv)>2:
     min_sigma=sys.argv[2]
