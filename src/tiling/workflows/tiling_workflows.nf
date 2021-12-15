@@ -82,35 +82,37 @@ workflow standard_merfish_tiling {
         // Dapi image
         DAPI
     main:
-        calculate_biggest_resolution(glob_pattern)
+        calculate_biggest_resolution(params.target_tile_x, params.target_tile_y, glob_pattern)
 
-        calculate_tile_size(calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+        // Rename variables for readability
+        max_x_resolution =  calculate_biggest_resolution.out.max_x_resolution
+        max_y_resolution = calculate_biggest_resolution.out.max_y_resolution 
+        xdiv = calculate_biggest_resolution.out.xdiv 
+        ydiv = calculate_biggest_resolution.out.ydiv 
                 
-        pad_dapi(DAPI,  calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
-        pad_round(data, calculate_biggest_resolution.out.max_x_resolution, calculate_biggest_resolution.out.max_y_resolution)
+        pad_dapi(DAPI, max_x_resolution, max_y_resolution)
+        pad_round(data, max_x_resolution, max_y_resolution)
 
-        tile_dapi(pad_dapi.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
-        tile_image(pad_round.out, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y)
+        tile_dapi(pad_dapi.out, xdiv, ydiv)
+        tile_image(pad_round.out, xdiv, ydiv)
 
 
         if (params.stitch==true){
             // Stitch tiles back as a control
-            stitch_dapi(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, tile_dapi.out)
+            stitch_dapi(xdiv, ydiv, params.target_tile_x, params.target_tile_y, tile_dapi.out)
 
             // Group images by origin image, so that they can be stitched back
             tile_image.out.flatten().map() {file -> tuple((file.baseName=~ /$params.image_prefix\d+/)[0], file)} \
                                 | groupTuple(by:0) \
                                 | set {grouped_rounds}
 
-            stitch_image_tiles(calculate_tile_size.out.grid_size_x, calculate_tile_size.out.grid_size_y, calculate_tile_size.out.tile_size_x, calculate_tile_size.out.tile_size_y, grouped_rounds)
+            stitch_image_tiles(xdiv, ydiv, params.target_tile_x, params.target_tile_y, grouped_rounds)
         }
 
     emit:
         rounds = tile_image.out.flatten()
         dapi = tile_dapi.out.flatten()
-        tile_size_x = calculate_tile_size.out.tile_size_x
-        tile_size_y = calculate_tile_size.out.tile_size_y
-        grid_size_x = calculate_tile_size.out.grid_size_x
-        grid_size_y = calculate_tile_size.out.grid_size_y
+        grid_size_x = xdiv
+        grid_size_y = ydiv
         padded_whole_reference = pad_round.out.first()
 }

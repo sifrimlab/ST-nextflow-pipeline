@@ -67,8 +67,6 @@ workflow merfish {
             merfish_global_registration(params.reference, images)
 
             tiling(glob_pattern, merfish_global_registration.out, params.DAPI)
-            tile_size_x = tiling.out.tile_size_x
-            tile_size_y = tiling.out.tile_size_y
             grid_size_x = tiling.out.grid_size_x
             grid_size_y = tiling.out.grid_size_y
             tiled_rounds = tiling.out.rounds
@@ -89,37 +87,35 @@ workflow merfish {
             }
             // We're assuming they are already registered and that they vollow the naming convention with tile*
             tiled_dapi =  Channel.fromPath(params.dapi_glob_pattern)
-            tile_size_x = params.tile_size_x
-            tile_size_y = params.tile_size_y
             grid_size_x = params.grid_size_x
             grid_size_y = params.grid_size_y
         }
         
         
         // Gaussian high pass filter 
-        gaussian_high_pass_filter_workflow(tiled_rounds, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_high_pass_filter_workflow(tiled_rounds, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
 
         // Deconvolution with richardson_lucy
-        deconvolve_PSF_workflow(gaussian_high_pass_filter_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        deconvolve_PSF_workflow(gaussian_high_pass_filter_workflow.out, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
 
-        gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        gaussian_low_pass_filter_workflow(deconvolve_PSF_workflow.out, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
         // Map the images to their respective tiles, since for decoding they need to be in the correct order
         gaussian_low_pass_filter_workflow.out.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)} \
                                         | groupTuple()
                                         | set {grouped_images}
                                         
-        pixel_based_decoding(tile_size_x, tile_size_y, params.min_area, grouped_images)
+        pixel_based_decoding(params.target_tile_x, params.target_tile_y, params.min_area, grouped_images)
         pixel_based_decoding.out.collectFile(name: "$params.outDir/decoded/concat_decoded_genes.csv", sort:true, keepHeader:true).set {decoded_genes}
 
         // Analysis processes only to do if the input image are whole-slide
         if (!params.containsKey("n_tiles")){
-            transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
-            plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+            transform_tile_coordinate_system(decoded_genes, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
+            plot_decoded_spots(decoded_genes, tiling.out.padded_whole_reference, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
         }
 
         merfish_decoding_statistics(decoded_genes, params.codebook)
 
-        segmentation(tiled_dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, tile_size_x, tile_size_y)
+        segmentation(tiled_dapi, pixel_based_decoding.out, grid_size_x, grid_size_y, params.target_tile_x, params.target_tile_y)
         // Calculate assignment stats
         assignment_statistics_workflow(segmentation.out.concat_assigned_genes)
 }

@@ -1,10 +1,10 @@
-from skimage.io import imread_collection, imsave, imread
-from skimage import io
-import numpy as np
-from tifffile import imsave
-from typing import List
-import glob
 import os
+import glob
+import numpy as np
+from skimage import io
+from typing import List
+from tifffile import imsave
+from skimage.io import imread_collection, imsave, imread
 
 def calculateOptimalLargestResolution(images: str, target_tile_height: int, target_tile_width: int) -> List[int]: 
     images_array = np.array(io.ImageCollection(images))
