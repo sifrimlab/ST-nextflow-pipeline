@@ -1,9 +1,10 @@
 import sys
 import os
-from modules.tilingHelperFunctions import writeTiles
+from modules.adaptedTileFunction import tileImage
 
 
 image = sys.argv[1]
 prefix = os.path.splitext(image)[0]
-tile_x, tile_y = int(sys.argv[2]), int(sys.argv[3])
-writeTiles(image, prefix, tile_size_x=tile_x, tile_size_y=tile_y)
+xdiv = int(sys.argv[2])
+ydiv = int(sys.argv[3])
+tileImage(image_path = image,xdiv = xdiv, ydiv = ydiv,  image_prefix = prefix)

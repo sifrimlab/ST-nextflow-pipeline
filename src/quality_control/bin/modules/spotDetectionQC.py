@@ -301,5 +301,5 @@ if __name__=='__main__':
     for round_nr in range(1,6):
         dict_of_closest_ref_point_dicts[round_nr] ={}
         for tile_nr in range(1,49):
-            dict_of_closest_ref_point_dicts[round_nr][tile_nr] =f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/quality_control_pixel_distance_3/spot_detection_QC/precision/tiled_{tile_nr}_Round{round_nr}_closest_ref_point_dict.json"
+            dict_of_closest_ref_point_dicts[round_nr][tile_nr] =f"/media/Puzzles/gabriele_data/1442_OB/results_correct_codebook_whiteDisk3_minSigma2_maxSigma20_noNorm_stardistSegmentation_voronoiAssigned_spotDetectionQC/quality_control_pixel_distance_3/spot_detection_QC/precision/tile{tile_nr}_Round{round_nr}_closest_ref_point_dict.json"
     checkCompleteBarcodeDecodingRatio(decoded_genes, dict_of_closest_ref_point_dicts, 5)

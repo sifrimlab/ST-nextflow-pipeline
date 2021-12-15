@@ -13,7 +13,7 @@ process decode_sequential_max_intensity {
     path max_intensities
 
     output:
-    path "decoded_tiled_*.csv"
+    path "decoded_tile*.csv"
 
     """
     python $binDir/decodeSequentialMaxIntensity.py ${max_intensities} ${params.codebook}

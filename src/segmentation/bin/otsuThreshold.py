@@ -10,7 +10,7 @@ image_path = sys.argv[1]
 prefix = os.path.splitext(image_path)[0]
 try:
     # Check if there's a tile number in the image
-    tile_nr = re.findall(r"\d+", re.findall(r"tiled_\d+", prefix)[0])[0]
+    tile_nr = re.findall(r"\d+", re.findall(r"tile\d+", prefix)[0])[0]
 except:
     tile_nr=""
 labeled_image, attributes_df = otsuThresholding(image_path, tile_nr)

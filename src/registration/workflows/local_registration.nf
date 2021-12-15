@@ -23,8 +23,8 @@ workflow local_registration_of_tiles {
         tile_size_y
 
     main:
-        reference_tiles.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {ref_images_mapped} 
-        round_tiles.map(){ file -> tuple((file.baseName=~ /tiled_\d+/)[0], file) }.set {round_images_mapped} 
+        reference_tiles.map(){ file -> tuple((file.baseName=~ /tile\d+/)[0], file) }.set {ref_images_mapped} 
+        round_tiles.map(){ file -> tuple((file.baseName=~ /tile\d+/)[0], file) }.set {round_images_mapped} 
 
         //combine ref and rounds into a dataobject that allows for local registration per tile
         ref_images_mapped.combine(round_images_mapped,by: 0).set { combined_tiles }

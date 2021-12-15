@@ -59,7 +59,7 @@ workflow spot_detection_iss {
     }
     
     //map round images into a tuple containing their round, channel and tile number, gather intensity code requires this information up front
-    round_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
+    round_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0],(file.baseName=~ /Round\d+/)[0],(file.baseName=~ /c\d+/)[0], file) }.set {round_images_mapped}
 
     // Gather intesnity on each round image of every spot
     gather_intensities_in_rounds(blobs_value_channel, round_images_mapped)

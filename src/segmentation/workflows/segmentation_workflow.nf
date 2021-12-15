@@ -32,10 +32,10 @@ workflow merfish_threshold_watershed_segmentation {
         otsu_thresholding(dapi_images)
         collect_cell_properties(otsu_thresholding.out.properties.collect()) //Saves them into a concatenated file
 
-        decoded_genes.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
-        otsu_thresholding.out.labeled_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {labeled_images_mapped}
-        otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
-        dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
+        decoded_genes.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {decoded_genes_mapped}
+        otsu_thresholding.out.labeled_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {labeled_images_mapped}
+        otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {cell_properties_mapped}
+        dapi_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {dapi_images_mapped}
 
 
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
@@ -79,11 +79,11 @@ workflow threshold_watershed_segmentation {
         collect_cell_properties(otsu_thresholding.out.properties.collect()) //Saves them into a concatenated file
 
         // Parse the outputs in a way that per tile, one decoded gene file and one labeled image is input into the pipeline
-        decoded_genes.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
-        otsu_thresholding.out.labeled_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {labeled_images_mapped}
-        otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
-        dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
-        ref_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {ref_images_mapped}
+        decoded_genes.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {decoded_genes_mapped}
+        otsu_thresholding.out.labeled_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {labeled_images_mapped}
+        otsu_thresholding.out.properties.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {cell_properties_mapped}
+        dapi_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {dapi_images_mapped}
+        ref_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {ref_images_mapped}
 
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
         labeled_images_mapped.join(ref_images_mapped, by:0).set{combined_ref_labeled_images}
@@ -104,7 +104,7 @@ workflow threshold_watershed_segmentation {
         /* find_seurat_clusters(create_count_matrix.out) */
 
         
-        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
+        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {assigned_genes_mapped} */
         /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
 
         /* plot_assigned_genes(combined_assigned_genes) */
@@ -132,11 +132,11 @@ workflow stardist_segmentation_workflow {
         collect_cell_properties(stardist_segmentation.out.properties.collect()) //Saves them into a concatenated file
 
         // Parse the outputs in a way that per tile, one decoded gene file and one labeled image is input into the pipeline
-        decoded_genes.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {decoded_genes_mapped}
-        stardist_segmentation.out.labeled_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {labeled_images_mapped}
-        stardist_segmentation.out.properties.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {cell_properties_mapped}
-        dapi_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {dapi_images_mapped}
-        /* ref_images.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {ref_images_mapped} */
+        decoded_genes.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {decoded_genes_mapped}
+        stardist_segmentation.out.labeled_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {labeled_images_mapped}
+        stardist_segmentation.out.properties.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {cell_properties_mapped}
+        dapi_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {dapi_images_mapped}
+        /* ref_images.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {ref_images_mapped} */
 
         // Cobmine all segmentation results and decoded genes by tile, such that everything after this can happen correctly per Tile
         labeled_images_mapped.join(dapi_images_mapped, by:0).set{combined_dapi_labeled_images}
@@ -159,7 +159,7 @@ workflow stardist_segmentation_workflow {
 
 
         // Plot assigned genes doesnt work yet, something with running out of memory problem 
-        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tiled_\d+/)[0], file)}.set {assigned_genes_mapped} */
+        /* assign_genes_to_cells.out.map {file -> tuple((file.baseName=~ /tile\d+/)[0], file)}.set {assigned_genes_mapped} */
         /* assigned_genes_mapped.join(labeled_images_mapped, by:0).set {combined_assigned_genes} */
 
         /* plot_assigned_genes(combined_assigned_genes) */
