@@ -9,15 +9,6 @@ include {
 } from "./workflows/merfish.nf"
 
 
-
-// Make  test workflow 
-/* workflow test_ISS { */
-/*     take: */
-/*         data */
-/*     main: */
-/*         single_sample( data ) */
-/* } */
-
 workflow {
     main:
         switch(params.test) {
