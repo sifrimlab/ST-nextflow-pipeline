@@ -74,7 +74,6 @@ workflow merfish {
         }
         // Otherwise, the images are already tiled, so the input to image processing needs to be done differently
         else{
-            log.info("reached")
             glob_pattern ="${params.dataDir}/${params.tile_prefix}*${params.image_prefix}*.${params.extension}" 
             images = Channel.fromPath(glob_pattern)
             images = convert_to_uin16(images)

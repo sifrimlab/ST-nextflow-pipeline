@@ -12,7 +12,6 @@ def createCodebookTree(codebook_path: str, bit_len:int, algorithm="ball_tree"):
 
     def extractVectorsFromCodebook(codebook: str, bit_len: int):
         df = pd.read_csv(codebook)
-        ic(type(list(df['Barcode'])[0]), list(df['Barcode'])[0])
         df['Barcode'] = [f"{barcode:0>{bit_len}}" for barcode in list(df['Barcode'])]
         df['Vector'] = [createBarcodeVector(barcode) for barcode in df['Barcode']]
         # array_of_codebook_vectors = np.array(df['Vector'])
