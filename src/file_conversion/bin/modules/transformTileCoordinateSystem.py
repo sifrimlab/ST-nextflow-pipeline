@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: int):
+def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: int, start_at_0=False):
     """Calculates all necessary grid statistics based on tile shape and size
 
     Parameters
@@ -30,13 +30,16 @@ def calculateTileGridStatistics(tile_grid_shape, tile_size_x: int, tile_size_y: 
     """
     total_n_tiles = tile_grid_shape[0]*tile_grid_shape[1]
     # Create range list of the tiles
-    total_tiles_list = list(range(1,total_n_tiles+1))
+    if not start_at_0:
+        total_tiles_list = list(range(1,total_n_tiles+1))
+    else:
+        total_tiles_list =  list(range(0,total_n_tiles))
     # Reshape the range list into the tile grid of the original image.
     # We swap the elements of the grid because the rest of the pipeline sees x and y as horizontal vs vertical, but numpy sees it as an array, where x = vertical movement
     swapped_grid = (tile_grid_shape[1],tile_grid_shape[0])
     tile_grid_array = np.reshape(total_tiles_list, swapped_grid)
     # Creating an empty array the size of an original image
-    original_x = tile_grid_array.shape[1] * tile_size_x 
+    original_x = tile_grid_array.shape[1] * tile_size_x
     original_y = tile_grid_array.shape[0] * tile_size_y
     return total_n_tiles, tile_grid_array, original_x, original_y
 
@@ -47,8 +50,10 @@ def transformTileCoordinateSystem(path_to_csv: str, tile_grid_shape, tile_size_x
     original_x_column = []
     original_y_column = []
 
-    total_n_tiles, tile_grid_array, _, _ = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y)
-    for row in decoded_df.itertuples():
+    start_at_0 = 0 in decoded_df["Tile"].values # If one of the values of tile == 0, the tile grid array range needs to start at 0 instead of 1, otherwise it'll throw errors since nothing is found on that tile.
+
+    total_n_tiles, tile_grid_array, _, _ = calculateTileGridStatistics(tile_grid_shape, tile_size_x, tile_size_y, start_at_0)
+    for i, row in enumerate(decoded_df.itertuples()):
         # extract X and Y coordinates of the respective tile the spot belongs to
         row_location, col_location = np.where(tile_grid_array==row.Tile) # this returns rows and columns, NOT X and Y, which is the opposite
         # unpacking the array structure of the return tuple of np.where
