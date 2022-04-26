@@ -25,7 +25,7 @@ Currently it supports both ISS data and MERFISH data.
 	nextflow config -profile conda,iss >> standard_iss_experiment.config
 	```
 - *Note that this config file is where you change everything that you want to change, such as data directory, output directory, image format etc.*
-For an explanation on all possible parameters you might encounter in the generated configs, check https://woutdavid.github.io/ST-nextflow-pipeline/configuration
+For an explanation on all possible parameters you might encounter in the generated configs, check https://sifrimlab.github.io/ST-nextflow-pipeline/configuration
 
 - After making the needed changes to the config file, you can run pipeline by specifying an entry point with "-entry", which takes as argument the name of one of the workflows included in the main.nf file.  
 - ```bash
