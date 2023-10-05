@@ -1,7 +1,6 @@
 import re
 from sklearn.neighbors import NearestNeighbors
 from modules.pixelBasedDecoding import parseBarcodes, createBarcodeVector, createPixelVector
-from icecream import ic
 from skimage import io
 from skimage import img_as_float
 from skimage.measure import label, regionprops_table

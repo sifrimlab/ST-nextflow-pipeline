@@ -212,4 +212,5 @@ dependencies:
     - csbdeep==0.6.3
     - imagecodecs==2021.8.26
     - stardist==0.7.3
+    - seaborn==0.12.2
 prefix: /home/david/Documents/communISS/test_env
